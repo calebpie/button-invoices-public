@@ -5,8 +5,18 @@
       "idiom" : "universal"
     },
     {
+      "appearances" : [ { "appearance" : "contrast", "value" : "high" } ],
+      "color" : { "color-space" : "srgb", "components" : { "alpha" : "1.000", "blue" : "0x1E", "green" : "0x38", "red" : "0xA3" } },
+      "idiom" : "universal"
+    },
+    {
       "appearances" : [ { "appearance" : "luminosity", "value" : "dark" } ],
       "color" : { "color-space" : "srgb", "components" : { "alpha" : "1.000", "blue" : "0x52", "green" : "0x6E", "red" : "0xE5" } },
+      "idiom" : "universal"
+    },
+    {
+      "appearances" : [ { "appearance" : "luminosity", "value" : "dark" }, { "appearance" : "contrast", "value" : "high" } ],
+      "color" : { "color-space" : "srgb", "components" : { "alpha" : "1.000", "blue" : "0x5E", "green" : "0x7A", "red" : "0xEA" } },
       "idiom" : "universal"
     }
   ],

@@ -1,23 +1,28 @@
 import InvoiceKit
 import SwiftData
 import SwiftUI
+import TipKit
 
 /// The Invoices tab: a greeting, New Invoice, then drafts to continue and finished invoices
-/// to see or share (SPEC.md, "Invoices").
+/// to see or share (SPEC.md, "Invoices"). Every swipe action is also in the row's context
+/// menu and on the invoice's own screen (Accessibility, "Offer alternatives to gestures").
 struct InvoicesTab: View {
     @Environment(\.modelContext) private var context
     @Environment(BusinessSettings.self) private var settings
+    @Environment(AppRouter.self) private var router
     @Query(sort: [SortDescriptor(\Invoice.date, order: .reverse), SortDescriptor(\Invoice.number, order: .reverse)])
     private var invoices: [Invoice]
-    @State private var path: [Invoice] = []
     @State private var pendingDelete: Invoice?
+    @State private var sharing: URL?
+    private let repeatTip = RepeatOrderTip()
 
     var body: some View {
-        NavigationStack(path: $path) {
+        @Bindable var router = router
+        NavigationStack(path: $router.invoicePath) {
             List {
                 Section {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Hello, \(settings.profile.greetingName).").font(.title.bold())
+                        Text("Hello, \(settings.profile.greetingName).").font(.title.bold()).heading()
                         Text("What would you like to do today?").foregroundStyle(.secondary)
                     }
                     .listRowBackground(Color.clear)
@@ -30,8 +35,15 @@ struct InvoicesTab: View {
                             .frame(maxWidth: .infinity, minHeight: 48)
                     }
                     .buttonStyle(.borderedProminent)
+                    .keyboardShortcut("n", modifiers: .command)
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
+                }
+
+                if invoices.contains(where: { $0.status != .draft }) {
+                    TipView(repeatTip)
+                        .listRowBackground(Color.clear)
+                        .listRowInsets(EdgeInsets())
                 }
 
                 ForEach(InvoiceStatus.allCases) { status in
@@ -44,7 +56,18 @@ struct InvoicesTab: View {
                                         Button("Delete", systemImage: "trash", role: .destructive) { pendingDelete = invoice }
                                     }
                                     .swipeActions(edge: .leading) {
-                                        Button("Copy", systemImage: "doc.on.doc") { duplicate(invoice) }.tint(.blue)
+                                        Button("Duplicate", systemImage: "plus.square.on.square") { duplicate(invoice) }
+                                            .tint(.blue)
+                                    }
+                                    .contextMenu {
+                                        Button("Duplicate", systemImage: "plus.square.on.square") { duplicate(invoice) }
+                                        if invoice.status != .draft {
+                                            Button("Share PDF…", systemImage: "square.and.arrow.up") {
+                                                sharing = InvoiceExport.storedPDF(invoice, profile: settings.profile)
+                                            }
+                                        }
+                                        Divider()
+                                        Button("Delete…", systemImage: "trash", role: .destructive) { pendingDelete = invoice }
                                     }
                             }
                         } header: {
@@ -57,7 +80,7 @@ struct InvoicesTab: View {
             }
             .overlay {
                 if invoices.isEmpty {
-                    ContentUnavailableView("No invoices yet", systemImage: "doc.text",
+                    ContentUnavailableView("No Invoices Yet", systemImage: "doc.text",
                                            description: Text("Tap New Invoice to start one."))
                         .offset(y: 80)
                 }
@@ -67,16 +90,21 @@ struct InvoicesTab: View {
             .toolbarTitleDisplayMode(.inline)
             .navigationDestination(for: Invoice.self) { InvoiceScreen(invoice: $0) }
             .onAppear(perform: removeEmptyDrafts)
+            .onAppear(perform: handleRequest)
+            .onChange(of: router.request) { handleRequest() }
+            .sheet(item: $sharing) { url in
+                ShareSheet(url: url).presentationDetents([.medium, .large])
+            }
             .confirmationDialog(deleteTitle, isPresented: .init(get: { pendingDelete != nil },
                                                                set: { if !$0 { pendingDelete = nil } }),
                                 titleVisibility: .visible) {
                 Button("Delete Invoice", role: .destructive) {
-                    if let invoice = pendingDelete { context.delete(invoice) }
+                    if let invoice = pendingDelete { InvoiceActions.delete(invoice, context) }
                     pendingDelete = nil
                 }
             } message: {
                 Text(pendingDelete?.status == .draft
-                     ? "Your buttons stay saved; only this draft is removed."
+                     ? "The buttons stay saved; only this draft is removed."
                      : "This removes the invoice and its PDF from the app. Copies you already sent aren't affected.")
             }
         }
@@ -92,37 +120,59 @@ struct InvoicesTab: View {
 
     private var deleteTitle: String {
         guard let invoice = pendingDelete else { return "" }
-        return invoice.status == .draft ? "Delete draft \(invoice.number)?" : "Delete finished invoice \(invoice.number)?"
+        return invoice.status == .draft ? "Delete draft \(invoice.number)?" : "Delete invoice \(invoice.number)?"
+    }
+
+    private func handleRequest() {
+        guard router.request == .newInvoice else { return }
+        router.request = nil
+        newInvoice()
     }
 
     private func newInvoice() {
+        router.invoicePath = [InvoiceActions.newInvoice(context, existing: invoices.map(\.number))]
+    }
+
+    private func duplicate(_ source: Invoice) {
+        repeatTip.invalidate(reason: .actionPerformed)
+        router.invoicePath = [InvoiceActions.duplicate(source, context, existing: invoices.map(\.number))]
+    }
+
+    /// An invoice she started and left without adding anything isn't kept.
+    private func removeEmptyDrafts() {
+        guard router.invoicePath.isEmpty else { return }
+        for invoice in invoices where invoice.status == .draft && invoice.isEmpty {
+            context.delete(invoice)
+        }
+    }
+}
+
+/// Creating, duplicating and deleting invoices, shared by the list and the invoice screens.
+@MainActor enum InvoiceActions {
+    static func newInvoice(_ context: ModelContext, existing: [String]) -> Invoice {
         let today = Date()
-        let invoice = Invoice(number: InvoiceNumber.next(for: today, existing: invoices.map(\.number)), date: today)
+        let invoice = Invoice(number: InvoiceNumber.next(for: today, existing: existing), date: today)
         context.insert(invoice)
         try? context.save()
-        path.append(invoice)
+        return invoice
     }
 
     /// A new draft with the same buttons and quantities at today's prices, no shipping.
-    private func duplicate(_ source: Invoice) {
-        let today = Date()
-        let copy = Invoice(number: InvoiceNumber.next(for: today, existing: invoices.map(\.number)), date: today)
-        context.insert(copy)
+    static func duplicate(_ source: Invoice, _ context: ModelContext, existing: [String]) -> Invoice {
+        let copy = newInvoice(context, existing: existing)
         for line in source.sortedLines {
             let new = InvoiceLine(copying: line)
             context.insert(new)
             new.invoice = copy
         }
         try? context.save()
-        path.append(copy)
+        return copy
     }
 
-    /// An invoice she started and left without adding anything isn't kept.
-    private func removeEmptyDrafts() {
-        guard path.isEmpty else { return }
-        for invoice in invoices where invoice.status == .draft && invoice.isEmpty {
-            context.delete(invoice)
-        }
+    /// Deleting can be undone with a shake (Undo and redo, "describe the operation").
+    static func delete(_ invoice: Invoice, _ context: ModelContext) {
+        context.undoManager?.setActionName("Delete Invoice")
+        context.delete(invoice)
     }
 }
 
@@ -130,20 +180,23 @@ struct InvoiceRow: View {
     let invoice: Invoice
 
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundStyle(invoice.status == .paid ? Color.green : Color.accentColor)
-                .frame(width: 32)
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Invoice \(invoice.number)").font(.headline)
-                Text(detail).font(.subheadline).foregroundStyle(.secondary)
+        AdaptiveRow {
+            IconTextStack {
+                Image(systemName: icon)
+                    .font(.title2)
+                    .foregroundStyle(invoice.status == .paid ? Color.green : Color.accentColor)
+                    .frame(minWidth: 32)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Invoice \(invoice.number)").font(.headline)
+                    Text(detail).font(.subheadline).foregroundStyle(.secondary)
+                }
             }
-            Spacer()
+        } trailing: {
             Text(invoice.total.formatted).font(.headline).monospacedDigit()
         }
         .padding(.vertical, 4)
         .accessibilityElement(children: .combine)
+        .accessibilityValue(invoice.status.label)
     }
 
     private var icon: String {
@@ -168,18 +221,13 @@ struct InvoiceScreen: View {
     @State private var shareWhenOpened = false
 
     var body: some View {
-        if invoice.status == .draft {
-            InvoiceFlowView(invoice: invoice) { shareWhenOpened = true }
-        } else {
-            FinishedInvoiceView(invoice: invoice, shareWhenOpened: $shareWhenOpened)
+        Group {
+            if invoice.status == .draft {
+                InvoiceFlowView(invoice: invoice) { shareWhenOpened = true }
+            } else {
+                FinishedInvoiceView(invoice: invoice, shareWhenOpened: $shareWhenOpened)
+            }
         }
-    }
-}
-
-extension View {
-    func card() -> some View {
-        padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(RoundedRectangle(cornerRadius: 14).fill(Color(.secondarySystemGroupedBackground)))
+        .finishHaptic(invoice.status != .draft)
     }
 }

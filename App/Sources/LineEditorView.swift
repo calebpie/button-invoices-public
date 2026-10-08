@@ -21,6 +21,8 @@ struct LineEditorView: View {
     @State private var showDiscount = false
     @State private var savePrice = false
     @State private var loaded = false
+    @State private var original = ""
+    @State private var askDiscard = false
     @FocusState private var quantityFocused: Bool
 
     var body: some View {
@@ -37,10 +39,18 @@ struct LineEditorView: View {
             }
 
             Section("How many?") {
-                TextField("Quantity", text: $quantityText)
-                    .keyboardType(.numberPad)
-                    .font(.title.monospacedDigit())
-                    .focused($quantityFocused)
+                // Typing suits 500; the stepper suits nudging 12 to 13 (Steppers, "Consider
+                // pairing a stepper with a text field").
+                HStack {
+                    TextField("Quantity", text: $quantityText)
+                        .keyboardType(.numberPad)
+                        .font(.title.monospacedDigit())
+                        .focused($quantityFocused)
+                    Stepper("Quantity", value: Binding(
+                        get: { quantity ?? 0 },
+                        set: { quantityText = $0 > 0 ? String($0) : "" }), in: 0...100_000)
+                        .labelsHidden()
+                }
             }
 
             Section {
@@ -57,8 +67,8 @@ struct LineEditorView: View {
             Section {
                 if showDiscount {
                     Picker("Discount in", selection: $discountIsPercent) {
-                        Text("$ off each button").tag(false)
-                        Text("% off").tag(true)
+                        Text("Dollars").tag(false)
+                        Text("Percent").tag(true)
                     }
                     .pickerStyle(.segmented)
                     HStack {
@@ -75,12 +85,12 @@ struct LineEditorView: View {
                     if discountIsPercent, let discount, discount > .zero {
                         Text("\(discount.formatted) off each button").foregroundStyle(.secondary)
                     }
-                    Button("No discount", role: .destructive) {
+                    Button("Remove Discount", role: .destructive) {
                         discountText = ""
                         showDiscount = false
                     }
                 } else {
-                    Button("Add a discount", systemImage: "tag") { showDiscount = true }
+                    Button("Add Discount", systemImage: "tag") { showDiscount = true }
                 }
             } header: {
                 Text("Discount")
@@ -109,6 +119,7 @@ struct LineEditorView: View {
                 .listRowBackground(Color.clear)
                 if case .edit(let line) = mode {
                     Button("Remove from Invoice", role: .destructive) {
+                        context.undoManager?.setActionName("Remove Button")
                         context.delete(line)
                         dismiss()
                     }
@@ -122,18 +133,25 @@ struct LineEditorView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if case .edit = mode {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) {
+                    CancelButton { if isDirty { askDiscard = true } else { dismiss() } }
+                }
             }
             ToolbarItem(placement: .confirmationAction) {
-                Button(isNew ? "Add" : "Save", action: save).disabled(!isValid)
+                ConfirmButton(title: isNew ? "Add" : "Save", action: save).disabled(!isValid)
             }
         }
+        .confirmsDiscard(isEditing && isDirty, isAsking: $askDiscard) { dismiss() }
         .onAppear(perform: load)
     }
 
     // MARK: State
 
     private var isNew: Bool { if case .new = mode { true } else { false } }
+    private var isEditing: Bool { !isNew }
+
+    private var snapshot: String { [quantityText, priceText, discountText, String(discountIsPercent), String(savePrice)].joined(separator: "|") }
+    private var isDirty: Bool { loaded && snapshot != original }
 
     private var variant: ButtonVariant? {
         switch mode {
@@ -207,6 +225,7 @@ struct LineEditorView: View {
                 ? (line.discountIsPercent ? line.discountPercent.formatted(.number.grouping(.never)) : line.discount.editingText) : ""
             showDiscount = line.discount > .zero
         }
+        original = snapshot
     }
 
     private func setDiscount(_ line: InvoiceLine, _ discount: Money) {

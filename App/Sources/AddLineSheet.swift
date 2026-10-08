@@ -1,6 +1,7 @@
 import InvoiceKit
 import SwiftData
 import SwiftUI
+import TipKit
 
 enum AddRoute: Hashable {
     case design(ButtonDesign)
@@ -21,6 +22,12 @@ struct AddLineSheet: View {
     @State private var search = ""
     /// Quantity and price typed in the search before starting a new button, for its quantity screen.
     @State private var newButtonRequest = OrderRequest.empty
+    @State private var askDiscard = false
+
+    /// A new button she has started would be lost by closing the sheet.
+    private var startedNewButton: Bool {
+        path.contains { if case .newButton(let draft, _) = $0 { draft.hasContent } else { false } }
+    }
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -28,6 +35,7 @@ struct AddLineSheet: View {
                 newButtonRequest = .empty
                 path.append(.design(design))
             } pickVariant: { variant in
+                TypeOrderTip().invalidate(reason: .actionPerformed)
                 path.append(.quantity(variant, Matcher.parse(search)))
             } newShape: {
                 let guess = Catalog.guessNewButton(from: search, designs: designs)
@@ -40,7 +48,9 @@ struct AddLineSheet: View {
             .navigationTitle("Add a Button")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) {
+                    CancelButton { if startedNewButton { askDiscard = true } else { dismiss() } }
+                }
             }
             .navigationDestination(for: AddRoute.self) { route in
                 switch route {
@@ -64,6 +74,7 @@ struct AddLineSheet: View {
                 }
             }
         }
+        .confirmsDiscard(startedNewButton, isAsking: $askDiscard) { dismiss() }
     }
 
     private func startNewButton(_ draft: ButtonDraft) {
@@ -82,15 +93,19 @@ struct ShapePickerView: View {
     @Query(sort: [SortDescriptor(\ButtonDesign.name, comparator: .localizedStandard)]) private var designs: [ButtonDesign]
     @Query private var variants: [ButtonVariant]
 
-    private let grid = [GridItem(.adaptive(minimum: 104), spacing: 12)]
+    @ScaledMetric private var tileWidth: CGFloat = 104
+    private var grid: [GridItem] { [GridItem(.adaptive(minimum: tileWidth), spacing: 12)] }
+    private let typeTip = TypeOrderTip()
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Which button? Tap its shape.").font(.title3.weight(.semibold))
-                searchField
+                TipView(typeTip)
+                let searching = !search.trimmingCharacters(in: .whitespaces).isEmpty
+                Text(searching ? "Which button? Tap it." : "Which button? Tap its shape.")
+                    .font(.title3.weight(.semibold)).heading()
 
-                if search.trimmingCharacters(in: .whitespaces).isEmpty {
+                if !searching {
                     LazyVGrid(columns: grid, spacing: 12) {
                         ForEach(designs.filter { !$0.visibleVariants.isEmpty }) { design in
                             Button { pickDesign(design) } label: { DesignTile(design: design) }
@@ -120,7 +135,7 @@ struct ShapePickerView: View {
                 VStack(spacing: 8) {
                     Text("A shape you haven't sold before?").foregroundStyle(.secondary)
                     Button(action: newShape) {
-                        Label("Add a new button", systemImage: "plus.circle")
+                        Label("Add a New Button", systemImage: "plus.circle")
                             .font(.headline).frame(maxWidth: .infinity, minHeight: 40)
                     }
                     .buttonStyle(.bordered)
@@ -132,22 +147,11 @@ struct ShapePickerView: View {
             .frame(maxWidth: .infinity)
         }
         .scrollDismissesKeyboard(.interactively)
-    }
-
-    private var searchField: some View {
-        HStack {
-            Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
-            TextField("Or type, like: 12 red hearts", text: $search)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-                .submitLabel(.search)
-            if !search.isEmpty {
-                Button { search = "" } label: { Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary) }
-                    .accessibilityLabel("Clear")
-            }
-        }
-        .padding(12)
-        .background(RoundedRectangle(cornerRadius: 12).fill(Color(.secondarySystemBackground)))
+        // The system search field, in its usual place (Search fields).
+        .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always),
+                    prompt: "Type an order, like 12 red hearts")
+        .textInputAutocapitalization(.never)
+        .autocorrectionDisabled()
     }
 }
 
@@ -181,7 +185,7 @@ struct ButtonTile: View {
                 .multilineTextAlignment(.center)
                 .lineLimit(3)
                 .frame(maxWidth: .infinity)
-            Text(variant.price.formatted).font(.footnote).foregroundStyle(.secondary)
+            Text(variant.price > .zero ? variant.price.formatted : "No price yet").font(.footnote).foregroundStyle(.secondary)
         }
         .padding(8)
         .frame(maxHeight: .infinity, alignment: .top)
@@ -206,12 +210,13 @@ struct VariantPickerView: View {
     @State private var color: String?
     @State private var size: String?
 
-    private let grid = [GridItem(.adaptive(minimum: 104), spacing: 12)]
+    @ScaledMetric private var tileWidth: CGFloat = 104
+    private var grid: [GridItem] { [GridItem(.adaptive(minimum: tileWidth), spacing: 12)] }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text("Which color?").font(.title3.weight(.semibold))
+                Text("Which color?").font(.title3.weight(.semibold)).heading()
                 LazyVGrid(columns: grid, spacing: 12) {
                     ForEach(colorOptions, id: \.self) { option in
                         Button {
@@ -225,13 +230,13 @@ struct VariantPickerView: View {
                         .buttonStyle(.plain)
                     }
                     Button { newVariant([], hasSizes ? (size ?? "") : (sizeOptions.first ?? "")) } label: {
-                        ColorTile(photo: nil, label: "Another color", selected: false, systemImage: "plus")
+                        ColorTile(photo: nil, label: "Another Color", selected: false, systemImage: "plus")
                     }
                     .buttonStyle(.plain)
                 }
 
                 if hasSizes, color != nil {
-                    Text("Which size?").font(.title3.weight(.semibold))
+                    Text("Which size?").font(.title3.weight(.semibold)).heading()
                     FlowChips {
                         ForEach(sizeOptions, id: \.self) { option in
                             let exists = variants.contains { $0.colorsText == color && $0.size == option }
@@ -249,7 +254,7 @@ struct VariantPickerView: View {
                             .background(Capsule().fill(size == option ? Color.accentColor : .clear))
                             .foregroundStyle(size == option ? .white : .primary)
                         }
-                        Button("Another size", systemImage: "plus") { newVariant(chosenColors, "") }
+                        Button("Another Size", systemImage: "plus") { newVariant(chosenColors, "") }
                             .buttonStyle(.bordered)
                     }
                 }
@@ -282,7 +287,7 @@ struct VariantPickerView: View {
                     }
                 }
                 Button { pick(match) } label: {
-                    Text("Use this button").font(.headline).frame(maxWidth: .infinity, minHeight: 40)
+                    Text("Use This Button").font(.headline).frame(maxWidth: .infinity, minHeight: 40)
                 }
                 .buttonStyle(.borderedProminent)
             }
@@ -292,7 +297,7 @@ struct VariantPickerView: View {
                 Text("There's no \(Naming.description(design: design.name, colors: chosenColors, size: chosenSize)) saved yet.")
                     .font(.headline)
                 Button { newVariant(chosenColors, chosenSize) } label: {
-                    Text("Add it as a new button").font(.headline).frame(maxWidth: .infinity, minHeight: 40)
+                    Text("Add as a New Button").font(.headline).frame(maxWidth: .infinity, minHeight: 40)
                 }
                 .buttonStyle(.borderedProminent)
             }

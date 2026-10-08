@@ -7,6 +7,7 @@ import SwiftUI
 /// never changes an invoice that already has it.
 struct CatalogView: View {
     @Environment(\.modelContext) private var context
+    @Environment(AppRouter.self) private var router
     @Query(sort: [SortDescriptor(\ButtonDesign.name, comparator: .localizedStandard)]) private var designs: [ButtonDesign]
     @Query private var variants: [ButtonVariant]
 
@@ -36,15 +37,20 @@ struct CatalogView: View {
                                 Text("\(active.count)").foregroundStyle(.secondary)
                                 Spacer()
                                 Menu {
-                                    Button("Add a color or size of \(design.name)", systemImage: "plus") {
+                                    Button("Add Color or Size…", systemImage: "plus") {
                                         adding = NewButton(design: design)
                                     }
-                                    Button("Rename \(design.name)", systemImage: "pencil") {
+                                    Button("Rename…", systemImage: "pencil") {
                                         newName = design.name
                                         renaming = design
                                     }
+                                    Button("Archive Shape", systemImage: "archivebox") {
+                                        context.undoManager?.setActionName("Archive \(design.name)")
+                                        for variant in design.variants ?? [] { variant.isHidden = true }
+                                    }
                                 } label: {
                                     Image(systemName: "ellipsis.circle").font(.title3)
+                                        .frame(minWidth: 44, minHeight: 44)
                                 }
                                 .accessibilityLabel("\(design.name) options")
                                 .textCase(nil)
@@ -71,7 +77,7 @@ struct CatalogView: View {
         .overlay(alignment: .bottomTrailing) { addButton }
         .overlay {
             if variants.isEmpty {
-                ContentUnavailableView("No buttons yet", systemImage: "circle.grid.2x2",
+                ContentUnavailableView("No Buttons Yet", systemImage: "circle.grid.2x2",
                                        description: Text("Tap Add a Button to save your first one."))
             }
         }
@@ -84,6 +90,8 @@ struct CatalogView: View {
         .sheet(item: $adding) { target in
             NewButtonSheet(design: target.design)
         }
+        .onAppear(perform: handleRequest)
+        .onChange(of: router.request) { handleRequest() }
         .alert("Rename shape", isPresented: .init(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
             TextField("Name", text: $newName)
             Button("Cancel", role: .cancel) { renaming = nil }
@@ -91,6 +99,13 @@ struct CatalogView: View {
         } message: {
             Text("Changes the name on new invoices and drafts. SKUs and finished invoices stay the same.")
         }
+    }
+
+    /// The Add a Button quick action and App Shortcut open the new-button steps here.
+    private func handleRequest() {
+        guard router.request == .newButton else { return }
+        router.request = nil
+        adding = NewButton(design: nil)
     }
 
     private var archived: [ButtonVariant] {
@@ -116,29 +131,45 @@ struct CatalogView: View {
         Button {
             editing = variant
         } label: {
-            HStack(spacing: 12) {
-                ButtonPhoto(data: variant.photo, side: 52)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(search.isEmpty && !variant.isHidden ? variantName(variant) : variant.title)
-                        .font(.body.weight(.medium))
-                    Text(variant.sku).font(.subheadline.monospaced()).foregroundStyle(.secondary)
+            AdaptiveRow {
+                IconTextStack {
+                    ButtonPhoto(data: variant.photo, side: 52)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(search.isEmpty && !variant.isHidden ? variantName(variant) : variant.title)
+                            .font(.body.weight(.medium))
+                        Text(variant.sku).font(.subheadline.monospaced()).foregroundStyle(.secondary)
+                    }
                 }
-                Spacer()
+            } trailing: {
                 Text(variant.price > .zero ? variant.price.formatted : "No price")
                     .monospacedDigit()
                     .foregroundStyle(variant.price > .zero ? .primary : Color.orange)
             }
             .opacity(variant.isHidden ? 0.5 : 1)
+            .accessibilityElement(children: .combine)
+            .accessibilityValue(variant.isHidden ? "Archived" : "")
         }
         .foregroundStyle(.primary)
-        .swipeActions(edge: .trailing) {
-            if variant.isHidden {
-                Button("Unarchive", systemImage: "tray.and.arrow.up") { variant.isHidden = false }
-                    .tint(.blue)
-            } else {
-                Button("Archive", systemImage: "archivebox") { variant.isHidden = true }
-                    .tint(.gray)
+        .swipeActions(edge: .trailing) { archiveButton(variant) }
+        .contextMenu {
+            Button("Change…", systemImage: "pencil") { editing = variant }
+            archiveButton(variant)
+        }
+    }
+
+    @ViewBuilder private func archiveButton(_ variant: ButtonVariant) -> some View {
+        if variant.isHidden {
+            Button("Unarchive", systemImage: "tray.and.arrow.up") {
+                context.undoManager?.setActionName("Unarchive")
+                variant.isHidden = false
             }
+            .tint(.blue)
+        } else {
+            Button("Archive", systemImage: "archivebox") {
+                context.undoManager?.setActionName("Archive")
+                variant.isHidden = true
+            }
+            .tint(.gray)
         }
     }
 
@@ -162,17 +193,6 @@ struct CatalogView: View {
             for line in variant.invoiceLines ?? [] where line.invoice?.status == .draft {
                 line.copyDetails(from: variant)
             }
-        }
-    }
-}
-
-extension View {
-    /// Liquid Glass on iOS 26 and later; a filled capsule before that.
-    @ViewBuilder func glassProminentButton() -> some View {
-        if #available(iOS 26.0, *) {
-            buttonStyle(.glassProminent)
-        } else {
-            buttonStyle(.borderedProminent).buttonBorderShape(.capsule)
         }
     }
 }

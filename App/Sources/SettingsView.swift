@@ -28,7 +28,7 @@ struct SettingsView: View {
                 line($settings.profile.sellerLines, 1, "Town", prompt: "Warren, RI 02805")
                 line($settings.profile.sellerLines, 2, "Phone", prompt: "(401) 555-0100", keyboard: .phonePad)
             } header: {
-                Text("Your business")
+                Text("Business")
             } footer: {
                 Text("Top left of the invoice. The name is printed in bold.")
             }
@@ -74,7 +74,7 @@ struct SettingsView: View {
                 Button {
                     preview = samplePDF()
                 } label: {
-                    Label("See a sample invoice with these details", systemImage: "doc.text.magnifyingglass")
+                    Label("Preview Sample Invoice", systemImage: "doc.text.magnifyingglass")
                 }
             }
 
@@ -91,7 +91,7 @@ struct SettingsView: View {
             } header: {
                 Text("About")
             } footer: {
-                Text("Everything is kept on this device and included in its iCloud Backup.")
+                Text("Everything is kept on this device and included in its iCloud Backup. The bank numbers are kept in the device's keychain.")
             }
         }
         .readableWidth()

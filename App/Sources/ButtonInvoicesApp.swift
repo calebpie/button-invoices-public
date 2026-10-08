@@ -2,9 +2,12 @@ import InvoiceKit
 import OSLog
 import SwiftData
 import SwiftUI
+import TipKit
+import UIKit
 
 @main
 struct ButtonInvoicesApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     let container: ModelContainer
     @State private var settings = BusinessSettings()
 
@@ -24,6 +27,7 @@ struct ButtonInvoicesApp: App {
         Logger(subsystem: "InvoiceKit", category: "Probe").notice("probe: startup seeding took \(Date().timeIntervalSince(start)) s")
         if UserDefaults.standard.bool(forKey: "ExportFinishedPDFs") { Self.exportFinishedPDFs(container.mainContext) }
         #endif
+        try? Tips.configure([.displayFrequency(.daily)])
         #if DEBUG
         Self.runCutoutProbeIfAsked()
         if UserDefaults.standard.bool(forKey: "FreezeProbe") { Self.runFreezeProbe(container.mainContext) }
@@ -37,7 +41,7 @@ struct ButtonInvoicesApp: App {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent("StoredPDFs")
         try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         for invoice in (try? context.fetch(FetchDescriptor<Invoice>(sortBy: [SortDescriptor(\.date)]))) ?? [] {
-            guard let pdf = invoice.finishedPDF else { continue }
+            let pdf = invoice.finishedPDF ?? InvoiceExport.render(invoice, profile: invoice.businessProfile(current: BusinessProfile()))
             try? pdf.write(to: folder.appendingPathComponent("\(invoice.number).pdf"))
             log.notice("probe: stored \(invoice.number, privacy: .public) \(invoice.status.label, privacy: .public) \(InvoiceDocument.formatDate(invoice.date), privacy: .public) lines=\(invoice.sortedLines.count) total=\(invoice.total.formatted, privacy: .public) pdfBytes=\(pdf.count)")
         }
@@ -133,6 +137,7 @@ struct ButtonInvoicesApp: App {
         WindowGroup {
             RootView()
                 .environment(settings)
+                .environment(AppRouter.shared)
                 .keyboardDoneButton()
         }
         .modelContainer(container)
@@ -143,40 +148,90 @@ struct ButtonInvoicesApp: App {
     }
 }
 
-/// Three tabs in the floating Liquid Glass tab bar (SPEC.md, "Layout").
+/// Three tabs in the floating Liquid Glass tab bar (SPEC.md, "Layout"). Filled symbols, as
+/// the tab bar guidelines prefer. Remembers the tab and the open draft between launches
+/// (Launching, "Restore the previous state").
 struct RootView: View {
+    @Environment(AppRouter.self) private var router
+    @Environment(\.modelContext) private var context
+    @Environment(\.undoManager) private var undoManager
+    @SceneStorage("tab") private var savedTab = AppTab.invoices.rawValue
+    @SceneStorage("openInvoice") private var savedInvoice = ""
+    @State private var restored = false
+
     var body: some View {
-        TabView {
-            Tab("Invoices", systemImage: "doc.text") {
+        @Bindable var router = router
+        TabView(selection: $router.tab) {
+            Tab("Invoices", systemImage: "doc.text.fill", value: AppTab.invoices) {
                 InvoicesTab()
             }
-            Tab("Buttons", systemImage: "circle.grid.2x2") {
+            Tab("Buttons", systemImage: "circle.grid.2x2.fill", value: AppTab.buttons) {
                 NavigationStack { CatalogView() }
             }
-            Tab("Settings", systemImage: "gearshape") {
+            Tab("Settings", systemImage: "gearshape.fill", value: AppTab.settings) {
                 NavigationStack { SettingsView() }
             }
+        }
+        .onAppear {
+            // Shake to undo, and the three-finger swipe, act on the saved data
+            // (Undo and redo).
+            context.undoManager = undoManager
+            restore()
+            #if DEBUG
+            // Probe: `-OrientationProbe landscape` turns the headless Simulator sideways.
+            if UserDefaults.standard.string(forKey: "OrientationProbe") == "landscape",
+               let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                scene.requestGeometryUpdate(.iOS(interfaceOrientations: .landscapeRight))
+            }
+            #endif
+        }
+        .onChange(of: router.tab) { _, tab in savedTab = tab.rawValue }
+        .onChange(of: router.invoicePath) { _, path in
+            savedInvoice = path.last.map { $0.status == .draft ? $0.number : "" } ?? ""
+        }
+    }
+
+    private func restore() {
+        guard !restored else { return }
+        restored = true
+        guard router.request == nil else { return } // a quick action decides where to go
+        router.tab = AppTab(rawValue: savedTab) ?? .invoices
+        if !savedInvoice.isEmpty {
+            let number = savedInvoice
+            let match = try? context.fetch(FetchDescriptor<Invoice>(predicate: #Predicate { $0.number == number })).first
+            if let match, match.status == .draft { router.invoicePath = [match] }
         }
     }
 }
 
-extension View {
-    /// A Done button above every keyboard. The number pads have no Return key, so without it
-    /// the keyboard covers the rest of the form.
-    func keyboardDoneButton() -> some View {
-        toolbar {
-            ToolbarItemGroup(placement: .keyboard) {
-                Spacer()
-                Button("Done") {
-                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                }
-                .fontWeight(.semibold)
-            }
-        }
+/// Home Screen quick actions (Home Screen quick actions guidelines): New Invoice and Add a
+/// Button, defined in project.yml. SwiftUI keeps managing the window; this delegate only
+/// passes the chosen action to the router.
+final class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication, configurationForConnecting session: UISceneSession,
+                     options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        if let item = options.shortcutItem { QuickAction.perform(item) }
+        let configuration = UISceneConfiguration(name: nil, sessionRole: session.role)
+        configuration.delegateClass = QuickActionSceneDelegate.self
+        return configuration
     }
+}
 
-    /// On iPad, keeps forms and lists to a comfortable reading width instead of the full screen.
-    func readableWidth() -> some View {
-        frame(maxWidth: 760).frame(maxWidth: .infinity).background(Color(.systemGroupedBackground))
+final class QuickActionSceneDelegate: NSObject, UIWindowSceneDelegate {
+    func windowScene(_ windowScene: UIWindowScene, performActionFor shortcutItem: UIApplicationShortcutItem,
+                     completionHandler: @escaping (Bool) -> Void) {
+        completionHandler(QuickAction.perform(shortcutItem))
+    }
+}
+
+enum QuickAction {
+    @discardableResult @MainActor
+    static func perform(_ item: UIApplicationShortcutItem) -> Bool {
+        switch item.type {
+        case "NewInvoice": AppRouter.shared.handle(.newInvoice)
+        case "NewButton": AppRouter.shared.handle(.newButton)
+        default: return false
+        }
+        return true
     }
 }

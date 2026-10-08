@@ -17,6 +17,7 @@ struct PhotoCutoutView: View {
     @State private var lastPoint: CGPoint?
     @State private var fingerAt: CGPoint?
     @State private var saving = false
+    @State private var askDiscard = false
 
     var body: some View {
         NavigationStack {
@@ -35,14 +36,22 @@ struct PhotoCutoutView: View {
             .navigationTitle(touchingUp ? "Touch Up" : "Button Photo")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) {
+                    // Touch-up work isn't thrown away without asking (Photo editing, "Confirm
+                    // cancellation of edits").
+                    CancelButton { if canvas?.canUndo == true { askDiscard = true } else { dismiss() } }
+                }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(touchingUp ? "Done" : "Use Photo") {
+                    ConfirmButton(title: touchingUp ? "Done" : "Use Photo") {
                         if touchingUp { touchingUp = false } else { finish() }
                     }
                     .disabled(cutout == nil || saving)
                 }
             }
+        }
+        .confirmationDialog("Discard your touch-up?", isPresented: $askDiscard, titleVisibility: .visible) {
+            Button("Discard Changes", role: .destructive) { dismiss() }
+            Button("Keep Editing", role: .cancel) {}
         }
         .task {
             let result = await Cutout.lift(source)
@@ -80,6 +89,7 @@ struct PhotoCutoutView: View {
                 if let mask {
                     Image(decorative: source, scale: 1).resizable()
                         .mask { Image(decorative: mask, scale: 1).resizable().luminanceToAlpha() }
+                        .accessibilityLabel(touchingUp ? "Photo being touched up" : "Button photo with the background removed")
                 }
                 if touchingUp, let fingerAt {
                     Circle().stroke(.white, lineWidth: 2).shadow(radius: 1)
@@ -102,8 +112,8 @@ struct PhotoCutoutView: View {
         if touchingUp {
             VStack(spacing: 12) {
                 Picker("Brush", selection: $restoring) {
-                    Label("Erase", systemImage: "eraser").tag(false)
-                    Label("Restore", systemImage: "paintbrush").tag(true)
+                    Text("Erase").tag(false)
+                    Text("Restore").tag(true)
                 }
                 .pickerStyle(.segmented)
                 HStack {
@@ -133,7 +143,13 @@ struct PhotoCutoutView: View {
                 Button {
                     finish()
                 } label: {
-                    Text("Use This Photo").font(.headline).frame(maxWidth: .infinity, minHeight: 36)
+                    // An activity indicator in the button while the photo is prepared
+                    // (Buttons, iOS).
+                    HStack(spacing: 8) {
+                        if saving { ProgressView().tint(.white) }
+                        Text(saving ? "Saving Photo…" : "Use This Photo")
+                    }
+                    .font(.headline).frame(maxWidth: .infinity, minHeight: 36)
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(saving)

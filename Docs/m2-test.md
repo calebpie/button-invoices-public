@@ -1,6 +1,6 @@
 # M2 test: the app in the Simulator
 
-About 30 minutes. Record results in Docs/progress.md under "M2", using the Part N, step M
+About 40 minutes. Record results in Docs/progress.md under "M2", using the Part N, step M
 labels below. Commands run in Terminal from the project folder
 (`cd "/Users/calebpietrafesa/Developer/DV Button Invoicer"`).
 
@@ -31,53 +31,62 @@ labels below. Commands run in Terminal from the project folder
    Settings shows "123 Example St, Suite 100".
 2. Add test photos to the Simulator:
    `xcrun simctl addmedia booted Examples/Images/Raw/IMG_8516.heic "Examples/Images/Shipping Receipts/IMG_9049.heic"`
-3. Invoices tab → **New Invoice**. Expected: step bar 1 Buttons · 2 Shipping · 3 Review with
-   2 and 3 grayed out; "Total so far $0.00"; Next disabled with "Add at least one button
-   to go on."
-4. Tap **Add the first button** → **Heart** → **Navy**. Expected: "Heart, Navy, Medium,
-   $4.00 · 26HNM" and **Use this button**. Tap it, type 12 as the quantity, tap **Add**.
-   Expected: line "12 × $4.00 … $48.00", total $48.00, Next enabled.
-5. **Add another button** → type `500 navy blue mushrooms @ $8` in the box. Expected:
-   "500 buttons · $8.00 each" and Mushroom, Navy / White first. Tap it. Expected:
-   quantity 500, price 8. Tap **Add a discount** → **% off** → type 10 → keyboard
-   **Done**. Expected: "$0.80 off each button", line total $3,600.00. Tap **Add**.
-6. **Add another button** → **Daisy** → **Red / White** → **Large**. Expected: "There's no
-   Daisy, Red / White, Large saved yet." Tap **Add it as a new button**.
-7. **Choose from Photos** → the strawberry photo. Expected: "Background removed by color"
-   (Simulator) and the strawberry on a checkerboard. Tap **Touch Up**, erase a little of
-   the edge, **Undo**, **Done**, **Use This Photo**.
-8. Tap **Next: Is it already saved?** Expected in the Simulator: "Couldn't compare photos
-   on this device." (photo matching needs a real device; on the Mac it picks the
-   strawberry) and "Your saved Daisy buttons:" with the four daisies, each with "It's
-   this one" and "Same shape, new color or size". Tap **No, it's a new button**.
+3. Invoices tab → **New Invoice**. Expected: a standard back arrow at the top left, the
+   step bar 1 Buttons · 2 Shipping · 3 Review with 2 and 3 grayed out, the tab bar still
+   at the bottom, "Total so far · saved $0.00", and Next disabled with "Add at least one
+   button to go on."
+4. Tap **Add a Button** → **Heart** → **Navy**. Expected: "Heart, Navy, Medium, $4.00 ·
+   26HNM" and **Use This Button**. Tap it, type 12 as the quantity (or tap **+**), tap **Add
+   to Invoice**. Expected: line "12 × $4.00 … $48.00", total $48.00, Next enabled.
+5. **Add Another Button** → type `500 navy blue mushrooms @ $8` in the search field.
+   Expected: heading "Which button? Tap it.", "500 buttons · $8.00 each. Now tap the
+   button." and Mushroom, Navy / White first. Tap it. Expected: quantity 500, price 8. Tap
+   **Add Discount** → **Percent** → type 10 → keyboard **Done**. Expected: "$0.80 off each
+   button", line total $3,600.00. Tap **Add to Invoice**.
+6. **Add Another Button** → **Daisy** → **Red / White** → **Large**. Expected: "There's no
+   Daisy, Red / White, Large saved yet." Tap **Add as a New Button**.
+7. **Choose from Photos** → the strawberry photo. Expected: "The background was removed by
+   color" (Simulator) and the strawberry on a checkerboard. Tap **Touch Up**, erase a little
+   of the edge, **Undo**, then the **✓** at the top right, then **Use This Photo**.
+8. Tap **Next**. Expected in the Simulator: "Couldn't compare photos on this device."
+   (photo matching needs a real device; on the Mac it picks the strawberry) and "Your saved
+   Daisy buttons:" with the four daisies, each with **It's This One** and **Same Shape, New
+   Color or Size**. Tap **It's a New Button**.
 9. Expected: shape Daisy, colors Red / White, size Large, price $7.50, SKU 26DRWL. Tap
-   **Next: Check it** → **Save and Add to Invoice**, quantity 10, **Add**.
-10. Tap **Save & Exit**. Expected: the Invoices tab lists this invoice under Drafts. Quit the app (in the Simulator: swipe up from the bottom edge and hold, swipe
+   **Next** → **Save and Add to Invoice**, quantity 10, **Add to Invoice**.
+10. Tap the back arrow at the top left. Expected: the Invoices tab lists this invoice under
+    Drafts. Quit the app (in the Simulator: swipe up from the bottom edge and hold, swipe
     the app away), reopen it from the Home Screen ("Invoices"). Expected: the draft is
     still there with 3 lines; tapping it reopens at step 2, Shipping.
-11. **Add shipping** → **Choose from Photos** → the receipt. Expected: $36.48 filled in,
+11. **Add Shipping** → **Choose from Photos** → the receipt. Expected: $36.48 filled in,
     $36.48 / $19.58 / $16.90 to tap, note "Shipped 8/31/2026". Tap **Add Shipping**.
-12. **Add another box**, type 16.21, **Add Shipping**. Expected: total $3,775.69
+12. **Add Another Box**, type 16.21, **Add Shipping**. Expected: total $3,775.69
     ($48.00 + $3,600.00 + $75.00 + $36.48 + $16.21).
-13. Tap step **1 Buttons** in the step bar, then **3 Review**. Expected: both work.
-14. On Review, type 3775.69 under "Check against your own total". Expected: "Matches."
-    Tap the PDF page. Expected: full-screen PDF with 3 lines, DISCOUNT $0.80 on the
-    mushrooms, two SHIPPING rows. Close it.
-15. Tap **Finish** → **Finish and Share the PDF**. Expected: share sheet with
-    "Daphné Verley Invoice - AOB 0yyMMdd.pdf" with today's date (0261008 on Oct 8, 2026). Tap **Save to Files** →
-    **On My iPhone** → **Save**, then close.
-16. Back on the Invoices tab it's listed under "Finished, waiting for payment". Open it,
-    turn on **Alix of Bohemia has paid**, go back. Expected: it's under "Paid".
+13. Tap step **1 Buttons** in the step bar, then **3 Review**. Expected: both work. On step
+    2, the round **‹** button at the bottom goes back to step 1.
+14. On Review, type 3775.69 under "Compare with your own total (optional)". Expected:
+    "Matches." Tap the PDF page. Expected: full-screen PDF with 3 lines, DISCOUNT $0.80 on
+    the mushrooms, two SHIPPING rows. Close it.
+15. Tap **Finish**. Expected: no question first; the share sheet opens with "Daphné Verley
+    Invoice - AOB 0yyMMdd.pdf" with today's date (0261008 on Oct 8, 2026). Tap **Save to
+    Files** → **On My iPhone** → **Save**, then close.
+16. Back on the Invoices tab it's listed under "Finished, waiting for payment". Open it.
+    Expected: total, **Share PDF**, a Share button and **⋯** at the top right, the switch
+    **Alix of Bohemia has paid**, and the PDF. Turn the switch on, go back. Expected: it's
+    under "Paid".
 17. Buttons tab → Heart section → tap **Navy, Medium** → change the price to 4.50 →
-    **Save**. Tap it again. Expected: "Before your changes" shows the $4.00 version. Tap
-    **Archive This Button**. Expected: it moves to "Archived" at the bottom of the list.
+    **Save Changes**. Tap it again. Expected: "Before your changes" shows the $4.00
+    version. Tap **Archive This Button**. Expected: it moves to "Archived" at the bottom of
+    the list.
 18. Settings tab → change Street to "1 Test Street". Invoices tab → open the finished
-    invoice. Expected: the PDF still shows Suite 100 and the heart at $4.00. Then
-    **New Invoice** → **Add the first button** → **Heart**. Expected: Navy isn't offered
-    (archived). Tap **Cancel**, **Save & Exit**. Put Settings back to "123 Example St, Suite 100"
-    and unarchive the heart (Buttons → Archived → tap it → **Unarchive This Button**).
+    invoice. Expected: the PDF still shows Suite 100 and the heart at $4.00. Then go back,
+    **New Invoice** → **Add a Button** → **Heart**. Expected: Navy isn't offered
+    (archived). Tap **✕** at the top left, then the back arrow. Put Settings back to "123
+    Example St, Suite 100" and unarchive the heart (Buttons → Archived → tap it →
+    **Unarchive This Button**).
 19. Repeat Part 2, steps 1–4 with `SIMULATOR="iPad Air 11-inch (M4)" make sim`. Expected:
-    the same screens, centered at a readable width.
+    the same screens, with the tabs at the top and the content centered at a readable
+    width.
 
 ## Part 3: Template typo fixes
 
@@ -87,6 +96,37 @@ labels below. Commands run in Terminal from the project folder
    "123 Example St, Suite 100"; the photos are still in column C.
 2. Repeat Part 3, step 1 for BUTTON INVOICE TEMPLATE.xlsx. The originals are in
    "Originals before typo fixes" in the same folder.
+
+## Part 4: Apple's design guidelines
+
+Checks for SPEC.md, "Design guidelines". Use the iPhone Simulator from Part 2.
+
+1. Invoices tab → touch and hold the paid invoice from Part 2, step 16. Expected: a menu
+   with **Duplicate**, **Share PDF…** and **Delete…**. Tap **Duplicate**. Expected: a new
+   draft opens at step 2, Shipping, with the same three buttons and no shipping yet.
+2. In that draft, tap the mushroom line. Expected: a form with **✕** at the top left and
+   **✓** at the top right. Change the quantity to 400, then swipe the form down from its
+   top. Expected: "Discard your changes?" with **Discard Changes**. Tap it. Expected: the
+   line still says 500. Open it again, change to 400, tap **✕**. Expected: the same
+   question; tap outside it to keep editing, then **✕** → **Discard Changes**.
+3. Swipe left on the mushroom line → **Delete**. Then in the Simulator's menu bar choose
+   **Device → Shake**. Expected: "Undo Remove Button"; tap **Undo**. The line is back.
+4. Go back to the Invoices tab, swipe the duplicate left → **Delete** → **Delete
+   Invoice**. Press **⇧⌘H** (Home Screen), touch and hold the **Invoices** icon. Expected:
+   **New Invoice** and **Add a Button**. Tap **Add a Button**. Expected: the app opens on
+   the Buttons tab with the new-button steps. Tap **✕**.
+5. In Terminal:
+   `xcrun simctl ui booted content_size accessibility-extra-extra-extra-large`
+   Expected: the app's text gets much larger; invoice rows put the icon above the text and
+   no invoice number is split; in a draft the two bars stay a usable size. Put it back:
+   `xcrun simctl ui booted content_size large`
+6. In Terminal: `xcrun simctl ui booted appearance dark`. Expected: dark screens, the
+   accent a lighter terracotta, the photo checkerboard dark gray. Put it back:
+   `xcrun simctl ui booted appearance light`
+7. Simulator menu bar → **Device → Rotate Left**. Expected: the app turns to landscape and
+   stays usable (the draft's step content scrolls between the bars). **Device → Rotate
+   Right** to return.
+8. Home Screen: expected app icon, a terracotta button with four holes on cream.
 
 ## Notes for the results
 

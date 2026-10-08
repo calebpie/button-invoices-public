@@ -3,75 +3,86 @@ import QuickLook
 import SwiftData
 import SwiftUI
 
-/// A finished invoice: its PDF, Share, paid or not, and Make Changes.
+/// A finished invoice: its stored PDF, Share, paid or not, and a More menu with Duplicate,
+/// Make Changes and Delete. Share sits in the toolbar where people look for it, and as the
+/// screen's one prominent button (Collaboration and sharing; Buttons).
 struct FinishedInvoiceView: View {
     @Bindable var invoice: Invoice
     @Binding var shareWhenOpened: Bool
 
+    @Environment(\.modelContext) private var context
+    @Environment(\.dismiss) private var dismiss
     @Environment(BusinessSettings.self) private var settings
+    @Environment(AppRouter.self) private var router
+    @Query private var allInvoices: [Invoice]
     @State private var pdfURL: URL?
     @State private var pages: [UIImage] = []
     @State private var sharing = false
     @State private var fullScreen: URL?
     @State private var confirmChanges = false
+    @State private var confirmDelete = false
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+        List {
+            Section {
                 VStack(alignment: .leading, spacing: 6) {
-                    HStack {
-                        Text(invoice.total.formatted).font(.largeTitle.bold()).monospacedDigit()
-                        Spacer()
-                        Text(invoice.status.label)
-                            .font(.subheadline.weight(.semibold))
-                            .padding(.horizontal, 10).padding(.vertical, 4)
-                            .background(Capsule().fill(invoice.status == .paid ? Color.green.opacity(0.2) : Color.orange.opacity(0.2)))
-                    }
+                    Text(invoice.total.formatted).font(.largeTitle.bold()).monospacedDigit()
+                        .textSelection(.enabled)
                     Text("Invoice \(invoice.number) · \(invoice.date.formatted(.dateTime.day().month(.wide).year()))")
                         .foregroundStyle(.secondary)
+                        .textSelection(.enabled)
                     Text("\(invoice.buttonCount) buttons · shipping \(invoice.shippingTotal.formatted)")
                         .foregroundStyle(.secondary)
                 }
-                .card()
+                .padding(.vertical, 4)
+            }
 
+            Section {
                 Button {
                     sharing = true
                 } label: {
-                    Label("Share the PDF", systemImage: "square.and.arrow.up")
+                    Label("Share PDF", systemImage: "square.and.arrow.up")
                         .font(.title3.weight(.semibold))
-                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(pdfURL == nil)
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
+            } footer: {
                 Text("Send it by Messages, Mail or AirDrop, or save it to Files.")
-                    .font(.footnote).foregroundStyle(.secondary)
+            }
 
+            Section {
+                // A switch belongs in a list row (Toggles).
                 Toggle("Alix of Bohemia has paid", isOn: Binding(
                     get: { invoice.status == .paid },
                     set: { invoice.status = $0 ? .paid : .finalized }))
-                    .card()
-
-                PDFPages(pages: pages) { fullScreen = pdfURL }
-
-                Button("Make Changes to This Invoice") { confirmChanges = true }
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 8)
             }
-            .padding()
-            .frame(maxWidth: 760)
-            .frame(maxWidth: .infinity)
+
+            Section("The PDF") {
+                PDFPages(pages: pages) { fullScreen = pdfURL }
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+            }
         }
-        .background(Color(.systemGroupedBackground))
+        .readableWidth()
         .navigationTitle("Invoice \(invoice.number)")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                if let pdfURL { ShareLink(item: pdfURL) }
+            }
+            ToolbarItem(placement: .secondaryAction) {
+                moreMenu
+            }
+        }
         .task {
             // Exactly the PDF made when she tapped Finish; later edits to buttons or
             // Settings don't reach it.
-            let profile = invoice.businessProfile(current: settings.profile)
-            let pdf = invoice.finishedPDF ?? InvoiceExport.render(invoice, profile: profile)
-            if let url = try? InvoiceExport.write(pdf, number: invoice.number, profile: profile) {
-                pdfURL = url
-                pages = PDFPages.render(url, width: 900)
+            pdfURL = InvoiceExport.storedPDF(invoice, profile: settings.profile)
+            if let pdfURL {
+                pages = PDFPages.render(pdfURL, width: 900)
                 if shareWhenOpened {
                     shareWhenOpened = false
                     sharing = true
@@ -92,6 +103,27 @@ struct FinishedInvoiceView: View {
             }
         } message: {
             Text("It goes back to being a draft. If you already sent it, send the new PDF when you finish.")
+        }
+        .confirmationDialog("Delete invoice \(invoice.number)?", isPresented: $confirmDelete, titleVisibility: .visible) {
+            Button("Delete Invoice", role: .destructive) {
+                dismiss()
+                InvoiceActions.delete(invoice, context)
+            }
+        } message: {
+            Text("This removes the invoice and its PDF from the app. Copies you already sent aren't affected.")
+        }
+    }
+
+    private var moreMenu: some View {
+        Menu {
+            Button("Duplicate", systemImage: "plus.square.on.square") {
+                router.invoicePath = [InvoiceActions.duplicate(invoice, context, existing: allInvoices.map(\.number))]
+            }
+            Button("Make Changes…", systemImage: "pencil") { confirmChanges = true }
+            Divider()
+            Button("Delete…", systemImage: "trash", role: .destructive) { confirmDelete = true }
+        } label: {
+            Label("More", systemImage: "ellipsis")
         }
     }
 }

@@ -64,21 +64,23 @@ struct ButtonPhoto: View {
     }
 }
 
-/// Gray and white squares behind cutouts, so she can see what's been removed.
+/// Squares behind cutouts, so she can see what's been removed. System grays, so it adapts
+/// to Dark Mode instead of glowing white (Dark Mode, "Soften the color of white backgrounds").
 struct Checkerboard: View {
     var square: CGFloat = 12
 
     var body: some View {
         Canvas { context, size in
-            context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(.white))
+            context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(Color(.systemGray6)))
             let cols = Int(size.width / square) + 1, rows = Int(size.height / square) + 1
             for r in 0..<rows {
                 for c in 0..<cols where (r + c).isMultiple(of: 2) {
                     let rect = CGRect(x: CGFloat(c) * square, y: CGFloat(r) * square, width: square, height: square)
-                    context.fill(Path(rect), with: .color(Color(white: 0.9)))
+                    context.fill(Path(rect), with: .color(Color(.systemGray4)))
                 }
             }
         }
+        .accessibilityHidden(true)
     }
 }
 

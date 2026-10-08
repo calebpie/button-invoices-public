@@ -5,7 +5,7 @@
 | Milestone | State |
 |---|---|
 | M1 Core logic and PDF | Built; automated tests pass; Caleb's comparison (Docs/m2-test.md, Part 1) pending |
-| M2 App in the Simulator | Built and walked through by Claude in the Simulator; Caleb's run of Docs/m2-test.md, Part 2 pending |
+| M2 App in the Simulator | Built and walked through by Claude in the Simulator; Caleb's run of Docs/m2-test.md, Parts 2 and 4 pending |
 | M3 App on her iPhone | Not started (needs signing, README "Installing on her iPhone or iPad") |
 
 ## Automated results (Claude, Oct 8, 2026, M4 Max, Xcode 27.0, iOS 27.0 Simulator)
@@ -73,6 +73,38 @@ from the Simulator (ExportFinishedPDFs probe): 0260426-1 $947.21, -2 $1,321.14,
 -3 $440.14, -4 $4,192.90, -5 $1,876.18, 0260607 $7,422.11, 0260812 $976.90 (2 pages),
 0260819 $2,656.21, 0260903 $4,178.69: all equal the printed totals. First launch 0.86 s.
 PDF size with JPEG photos: 66–212 KB (was 153 KB–1.1 MB). `make test`: 35 passed.
+
+## Apple design guidelines (Oct 8, 2026)
+
+SPEC.md revision 5, "Design guidelines": all 173 Human Interface Guidelines pages read
+(the iOS and iPadOS ones in full). Checked by Claude in the iPhone 17 Simulator (iOS 27.0)
+and the iPad Air 11-inch (M4) Simulator:
+
+- Draft flow: standard back arrow, tab bar visible, round ‹ for the previous step (the
+  word "Back" was cut to "Ba…" in the first try, so it is now an icon with the VoiceOver
+  label "Back to Buttons").
+- Shipping form: ✕ and ✓; typing $42.50 then ✕, and separately swiping the form down,
+  both asked "Discard your changes?"; Discard Changes closed it with nothing added.
+- Add a Button: search field always visible; "12 red hearts" → hearts first, quantity 12
+  carried to the quantity screen.
+- Largest accessibility text: the step bar showed "1 …" and the bottom bar took half the
+  screen; both now stop at the largest standard size. Invoice rows split "0261008" across
+  two lines; the icon now moves above the text. Both fixed and rechecked.
+- Dark Mode: contrast of white text on the high-contrast dark accent was 2.40:1; changed
+  to #EA7A5E (2.82:1, the same as Apple's red) with accent text on dark cards at 5.49:1.
+- Landscape (forced with the DEBUG `-OrientationProbe landscape` launch argument, since
+  the Simulator here runs without a window): draft flow usable, content scrolls between
+  the bars.
+- Home Screen: the new icon renders; touch and hold shows New Invoice and Add a Button;
+  Add a Button opened the new-button steps on the Buttons tab.
+- Finished invoice: Share and ⋯ at the top right, paid switch in its own row. The Share PDF
+  button touched the summary card; moved to its own section.
+- iPad: tabs at the top, readable width, the Repeat an Order tip shown.
+
+Not checked by Claude: shake to undo (the Simulator here has no Device menu), Siri
+phrases, drag and drop, ⌘N with a keyboard. Docs/m2-test.md, Part 4 covers the first one.
+
+`make test`: 35 tests in 9 suites passed.
 
 ## M2 results (Caleb)
 

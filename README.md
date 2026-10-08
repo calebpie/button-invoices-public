@@ -108,21 +108,32 @@ lasts 90 days. Steps will be added to this README when the paid team exists (SPE
 Three tabs at the bottom: **Invoices**, **Buttons**, **Settings**.
 
 1. **Invoices → New Invoice.** The number and date are filled in.
-2. **Step 1, Buttons.** Add the first button: tap its shape, then its color (and size).
-   Or type the line from her notes ("125 burgundy mushrooms @ $8") and tap the photo.
-   Check the quantity and price, add a discount if any ($ or %), tap **Add**. Repeat, then
-   **Next**.
-3. A button that isn't saved yet: "Add it as a new button" (or **Add a new button** under
-   the shapes). Take its photo on a plain background, check the cutout (**Touch Up** if
-   needed), say whether it's one already saved, check the name and price, **Save and Add
-   to Invoice**.
-4. **Step 2, Shipping.** **Add shipping** for each box: type the amount, or photograph the
+2. **Step 1, Buttons.** **Add a Button**: tap its shape, then its color (and size).
+   Or type the line from her notes in the search field ("125 burgundy mushrooms @ $8") and
+   tap the photo. Check the quantity (type it, or **−** / **+**) and price, add a discount
+   if any (**Dollars** or **Percent**), tap **Add to Invoice** (or ✓ at the top right).
+   Repeat with **Add Another Button**, then **Next**.
+3. A button that isn't saved yet: **Add as a New Button** (or **Add a New Button** under
+   the shapes). Take its photo on a plain background, check the cutout (**Touch Up the
+   Edges** if needed), say whether it's one already saved, check the name and price,
+   **Save and Add to Invoice**.
+4. **Step 2, Shipping.** **Add Shipping** for each box: type the amount, or photograph the
    receipt and tap the amount for this order. Then **Next**.
 5. **Step 3, Review.** Check the lines and total (optionally type her own total to
-   compare), then **Finish** → **Finish and Share the PDF** → Messages or Mail.
+   compare), then **Finish**. The phone gives a short tap and the share sheet opens:
+   Messages or Mail.
 
-**Save & Exit** (top left) keeps the draft under Drafts on the Invoices tab. Finished
-invoices are listed there too; tap one to share its PDF again or mark it paid.
+Everything is saved as she goes. The back arrow at the top left (or a swipe from the left
+edge of the screen) returns to the Invoices tab, where the draft waits under Drafts; the
+round **‹** button at the bottom goes back one step. In a form that slides up from the
+bottom, **✕** at the top left cancels (it asks first if she typed something) and **✓** at
+the top right saves. Finished invoices are listed on the Invoices tab too; tap one to share
+its PDF again or mark it paid. Touch and hold an invoice for **Duplicate** (a new draft
+with the same buttons), **Share PDF…** and **Delete…**. Shake the phone to undo a removal
+or deletion.
+
+Shortcuts: touch and hold the app icon on the Home Screen for **New Invoice** and **Add a
+Button**. Siri knows them too: "Start an invoice in Invoices", "Add a button in Invoices".
 
 **Buttons tab**: every button by shape. **Add a Button** (bottom right) adds a new one;
 tap a button to change its photo, name or price; swipe left to **Archive** it. Neither

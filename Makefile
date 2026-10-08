@@ -7,7 +7,7 @@ SIM_APP   := $(BUILD_DIR)/Build/Products/Debug-iphonesimulator/Button Invoices.a
 IOS_APP   := $(BUILD_DIR)/Build/Products/Debug-iphoneos/Button Invoices.app
 SIMULATOR ?= iPhone 17
 
-.PHONY: help setup generate open sim ios test sample-pdfs seed icon clean
+.PHONY: help setup generate open sim ios test sample-pdfs seed clean
 
 help:
 	@echo "make setup        One time, after signing into Xcode: find your team ID, write Configs/Signing.xcconfig"
@@ -18,7 +18,6 @@ help:
 	@echo "make test         Run the InvoiceKit tests (naming, SKUs, matching, totals, PDF, photo cutout)"
 	@echo "make sample-pdfs  Re-create the example invoices as PDFs in build/sample-pdfs, to compare with Examples/"
 	@echo "make seed         Rebuild the starting catalog in App/Resources/Seed from the newest invoice workbook"
-	@echo "make icon         Redraw App/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png"
 	@echo "make clean        Delete build output"
 
 Configs/Signing.xcconfig:
@@ -54,9 +53,6 @@ sample-pdfs:
 
 seed:
 	python3 Tools/seed/extract_seed.py
-
-icon:
-	swift Tools/icon/make_icon.swift App/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png
 
 clean:
 	rm -rf $(BUILD_DIR)

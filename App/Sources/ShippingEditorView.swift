@@ -16,6 +16,8 @@ struct ShippingEditorView: View {
     @State private var scan: ReceiptScan?
     @State private var reading = false
     @State private var loaded = false
+    @State private var original = ""
+    @State private var askDiscard = false
 
     var body: some View {
         Form {
@@ -26,12 +28,14 @@ struct ShippingEditorView: View {
                 if let receipt, let image = UIImage(data: receipt) {
                     Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 220)
                         .frame(maxWidth: .infinity)
+                        .accessibilityLabel("Receipt photo")
                 }
                 if reading {
                     ProgressView("Reading the receipt…")
                 } else if let scan {
                     if scan.amounts.isEmpty {
-                        Text("No amounts found. Type the amount above.").foregroundStyle(.secondary)
+                        Text("No amounts found. Type the amount above, or retake the photo flat and in good light.")
+                            .foregroundStyle(.secondary)
                     } else {
                         Text("Tap the amount for this order:").font(.subheadline)
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -53,7 +57,7 @@ struct ShippingEditorView: View {
                 Text("Check the amount: the app can misread a circled or crumpled receipt.")
             }
             Section("Note (just for you)") {
-                TextField("e.g. Shipped 9/2/2026", text: $note)
+                TextField("Like “Shipped 9/2/2026”", text: $note)
             }
             Section {
                 Button(action: save) {
@@ -66,6 +70,7 @@ struct ShippingEditorView: View {
                 .listRowBackground(Color.clear)
                 if let charge {
                     Button("Remove Shipping", role: .destructive) {
+                        context.undoManager?.setActionName("Remove Shipping")
                         context.delete(charge)
                         dismiss()
                     }
@@ -78,16 +83,34 @@ struct ShippingEditorView: View {
         .navigationTitle("Shipping")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+            ToolbarItem(placement: .cancellationAction) {
+                CancelButton { if isDirty { askDiscard = true } else { dismiss() } }
+            }
+            ToolbarItem(placement: .confirmationAction) {
+                ConfirmButton(title: charge == nil ? "Add" : "Save", action: save).disabled(amount == nil)
+            }
+        }
+        .confirmsDiscard(isDirty, isAsking: $askDiscard) { dismiss() }
+        .dropDestination(for: Data.self) { items, _ in
+            // Drag a receipt photo in from Photos or Files on iPad (Drag and drop).
+            guard let data = items.first, let image = ImageTools.uprightImage(from: data, maxSide: 3000) else { return false }
+            read(image)
+            return true
         }
         .onAppear {
-            guard !loaded, let charge else { return }
+            guard !loaded else { return }
             loaded = true
-            amountText = charge.amount.editingText
-            note = charge.note
-            receipt = charge.receiptPhoto
+            if let charge {
+                amountText = charge.amount.editingText
+                note = charge.note
+                receipt = charge.receiptPhoto
+            }
+            original = snapshot
         }
     }
+
+    private var snapshot: String { [amountText, note, String(receipt?.count ?? 0)].joined(separator: "|") }
+    private var isDirty: Bool { loaded && snapshot != original }
 
     private var amount: Money? { Money(parsing: amountText).flatMap { $0 > .zero ? $0 : nil } }
 

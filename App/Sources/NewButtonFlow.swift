@@ -13,7 +13,7 @@ enum NewButtonStep: Int, Hashable {
 enum NewButtonPurpose {
     /// Started from an invoice: saving goes on to the quantity screen.
     case invoice
-    /// Started from My Buttons: saving ends the flow.
+    /// Started from the Buttons tab: saving ends the flow.
     case catalog
 }
 
@@ -30,6 +30,8 @@ enum NewButtonPurpose {
     var priceText = ""
     var skuText = ""
     var skuEdited = false
+    /// Other words she uses for the button, comma-separated ("olive").
+    var aliasesText = ""
     /// Saved buttons the photo looks like, closest first, from the photo check.
     var lookAlikes: [(variant: ButtonVariant, distance: Double)] = []
 
@@ -47,10 +49,23 @@ enum NewButtonPurpose {
         size = v.size
         priceText = v.price.editingText
         skuText = v.sku
+        aliasesText = v.aliasesText
         photo = v.photo
     }
 
     static func == (a: ButtonDraft, b: ButtonDraft) -> Bool { a === b }
+
+    /// Everything she has entered, to tell whether there's anything to lose.
+    var snapshot: String {
+        [String(photo?.count ?? 0), String(describing: designID), newDesignName, colorsText, size, priceText, skuText, aliasesText]
+            .joined(separator: "|")
+    }
+
+    /// True once she has started a new button: a photo, or anything typed.
+    var hasContent: Bool {
+        photo != nil || !newDesignName.trimmingCharacters(in: .whitespaces).isEmpty
+            || !colorsText.trimmingCharacters(in: .whitespaces).isEmpty
+    }
     func hash(into hasher: inout Hasher) { hasher.combine(ObjectIdentifier(self)) }
 
     // MARK: Derived
@@ -142,6 +157,8 @@ enum NewButtonPurpose {
         v.price = newPrice
         v.photo = photo
         v.isHidden = isHidden
+        v.aliases = aliasesText.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces).lowercased() }
+            .filter { !$0.isEmpty }
         if let oldDesign, oldDesign !== design, (oldDesign.variants ?? []).allSatisfy({ $0 === v }) {
             context.delete(oldDesign)
         }
@@ -178,7 +195,7 @@ private struct FlowHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("New button · step \(step) of 4").font(.subheadline).foregroundStyle(.secondary)
-            Text(title).font(.title2.bold())
+            Text(title).font(.title2.bold()).heading()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -228,13 +245,13 @@ struct NewButtonPhotoStep: View {
             }
             Section {
                 Button { advance(.matches) } label: {
-                    Text("Next: Is it already saved?").font(.headline).frame(maxWidth: .infinity, minHeight: 40)
+                    Text("Next").font(.headline).frame(maxWidth: .infinity, minHeight: 40)
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(draft.photo == nil)
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
-                Button("No photo right now") { advance(.details) }
+                Button("Skip Photo") { advance(.details) }
                     .frame(maxWidth: .infinity)
             }
         }
@@ -246,6 +263,13 @@ struct NewButtonPhotoStep: View {
                 draft.photo = png
                 draft.lookAlikes = []
             }
+        }
+        .dropDestination(for: Data.self) { items, _ in
+            // Drag a photo in from Photos or Files on iPad (Drag and drop).
+            guard let data = items.first, let image = ImageTools.uprightImage(from: data, maxSide: Photos.workingSize) else { return false }
+            draft.source = image
+            cutoutSource = CutoutSource(image: image)
+            return true
         }
     }
 }
@@ -303,7 +327,7 @@ struct NewButtonMatchStep: View {
                     ForEach(sameShape) { matchCard($0) }
                 }
                 Button { advance(.details) } label: {
-                    Text("No, it's a new button").font(.headline).frame(maxWidth: .infinity, minHeight: 40)
+                    Text("It's a New Button").font(.headline).frame(maxWidth: .infinity, minHeight: 40)
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(checking)
@@ -328,12 +352,12 @@ struct NewButtonMatchStep: View {
                 }
             }
             HStack {
-                Button(purpose == .invoice ? "It's this one" : "Already saved") {
+                Button(purpose == .invoice ? "It's This One" : "Already Saved") {
                     v.isHidden = false // using it again brings it back from the archive
                     chose(v)
                 }
                     .buttonStyle(.bordered)
-                Button("Same shape, new color or size") {
+                Button("Same Shape, New Color or Size") {
                     draft.designID = v.design?.persistentModelID
                     draft.newDesignName = ""
                     if draft.colorsText.isEmpty { draft.colorsText = v.colorsText }
@@ -409,7 +433,7 @@ struct NewButtonDetailsStep: View {
             ButtonDetailsSections(draft: draft, editing: nil)
             Section {
                 Button { advance(.review) } label: {
-                    Text("Next: Check it").font(.headline).frame(maxWidth: .infinity, minHeight: 40)
+                    Text("Next").font(.headline).frame(maxWidth: .infinity, minHeight: 40)
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(problem != nil)
@@ -465,7 +489,7 @@ struct NewButtonReviewStep: View {
                         .foregroundStyle(.orange)
                 }
                 if draft.photo == nil {
-                    Label("No photo yet. You can add one later from My Buttons.", systemImage: "camera")
+                    Label("No photo yet. You can add one later from the Buttons tab.", systemImage: "camera")
                         .foregroundStyle(.secondary)
                 }
                 if let problem = draft.problem(designs, variants, editing: nil) {
@@ -479,7 +503,7 @@ struct NewButtonReviewStep: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(draft.problem(designs, variants, editing: nil) != nil)
-                Text("Tap Back to change anything.").font(.footnote).foregroundStyle(.secondary)
+                Text("To change anything, go back a step.").font(.footnote).foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
             }
             .padding()

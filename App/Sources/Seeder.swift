@@ -38,7 +38,8 @@ enum Seeder {
     /// Loads the invoices sent before the app (Seed/invoices.json) as paid invoices, once.
     /// Each is finished the way the app finishes an invoice: lines take the catalog's name,
     /// SKU and photo (spelling as corrected in the catalog), with the price, discount and
-    /// quantity that were invoiced; the business details and the PDF are stored with it.
+    /// quantity that were invoiced; the business details are stored with it, and the PDF is
+    /// made from them when first needed.
     /// Invoice numbers already in the app are skipped.
     static func seedSentInvoicesIfNeeded(_ context: ModelContext) {
         let defaults = UserDefaults.standard
@@ -80,7 +81,8 @@ enum Seeder {
             }
             invoice.noShipping = sent.shippingCents.isEmpty
             invoice.businessSnapshot = snapshot
-            invoice.finishedPDF = InvoiceExport.render(invoice, profile: profile)
+            // The PDF is made from these stored details the first time the invoice is
+            // opened or shared, which keeps first launch fast (Launching, "Launch instantly").
             invoice.status = .paid
             invoice.finalizedAt = date
         }

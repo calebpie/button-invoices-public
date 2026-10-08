@@ -14,10 +14,14 @@ struct EditButtonView: View {
     @State private var draft: ButtonDraft
     @State private var cutoutSource: NewButtonPhotoStep.CutoutSource?
     @State private var confirmDelete = false
+    @State private var askDiscard = false
+    @State private var original: String
 
     init(variant: ButtonVariant) {
         self.variant = variant
-        _draft = State(initialValue: ButtonDraft(editing: variant))
+        let draft = ButtonDraft(editing: variant)
+        _draft = State(initialValue: draft)
+        _original = State(initialValue: draft.snapshot)
     }
 
     var body: some View {
@@ -50,8 +54,21 @@ struct EditButtonView: View {
             ButtonDetailsSections(draft: draft, editing: variant)
 
             Section {
+                TextField("Like olive, blush", text: $draft.aliasesText)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+            } header: {
+                Text("Also known as")
+            } footer: {
+                // The search learns these when she picks this button after typing them, so
+                // she can see and correct what it learned (Machine learning, "Corrections").
+                Text("Other words that find this button when you type an order. The app adds words you used to find it; remove any that are wrong. Separate words with commas.")
+            }
+
+            Section {
                 Button(variant.isHidden ? "Unarchive This Button" : "Archive This Button",
                        systemImage: variant.isHidden ? "tray.and.arrow.up" : "archivebox") {
+                    context.undoManager?.setActionName(variant.isHidden ? "Unarchive" : "Archive")
                     variant.isHidden.toggle()
                     try? context.save()
                     dismiss()
@@ -101,9 +118,14 @@ struct EditButtonView: View {
         .navigationTitle("Change Button")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
-            ToolbarItem(placement: .confirmationAction) { Button("Save", action: save).disabled(problem != nil) }
+            ToolbarItem(placement: .cancellationAction) {
+                CancelButton { if isDirty { askDiscard = true } else { dismiss() } }
+            }
+            ToolbarItem(placement: .confirmationAction) {
+                ConfirmButton(title: "Save", action: save).disabled(problem != nil)
+            }
         }
+        .confirmsDiscard(isDirty, isAsking: $askDiscard) { dismiss() }
         .fullScreenCover(item: $cutoutSource) { source in
             PhotoCutoutView(source: source.image) { png in draft.photo = png }
         }
@@ -115,6 +137,8 @@ struct EditButtonView: View {
     }
 
     private var problem: String? { draft.problem(designs, variants, editing: variant) }
+
+    private var isDirty: Bool { draft.snapshot != original }
 
     private var neverInvoiced: Bool { (variant.invoiceLines ?? []).isEmpty }
 
@@ -133,11 +157,12 @@ struct EditButtonView: View {
     }
 }
 
-/// The new-button steps on their own, from My Buttons.
+/// The new-button steps on their own, from the Buttons tab.
 struct NewButtonSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var draft: ButtonDraft
     @State private var path: [NewButtonStep] = []
+    @State private var askDiscard = false
 
     init(design: ButtonDesign?) {
         _draft = State(initialValue: ButtonDraft(design: design,
@@ -148,10 +173,13 @@ struct NewButtonSheet: View {
         NavigationStack(path: $path) {
             step(.photo)
                 .toolbar {
-                    ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                    ToolbarItem(placement: .cancellationAction) {
+                        CancelButton { if draft.hasContent { askDiscard = true } else { dismiss() } }
+                    }
                 }
                 .navigationDestination(for: NewButtonStep.self) { step($0) }
         }
+        .confirmsDiscard(draft.hasContent, isAsking: $askDiscard) { dismiss() }
     }
 
     private func step(_ s: NewButtonStep) -> some View {

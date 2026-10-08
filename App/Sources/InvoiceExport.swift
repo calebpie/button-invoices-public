@@ -34,6 +34,15 @@ enum InvoiceExport {
         return url
     }
 
+    /// A finished invoice's PDF as a file to share: the one stored when it was finished, or,
+    /// for the invoices loaded on first launch, made now from its stored details and kept.
+    @MainActor static func storedPDF(_ invoice: Invoice, profile current: BusinessProfile) -> URL? {
+        let profile = invoice.businessProfile(current: current)
+        if invoice.finishedPDF == nil { invoice.finishedPDF = render(invoice, profile: profile) }
+        guard let pdf = invoice.finishedPDF else { return nil }
+        return try? write(pdf, number: invoice.number, profile: profile)
+    }
+
     /// The PDF of a draft, with the details it would be finished with.
     static func writePDF(_ invoice: Invoice, profile: BusinessProfile) throws -> URL {
         try write(render(invoice, profile: profile), number: invoice.number, profile: profile)

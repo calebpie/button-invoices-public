@@ -17,7 +17,10 @@ enum FlowStep: Int, CaseIterable, Identifiable {
 
 /// Making an invoice, one step at a time (SPEC.md, "Making an invoice"): buttons, shipping,
 /// review. She can go back to any step and forward to any step whose earlier steps are done.
-/// The running total and Save & Exit stay on screen throughout. Everything saves as she goes.
+/// The step bar and the running total stay on screen; the standard Back button (and swipe)
+/// returns to the list, and the draft is saved as she goes, so there's nothing to lose
+/// (Toolbars, "Use the standard Back and Close buttons"; Tab bars, "Make sure the tab bar is
+/// visible").
 struct InvoiceFlowView: View {
     @Bindable var invoice: Invoice
     let onFinish: () -> Void
@@ -27,12 +30,10 @@ struct InvoiceFlowView: View {
     @Environment(BusinessSettings.self) private var settings
     @State private var step: FlowStep = .buttons
     @State private var started = false
-    @State private var confirmFinish = false
+    @State private var confirmDelete = false
 
     var body: some View {
-        VStack(spacing: 0) {
-            StepIndicator(step: $step, isReachable: isReachable)
-            Divider()
+        Group {
             switch step {
             case .buttons: ButtonsStep(invoice: invoice)
             case .shipping: ShippingStep(invoice: invoice)
@@ -40,17 +41,24 @@ struct InvoiceFlowView: View {
             }
         }
         .background(Color(.systemGroupedBackground))
-        .safeAreaInset(edge: .bottom) { bottomBar }
+        // The bars stop growing at the largest standard text size, like the system tab bar,
+        // so the step's content keeps most of the screen; touching and holding one of their
+        // controls shows it in the large content viewer (Accessibility, "Large Content Viewer").
+        .controlBar(edge: .top) {
+            StepIndicator(step: $step, isReachable: isReachable)
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        }
+        .controlBar(edge: .bottom) {
+            bottomBar.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        }
         .navigationTitle("Invoice \(invoice.number)")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-        // The running total takes the tab bar's place while she works through the steps.
-        .toolbarVisibility(.hidden, for: .tabBar)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button("Save & Exit") {
-                    try? context.save()
-                    dismiss()
+            ToolbarItem(placement: .secondaryAction) {
+                Menu {
+                    Button("Delete Draft…", systemImage: "trash", role: .destructive) { confirmDelete = true }
+                } label: {
+                    Label("More", systemImage: "ellipsis")
                 }
             }
         }
@@ -61,10 +69,14 @@ struct InvoiceFlowView: View {
             step = FlowStep.allCases.first { !isDone($0) } ?? .review
         }
         .onChange(of: step) { try? context.save() }
-        .confirmationDialog("Finish invoice \(invoice.number)?", isPresented: $confirmFinish, titleVisibility: .visible) {
-            Button("Finish and Share the PDF", action: finish)
+        .onDisappear { try? context.save() }
+        .confirmationDialog("Delete draft \(invoice.number)?", isPresented: $confirmDelete, titleVisibility: .visible) {
+            Button("Delete Draft", role: .destructive) {
+                dismiss()
+                InvoiceActions.delete(invoice, context)
+            }
         } message: {
-            Text("The invoice and its PDF are then kept exactly as they are, even if you later change a button or Settings.")
+            Text("The buttons stay saved; only this draft is removed.")
         }
     }
 
@@ -92,7 +104,7 @@ struct InvoiceFlowView: View {
         case .buttons:
             return invoice.sortedLines.isEmpty ? "Add at least one button to go on." : "Every button needs a quantity and a price."
         case .shipping:
-            return "Add the shipping, or tap “No shipping on this invoice”."
+            return "Add the shipping, or turn on “No shipping on this invoice”."
         case .review:
             return nil
         }
@@ -101,40 +113,58 @@ struct InvoiceFlowView: View {
     // MARK: Bottom bar
 
     private var bottomBar: some View {
-        VStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: 8) {
             if let blockedMessage {
                 Text(blockedMessage).font(.subheadline).foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            HStack(spacing: 12) {
+            AdaptiveRow {
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("Total so far").font(.caption).foregroundStyle(.secondary)
+                    Text("Total so far · saved").font(.caption).foregroundStyle(.secondary)
                     Text(invoice.total.formatted).font(.title2.bold()).monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                         .contentTransition(.numericText())
                         .animation(.default, value: invoice.total)
                 }
-                Spacer()
-                if let previous = FlowStep(rawValue: step.rawValue - 1) {
-                    Button { step = previous } label: {
-                        Label("Back", systemImage: "chevron.left").frame(minHeight: 36)
+                .accessibilityElement(children: .combine)
+            } trailing: {
+                HStack(spacing: 12) {
+                    if let previous = FlowStep(rawValue: step.rawValue - 1) {
+                        Button { step = previous } label: {
+                            Label("Back", systemImage: "chevron.backward")
+                                .labelStyle(.iconOnly)
+                                .font(.headline)
+                                .frame(minWidth: 36, minHeight: 36)
+                        }
+                        .buttonStyle(.bordered)
+                        .buttonBorderShape(.circle)
+                        .accessibilityLabel("Back to \(previous.title)")
+                        .accessibilityShowsLargeContentViewer {
+                            Label("Back to \(previous.title)", systemImage: "chevron.backward")
+                        }
                     }
-                    .buttonStyle(.bordered)
-                }
-                if let next = FlowStep(rawValue: step.rawValue + 1) {
-                    Button { step = next } label: {
-                        Label("Next", systemImage: "chevron.right")
-                            .labelStyle(TrailingIcon())
-                            .font(.headline)
-                            .frame(minHeight: 36)
+                    if let next = FlowStep(rawValue: step.rawValue + 1) {
+                        Button { step = next } label: {
+                            Label("Next", systemImage: "chevron.forward")
+                                .labelStyle(TrailingIcon())
+                                .font(.headline)
+                                .frame(minHeight: 36)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(!isDone(step))
+                        .accessibilityLabel("Next: \(next.title)")
+                        .accessibilityShowsLargeContentViewer {
+                            Label("Next: \(next.title)", systemImage: "chevron.forward")
+                        }
+                    } else {
+                        Button(action: finish) {
+                            Label("Finish", systemImage: "checkmark").font(.headline).frame(minHeight: 36)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(!ReviewStep.canFinish(invoice, others: otherNumbers))
+                        .accessibilityShowsLargeContentViewer()
                     }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(!isDone(step))
-                } else {
-                    Button { confirmFinish = true } label: {
-                        Label("Finish", systemImage: "checkmark").font(.headline).frame(minHeight: 36)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(!ReviewStep.canFinish(invoice, others: otherNumbers))
                 }
             }
         }
@@ -142,7 +172,6 @@ struct InvoiceFlowView: View {
         .padding(.vertical, 10)
         .frame(maxWidth: 760)
         .frame(maxWidth: .infinity)
-        .background(.bar)
     }
 
     @Query private var allInvoices: [Invoice]
@@ -152,7 +181,8 @@ struct InvoiceFlowView: View {
     }
 
     /// Freezes the invoice: its business details (kept from the first Finish if she reopened
-    /// it) and the PDF that Share will send.
+    /// it) and the PDF that Share will send. No confirmation: it can be reopened with Make
+    /// Changes (Alerts, "Avoid displaying alerts for common, undoable actions").
     private func finish() {
         let profile = invoice.businessProfile(current: settings.profile)
         invoice.businessSnapshot = try? JSONEncoder().encode(profile)
@@ -174,10 +204,14 @@ private struct TrailingIcon: LabelStyle {
     }
 }
 
-/// 1 Buttons · 2 Shipping · 3 Review. Steps she can't reach yet are grayed out.
+/// 1 Buttons · 2 Shipping · 3 Review. Steps she can't reach yet are dimmed. At the largest
+/// text sizes only the numbers and the current step's name fit (the bar is capped at the largest
+/// standard size; see InvoiceFlowView).
 struct StepIndicator: View {
     @Binding var step: FlowStep
     let isReachable: (FlowStep) -> Bool
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @ScaledMetric(relativeTo: .subheadline) private var circle: CGFloat = 26
 
     var body: some View {
         HStack(spacing: 4) {
@@ -188,10 +222,14 @@ struct StepIndicator: View {
                     HStack(spacing: 6) {
                         Text("\(s.rawValue + 1)")
                             .font(.subheadline.bold())
-                            .frame(width: 26, height: 26)
+                            .frame(width: circle, height: circle)
                             .background(Circle().fill(s == step ? Color.accentColor : Color(.tertiarySystemFill)))
                             .foregroundStyle(s == step ? .white : .primary)
-                        Text(s.title).font(.subheadline.weight(s == step ? .semibold : .regular))
+                        if typeSize < .xxLarge || s == step {
+                            Text(s.title).font(.subheadline.weight(s == step ? .semibold : .regular))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                        }
                     }
                     .frame(maxWidth: .infinity, minHeight: 44)
                 }
@@ -200,11 +238,15 @@ struct StepIndicator: View {
                 .opacity(isReachable(s) ? 1 : 0.4)
                 .accessibilityLabel("Step \(s.rawValue + 1), \(s.title)")
                 .accessibilityAddTraits(s == step ? .isSelected : [])
+                .accessibilityShowsLargeContentViewer {
+                    Label(s.title, systemImage: "\(s.rawValue + 1).circle")
+                }
             }
         }
         .padding(.horizontal)
         .padding(.vertical, 6)
-        .background(.bar)
+        .frame(maxWidth: 760)
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -244,23 +286,27 @@ struct ButtonsStep: View {
                     ForEach(invoice.sortedLines) { line in
                         Button { editing = line } label: { LineRow(line: line) }
                             .foregroundStyle(.primary)
+                            .contextMenu {
+                                Button("Change…", systemImage: "pencil") { editing = line }
+                                Button("Remove", systemImage: "trash", role: .destructive) { remove(line) }
+                            }
                     }
                     .onDelete(perform: delete)
                     .onMove(perform: move)
                 } footer: {
-                    Text("Tap a button to change it. Swipe left to remove it.")
+                    Text("Tap a button to change it. Touch and hold, or swipe left, to remove it.")
                 }
             }
             Section {
                 Button {
                     adding = true
                 } label: {
-                    Label(invoice.sortedLines.isEmpty ? "Add the first button" : "Add another button",
+                    Label(invoice.sortedLines.isEmpty ? "Add a Button" : "Add Another Button",
                           systemImage: "plus.circle.fill")
                         .font(.title3.weight(.semibold))
                         .frame(maxWidth: .infinity, minHeight: 44)
                 }
-                .buttonStyle(.borderedProminent)
+                .addButtonStyle(prominent: invoice.sortedLines.isEmpty)
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
             }
@@ -272,8 +318,15 @@ struct ButtonsStep: View {
         }
     }
 
+    private func remove(_ line: InvoiceLine) {
+        context.undoManager?.setActionName("Remove Button")
+        context.delete(line)
+        for (i, other) in invoice.sortedLines.filter({ $0 !== line }).enumerated() { other.position = i }
+    }
+
     private func delete(at offsets: IndexSet) {
         let lines = invoice.sortedLines
+        context.undoManager?.setActionName("Remove Button")
         for i in offsets { context.delete(lines[i]) }
         for (i, line) in lines.enumerated().filter({ !offsets.contains($0.offset) }).map(\.element).enumerated() {
             line.position = i
@@ -291,17 +344,19 @@ struct LineRow: View {
     let line: InvoiceLine
 
     var body: some View {
-        HStack(spacing: 12) {
-            ButtonPhoto(data: line.photo, side: 56)
-            VStack(alignment: .leading, spacing: 3) {
-                Text(line.itemDescription).font(.headline)
-                Text("\(line.quantity) × \(line.unitPrice.formatted)").font(.subheadline).monospacedDigit()
-                    .foregroundStyle(.secondary)
-                if let discount = line.discountText {
-                    Text(discount).font(.subheadline).foregroundStyle(.secondary)
+        AdaptiveRow {
+            IconTextStack {
+                ButtonPhoto(data: line.photo, side: 56)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(line.itemDescription).font(.headline)
+                    Text("\(line.quantity) × \(line.unitPrice.formatted)").font(.subheadline).monospacedDigit()
+                        .foregroundStyle(.secondary)
+                    if let discount = line.discountText {
+                        Text(discount).font(.subheadline).foregroundStyle(.secondary)
+                    }
                 }
             }
-            Spacer(minLength: 4)
+        } trailing: {
             Text(line.subtotal.formatted).font(.headline).monospacedDigit()
         }
         .padding(.vertical, 2)
@@ -329,9 +384,17 @@ struct ShippingStep: View {
                     ForEach(invoice.sortedShipping) { charge in
                         Button { editing = charge } label: { ShippingRow(charge: charge) }
                             .foregroundStyle(.primary)
+                            .contextMenu {
+                                Button("Change…", systemImage: "pencil") { editing = charge }
+                                Button("Remove", systemImage: "trash", role: .destructive) {
+                                    context.undoManager?.setActionName("Remove Shipping")
+                                    context.delete(charge)
+                                }
+                            }
                     }
                     .onDelete { offsets in
                         let charges = invoice.sortedShipping
+                        context.undoManager?.setActionName("Remove Shipping")
                         for i in offsets { context.delete(charges[i]) }
                     }
                 }
@@ -341,12 +404,12 @@ struct ShippingStep: View {
                     invoice.noShipping = false
                     adding = true
                 } label: {
-                    Label(invoice.sortedShipping.isEmpty ? "Add shipping" : "Add another box",
+                    Label(invoice.sortedShipping.isEmpty ? "Add Shipping" : "Add Another Box",
                           systemImage: "shippingbox.fill")
                         .font(.title3.weight(.semibold))
                         .frame(maxWidth: .infinity, minHeight: 44)
                 }
-                .buttonStyle(.borderedProminent)
+                .addButtonStyle(prominent: invoice.sortedShipping.isEmpty && !invoice.noShipping)
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
             }
@@ -370,12 +433,24 @@ struct ShippingRow: View {
     let charge: ShippingCharge
 
     var body: some View {
-        HStack {
-            Image(systemName: charge.receiptPhoto == nil ? "shippingbox" : "doc.text.image")
-                .foregroundStyle(.secondary)
-            Text(charge.note.isEmpty ? "Shipping" : charge.note)
-            Spacer()
+        AdaptiveRow {
+            Label(charge.note.isEmpty ? "Shipping" : charge.note,
+                  systemImage: charge.receiptPhoto == nil ? "shippingbox" : "doc.text.image")
+        } trailing: {
             Text(charge.amount.formatted).font(.headline).monospacedDigit()
+        }
+        .accessibilityElement(children: .combine)
+    }
+}
+
+extension View {
+    /// The add button is the screen's prominent action only until the step has something in
+    /// it; after that, Next is (Buttons, "Keep the number of prominent buttons to one or two").
+    @ViewBuilder func addButtonStyle(prominent: Bool) -> some View {
+        if prominent {
+            buttonStyle(.borderedProminent)
+        } else {
+            buttonStyle(.bordered)
         }
     }
 }

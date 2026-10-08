@@ -1,6 +1,6 @@
 # Button Invoices — specification
 
-Revision 4, October 8, 2026 (the nine sent invoices preloaded as paid; smaller PDFs). Source of truth for the project; propose changes to Caleb
+Revision 5, October 8, 2026 (Apple's Human Interface Guidelines applied; see Design guidelines). Source of truth for the project; propose changes to Caleb
 rather than diverging. Status and test results: Docs/progress.md.
 
 ## Goal
@@ -45,7 +45,8 @@ and iPad can be switched on later without a migration (see Open questions).
 - **Shipping charge**: amount, a note for her, optional receipt photo.
 - **Business details** (Settings tab): seller name and address, bill-to, routing and
   account numbers, the "BUTTON" and "daphné verley ceramics" lines, the PDF name prefix.
-  Copied into an invoice when it is finished, with the PDF itself.
+  Copied into an invoice when it is finished, with the PDF itself. The routing and account
+  numbers are kept in the iOS keychain, the rest in the app's settings.
 
 First launch loads the catalog from App/Resources/Seed, which `make seed` builds from
 the 0260903 workbook's Reference sheet (37 buttons). Business details come from the same
@@ -83,11 +84,12 @@ Seed/invoices.json (gitignored) from the values Excel saved in each workbook: nu
 the date printed (=TODAY() as last calculated; it matches each PDF), each line's SKU,
 quantity, price and discount, and the shipping rows. The script stops if lines plus
 shipping don't equal the printed total. On first launch the app loads them as Paid
-invoices, finished the way the app finishes one (business details stored, PDF rendered
-and stored), with lines taking the catalog's current names and photos (so "Ladybug, Red /
+invoices, finished the way the app finishes one (business details stored; the PDF is
+rendered and stored the first time each is opened or shared), with lines taking the catalog's current names and photos (so "Ladybug, Red /
 White", "Pineapple", "Suite 100"). SKUs, quantities, prices, shipping and totals are as
 sent. Invoice numbers already in the app are skipped. Probe, Oct 8, 2026: all nine load
-with the printed totals; first launch takes 0.86 s in the Simulator.
+with the printed totals; first launch took 0.86 s in the Simulator with the PDFs made up
+front, 0.36 s with them made on first open.
 
 Kept: Pineapple's 26PYB (on sent invoice 0260812, though Brown is BR elsewhere), and
 "Rose, White / Green" (the edited photo is named "White : Blue", but its leaves are the
@@ -96,7 +98,9 @@ same teal she calls Green on the strawberry). The sent invoices themselves are u
 ### Privacy
 
 Examples/ (real invoices, photos) and Seed/business.json (bank details) are gitignored.
-The app makes no network requests.
+The app makes no network requests. On the device the routing and account numbers are in
+the keychain (readable only while the device is unlocked); they are still printed on
+every invoice, as on the Excel ones.
 
 ## Names
 
@@ -134,8 +138,10 @@ Three tabs in the floating Liquid Glass tab bar (Caleb, Oct 8, 2026):
 
 - **Invoices**: "Hello, Daphné. What would you like to do today?", New Invoice, then
   Drafts (tap to carry on), Finished, waiting for payment, and Paid. Swipe left to delete,
-  right to copy an invoice into a new draft. Drafts are saved as she goes, including when
-  she leaves the app; a new invoice left with nothing on it is discarded.
+  right to copy an invoice into a new draft; touching and holding an invoice offers the
+  same (Duplicate, Share PDF…, Delete…). Drafts are saved as she goes, including when she
+  leaves the app; a new invoice left with nothing on it is discarded. The app reopens on
+  the tab, and the draft, she left.
 - **Buttons**: every saved button, a section per shape (with a count) and a row per color
   and size. A floating Add a Button (Liquid Glass) starts the new-button steps; each
   shape's ⋯ menu adds a color or size or renames the shape. Swipe left (or open a button)
@@ -157,41 +163,49 @@ finished PDF byte-identical and the line "Heart, Navy, Medium $4.00".
 ## Making an invoice
 
 Three steps with a step bar at the top, a one-line instruction on each, and a bar at the
-bottom with the running total, Back and Next (Finish on the last step). Save & Exit is at
-the top left throughout. The tab bar is hidden while she works through an invoice. She can go back to any step, and forward to any step whose
-earlier steps are complete; Next is disabled with the reason shown until the current step
-is complete.
+bottom with the running total ("saved"), Back to the previous step and Next (Finish on
+the last step). The standard back button at the top left (or a swipe from the left edge)
+returns to the Invoices list; everything is already saved, so there is no Save & Exit.
+The tab bar stays visible. The ⋯ menu at the top right has Delete Draft…. She can go back
+to any step, and forward to any step whose earlier steps are complete; Next is disabled
+with the reason shown until the current step is complete. At the largest text sizes the
+two bars stop growing (touch and hold one of their buttons to see it enlarged), so the
+step itself keeps most of the screen.
 
 1. **Buttons**: at least one line, each with a quantity and price.
 2. **Shipping**: at least one charge, or "No shipping on this invoice".
 3. **Review**: invoice number and date (editable), each line, subtotal, shipping, total,
    an optional "your total" check, the checks below, and the PDF preview. Change buttons
-   jump to step 1 or 2. Finish asks to confirm, marks the invoice Finished, makes the PDF
-   and opens the share sheet (Messages, Mail, AirDrop, Save to Files, Print).
+   jump to step 1 or 2. Finish marks the invoice Finished (with a success tap from the
+   phone), makes the PDF and opens the share sheet (Messages, Mail, AirDrop, Save to
+   Files, Print). It doesn't ask to confirm: nothing is sent until she picks where to
+   send it, and Make Changes undoes it.
 
-A finished invoice shows its stored PDF, Share, a "has paid" switch, and Make Changes,
-which returns it to Draft (she then finishes and sends it again).
+A finished invoice shows its total, Share PDF (also at the top right), an "Alix of
+Bohemia has paid" switch, its stored PDF, and a ⋯ menu with Duplicate, Make Changes… (it
+returns to Draft; she then finishes and sends it again) and Delete….
 
 ## Adding a line
 
 Shape first: a grid of shapes with photos. Picking one lists its saved colors (with
 photos), then its sizes if it has more than one. A saved combination fills in the button
-("Use this button"); one that isn't saved offers "Add it as a new button" with the shape,
-color and size filled in, as do "Another color" and "Another size". Typing in the box
-above the shapes ("12 red hearts @ $4") is a shortcut straight to matching buttons
-(Finding a button). Then the quantity screen: quantity, price each (prefilled; "save as
-this button's price from now on" if she changes it), optional discount in $ off each
-button or % off, and the line total.
+("Use This Button"); one that isn't saved offers "Add as a New Button" with the shape,
+color and size filled in, as do "Another Color" and "Another Size". Typing in the search
+field above the shapes ("12 red hearts @ $4") is a shortcut straight to matching buttons
+(Finding a button). Then the quantity screen: quantity (typed, or − and + one at a time),
+price each (prefilled; "save as this button's price from now on" if she changes it),
+optional discount in Dollars off each button or Percent off, and the line total.
 
 ## Finding a button
 
-One search box: "Type like: 12 red hearts". A leading number is the quantity, "@ $8" or
+One search field: "Type an order, like 12 red hearts". A leading number is the quantity, "@ $8" or
 "$8" the price, "= $96" is ignored (InvoiceKit/Matcher.swift). The rest is matched
 against design, colors, size, SKU and aliases, ignoring case, accents and plurals, with
 one-typo tolerance on design names and a few color words from her messages (blush → pale
 pink, olive → green, off white → ivory, navy blue → navy). Results are ranked photo
 tiles, recently used first when the box is empty. When she picks a button after typing
-words it doesn't answer to, those words are saved as its aliases. All 17 lines from her
+words it doesn't answer to, those words are saved as its aliases. She can see and correct
+them under "Also known as" when she edits the button. All 17 lines from her
 2026 messages find the button Caleb invoiced (MatcherTests).
 
 ## Adding a new button
@@ -199,18 +213,18 @@ words it doesn't answer to, those words are saved as its aliases. All 17 lines f
 Four steps, from an invoice or from the Buttons tab:
 
 1. **Photo**: take or choose one; the background is removed (Button photos), with Touch
-   Up. "No photo right now" skips to step 3.
+   Up. "Skip Photo" goes to step 3.
 2. **Is it already saved?** The photo is compared with every saved photo (Vision feature
    prints, InvoiceKit/LookAlike.swift). A close match is a warning, not a block: each
-   match offers "It's this one" (use it) or "Same shape, new color or size" (fills in its
+   match offers "It's This One" (use it) or "Same Shape, New Color or Size" (fills in its
    shape, colors, size and price to edit). The saved buttons of the shape she already
-   picked are listed too. "No, it's a new button" continues.
+   picked are listed too. "It's a New Button" continues.
 3. **Shape, colors and price**: as filled in so far, cleaned up as she types (Names), with
    the SKU suggested (SKUs). A button with the same name or SKU can't be saved twice.
 4. **Review**: photo, name, SKU, price, and whether it's a new shape; "Save and Add to
    Invoice" goes straight to the quantity screen.
 
-Archived buttons are included in the photo check; choosing one ("It's this one")
+Archived buttons are included in the photo check; choosing one ("It's This One")
 unarchives it.
 
 Photo-match thresholds (probe, October 8, 2026: her 8 raw photos against the 37 saved
@@ -288,12 +302,74 @@ example invoices for side-by-side comparison.
 ## Platform
 
 - iPhone and iPad, iOS 18 or later (every iPhone since the XS/XR). Public APIs only.
-- Swift 6, SwiftUI, SwiftData, Vision. No third-party code in the app.
+- Swift 6, SwiftUI, SwiftData, Vision, TipKit, App Intents. No third-party code in the app.
+- iPhone in portrait and landscape; iPad in every orientation.
 - Project from project.yml (XcodeGen pinned in Tools/BuildTools); logic in the
   Packages/InvoiceKit Swift package, tested on the Mac with `make test`.
 - Distribution to her devices: TestFlight once Caleb's paid developer account is approved
   (builds last 90 days, she installs updates herself). Until then, development builds
   over a cable, which stop opening after 7 days with the free Personal Team (README).
+
+## Design guidelines
+
+Apple's Human Interface Guidelines (HIG), reviewed in full on Oct 8, 2026: every page that
+applies to iOS and iPadOS, including all of Foundations; pages for other platforms and
+for features the app doesn't have (games, Wallet, HealthKit, CarPlay and so on) were read
+for anything general. Shared pieces are in App/Sources/Platform.swift. Where the iOS 26
+form doesn't exist on iOS 18, the iOS 18 equivalent is used.
+
+Applied (HIG page in parentheses):
+
+- Navigation: the standard back button and edge swipe everywhere, the tab bar always
+  visible, filled tab symbols (Tab bars, Toolbars). Controls over scrolling content use
+  the system scroll edge effect (Layout).
+- Sheets: Cancel (✕) at the top left and the confirm action (✓) at the top right, the
+  one prominent button. Edits in a sheet are never lost silently: Cancel or swiping the
+  sheet down asks "Discard your changes?" (Sheets, Toolbars).
+- One prominent button per screen; title-case labels; "…" on menu items that ask a
+  question first (Buttons, Menus, Writing).
+- No confirmation for Finish; a success haptic marks it (Alerts, Playing haptics).
+  Confirmations stay for deleting and for reopening a sent invoice.
+- Every swipe action is also in the touch-and-hold menu (Context menus, Gestures).
+- Share uses the system share sheet and the standard Share button (Collaboration and
+  sharing). The paid switch sits in a list row (Toggles).
+- Larger text: rows stack their parts at the accessibility sizes, photo above text;
+  the invoice bars stop growing and offer the large content viewer (Typography,
+  Accessibility). VoiceOver headings on section titles, labels on photos and icon-only
+  buttons, the photo checkerboard hidden from VoiceOver (Accessibility, VoiceOver).
+- Color: the terracotta accent has darker and lighter versions for Increase Contrast and
+  Dark Mode. White on the light accent is 5.0:1 (6.7:1 with Increase Contrast). In Dark
+  Mode it is 3.1:1 on filled buttons (their text is large and bold) and 5.4:1 for accent
+  text on cards; with Increase Contrast, 2.8:1 and 5.5:1, the same trade-off Apple's
+  own red makes (Color, Dark Mode, Accessibility).
+- Privacy: bank numbers in the keychain; the camera prompt says what the camera is for
+  (Privacy).
+- Search: the system search field, always visible, above the shapes (Search fields).
+- Quantity stepper; Dollars / Percent as a segmented control (Steppers, Segmented
+  controls).
+- Undo: shake to undo (or three-finger swipe) for removing a line or shipping charge,
+  archiving and deleting, each named ("Undo Delete Invoice") (Undo and redo).
+- The app reopens where she left off (Launching, Multitasking).
+- Two tips, typing an order line and repeating an order with Duplicate, each shown until
+  she closes it or uses the feature, at most one new tip a day (Offering help).
+- Home Screen quick actions (touch and hold the icon) and App Shortcuts for Siri and
+  the Shortcuts app: New Invoice, Add a Button. ⌘N on an iPad keyboard (Home Screen quick
+  actions, App Shortcuts, Keyboards).
+- Photos can be dragged in from another app on iPad (Drag and drop).
+- Landscape on iPhone (Layout, "Designing for iOS").
+- A layered app icon made with Icon Composer, so iOS 26 can render it in Liquid Glass,
+  dark and tinted (App icons).
+- Launch: invoice PDFs are made when first opened, not at first launch (Launching).
+- Corrections to the button finder are visible and editable as "Also known as" (Machine
+  learning, "Let people correct mistakes").
+
+Not adopted, and why:
+
+- Widgets, Live Activities, notifications, Spotlight indexing: nothing in her week needs
+  them, and each is something more for her to learn or dismiss.
+- An iPad sidebar: three tabs fit; the system tab bar already moves to the top on iPad.
+- Assistive Access: a whole separate mode, out of scope unless she needs it.
+- Sign in with Apple, in-app purchase, Apple Pay, SharePlay: not used.
 
 ## Milestones
 

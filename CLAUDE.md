@@ -25,7 +25,7 @@ than diverging. Status and test results: Docs/progress.md.
 - `make sample-pdfs`: the nine example invoices re-rendered into build/sample-pdfs
 - `make sim` / `make ios`: build and run in the Simulator / on the connected iPhone
 - `make seed`: rebuild App/Resources/Seed from the 0260903 workbook in Examples/
-- `make generate`, `make setup`, `make icon`: see README
+- `make generate`, `make setup`: see README. The app icon is App/Resources/AppIcon.icon (Icon Composer format: icon.json and SVG layers)
 
 ## Layout
 

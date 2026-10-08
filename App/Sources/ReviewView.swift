@@ -42,7 +42,7 @@ struct ReviewStep: View {
                         Divider()
                         Text("This invoice keeps the business details it was first finished with, not the ones in Settings now.")
                             .font(.subheadline).foregroundStyle(.secondary)
-                        Button("Use the details in Settings instead") { invoice.businessSnapshot = nil }
+                        Button("Use Current Settings") { invoice.businessSnapshot = nil }
                             .font(.subheadline)
                     }
                 }
@@ -84,8 +84,8 @@ struct ReviewStep: View {
                 .card()
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Check against your own total (optional)").font(.subheadline.weight(.semibold))
-                    MoneyField(title: "Your total", text: $expectedText)
+                    Text("Compare with your own total (optional)").font(.subheadline.weight(.semibold))
+                    MoneyField(title: "Total from your notes", text: $expectedText)
                     if let expected = Money(parsing: expectedText) {
                         if expected == invoice.total {
                             Label("Matches.", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
@@ -98,7 +98,7 @@ struct ReviewStep: View {
                 }
                 .card()
 
-                Text("The PDF").font(.headline)
+                Text("The PDF").font(.headline).heading()
                 PDFPages(pages: pages) { fullScreen = pdfURL }
             }
             .padding()
@@ -117,9 +117,10 @@ struct ReviewStep: View {
     private func section(_ title: String, step: FlowStep, @ViewBuilder content: () -> some View) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(title).font(.headline)
+                Text(title).font(.headline).heading()
                 Spacer()
                 Button("Change") { goTo(step) }.buttonStyle(.bordered).controlSize(.small)
+                    .accessibilityLabel("Change \(title)")
             }
             content()
         }
@@ -235,6 +236,10 @@ struct PDFPages: View {
             }
         }
     }
+}
+
+extension URL: @retroactive Identifiable {
+    public var id: String { absoluteString }
 }
 
 /// The system share sheet for a file: Messages, Mail, AirDrop, Save to Files, Print.

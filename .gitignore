@@ -8,6 +8,9 @@ build/
 .build/
 DerivedData/
 
+# Generated from project.yml by `make generate`
+App/Info.plist
+
 # Machine-specific signing (created by `make setup`)
 Configs/Signing.xcconfig
 
