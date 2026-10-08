@@ -168,6 +168,29 @@ Found while checking:
 - The New Color chip first rendered as a tall "+" pill (a Label in a list row stretches);
   fixed.
 
+## Caleb's next three notes (Oct 8, 2026)
+
+- Color chips: each has a dot of its color, left of the name, with a white ring on the
+  orange picked chips. Her glazes come from the median color of each single-color button
+  photo in the seed catalog: Red heart #DE3F19, Burgundy heart #B04444, Navy heart
+  #131C44, Lavender ellipse #BFAAC9, Matte Pink nautilus #CFA493, Celadon dogwood
+  #A1AB8F, Brown nautilus #AA511C. Some medians were pulled off by an outline or
+  highlight (Blue crab #97846D, the crab's brown outline; Pale Pink cowrie #C9D0CA;
+  Ivory dogwood #A49E95), so those were set by eye from the photos. About 60 common
+  color words ("Sage", "Light Blue", "Navy Blue") get a dot too; an unknown word gets
+  none. `make test`: 37 tests in 10 suites passed (new: every saved color has a dot;
+  color words read right).
+- Row corners: the photo now sits on the same white card as Take Photo and Choose from
+  Photos (new-button step 1 and Change Button), so the card's top corners are rounded.
+  Skip Photo is plain text under Next, and Remove from Invoice has its own card, for the
+  same reason.
+- Change Button: Delete This Button has a trash icon; "Before your changes" is now
+  "Earlier versions".
+
+Checked in Device Hub: Bunny's Change Button screen (photo card, dots on all 16 colors,
+trash icon, Earlier versions), new-button step 1, and a line's Change Line screen in a
+throwaway draft, deleted afterwards.
+
 ## M2 results (Caleb)
 
 Use the Part N, step M labels from Docs/m2-test.md.

@@ -6,7 +6,7 @@ labels below. Commands run in Terminal from the project folder
 
 ## Part 1: Logic and PDF
 
-1. Run `make test`. Expected: "Test run with 35 tests in 9 suites passed".
+1. Run `make test`. Expected: "Test run with 37 tests in 10 suites passed".
 2. Run `make sample-pdfs`. A Finder window opens on build/sample-pdfs.
 3. Open "Daphné Verley Invoice - AOB 0260903.pdf" there and the same file in
    Examples/Invoice Excel and Output PDFs side by side (select both in Finder, press
@@ -80,7 +80,7 @@ labels below. Commands run in Terminal from the project folder
     Changes…** and **Delete…** right away; tap outside to close it. Turn the switch on, go back. Expected: it's
     under "Paid".
 17. Buttons tab → Heart section → tap **Navy, Medium** → change the price to 4.50 →
-    **Save Changes**. Tap it again. Expected: "Before your changes" shows the $4.00
+    **Save Changes**. Tap it again. Expected: "Earlier versions" shows the $4.00
     version. Tap **Archive This Button**. Expected: it moves to "Archived" at the bottom of
     the list.
 18. Settings tab → change Street to "1 Test Street". Invoices tab → open the finished
@@ -142,7 +142,8 @@ Checks for SPEC.md, "Design guidelines". Use the iPhone Simulator from Part 2.
     price row above the keypad. Tap the heart photo. Expected: the keypad closes.
 11. Tap **‹** twice and **✕**, then the back arrow (the empty draft is removed). Buttons tab
     → **Add a Button** → **Skip Photo**. Under Colors, tap **Navy**, then **New Color**,
-    type `Sage`, **Add**. Expected: **Navy ✕** and **Sage ✕** in orange, and the footer
+    type `Sage`, **Add**. Expected: **Navy ✕** and **Sage ✕** in orange, each with a dot of
+    its color, every other color chip with its dot too, and the footer
     "Tap one or more colors. The first one is the main color." Tap **✕** at the top left →
     **Discard Changes** (the question comes from the ✕). Open **Add a Button** → **Skip
     Photo** again. Expected: **Sage** is in the list. ⌥⌘K again to hide the keyboard.

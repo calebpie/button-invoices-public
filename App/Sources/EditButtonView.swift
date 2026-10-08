@@ -36,7 +36,7 @@ struct EditButtonView: View {
                     .frame(width: 170, height: 170)
                     Spacer()
                 }
-                .listRowBackground(Color.clear)
+                .padding(.vertical, 8)
                 PhotoSourceButtons(takeLabel: draft.photo == nil ? "Take Photo" : "Retake Photo",
                                    chooseLabel: "Choose from Photos") { image in
                     draft.source = image
@@ -74,7 +74,7 @@ struct EditButtonView: View {
                     dismiss()
                 }
                 if neverInvoiced {
-                    Button("Delete This Button", role: .destructive) { confirmDelete = true }
+                    Button("Delete This Button", systemImage: "trash", role: .destructive) { confirmDelete = true }
                 }
             } footer: {
                 Text(neverInvoiced
@@ -97,7 +97,7 @@ struct EditButtonView: View {
                         }
                     }
                 } header: {
-                    Text("Before your changes")
+                    Text("Earlier versions")
                 } footer: {
                     Text("A copy is kept each time you change this button. Finished invoices keep what they had.")
                 }

@@ -229,7 +229,7 @@ struct NewButtonPhotoStep: View {
                     .frame(width: 200, height: 200)
                     Spacer()
                 }
-                .listRowBackground(Color.clear)
+                .padding(.vertical, 8)
                 PhotoSourceButtons(takeLabel: draft.photo == nil ? "Take Photo" : "Retake Photo",
                                    chooseLabel: "Choose from Photos") { image in
                     draft.source = image
@@ -251,8 +251,11 @@ struct NewButtonPhotoStep: View {
                 .disabled(draft.photo == nil)
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
+                // Both on the screen's background: a card under a bare button would have
+                // square top corners.
                 Button("Skip Photo") { advance(.details) }
                     .frame(maxWidth: .infinity)
+                    .listRowBackground(Color.clear)
             }
         }
         .readableWidth()
@@ -637,6 +640,7 @@ struct ButtonDetailsSections: View {
                     ForEach(Array(draft.colors.enumerated()), id: \.offset) { index, color in
                         Button { removeColor(at: index) } label: {
                             HStack(spacing: 6) {
+                                ColorDot(name: color, onAccent: true)
                                 Text(color)
                                 Image(systemName: "xmark").font(.caption.weight(.bold))
                             }
@@ -650,10 +654,16 @@ struct ButtonDetailsSections: View {
             }
             FlowChips {
                 ForEach(colorChoices, id: \.self) { color in
-                    Button(color) { addColors([color]) }
-                        .buttonStyle(.bordered)
-                        .buttonBorderShape(.capsule)
-                        .tint(.primary)
+                    Button { addColors([color]) } label: {
+                        HStack(spacing: 6) {
+                            ColorDot(name: color)
+                            Text(color)
+                        }
+                    }
+                    .accessibilityLabel(color)
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.capsule)
+                    .tint(.primary)
                 }
                 Button { askNewColor = true } label: {
                     // Not a Label: in a list row a Label stretches to the row's height.
@@ -744,6 +754,25 @@ struct ButtonDetailsSections: View {
         let text = (variants.map(\.title) + designs.map(\.name) + [addedColorsText]).joined(separator: " ")
         return Set(Naming.splitWords(text.replacingOccurrences(of: ",", with: " ").replacingOccurrences(of: "/", with: " "))
             .map { $0.lowercased() })
+    }
+}
+
+/// A dot of the color a chip names, so she sees the glaze, not just its name. A color word
+/// the app doesn't know gets no dot.
+struct ColorDot: View {
+    let name: String
+    /// On an orange chip the ring is white, so a dark or reddish dot still stands out.
+    var onAccent = false
+
+    var body: some View {
+        if let rgb = Swatch.rgb(for: name) {
+            Circle()
+                .fill(Color(red: rgb.red, green: rgb.green, blue: rgb.blue))
+                .overlay(Circle().strokeBorder(onAccent ? Color.white : Color.primary.opacity(0.25),
+                                               lineWidth: onAccent ? 1.5 : 0.5))
+                .frame(width: 14, height: 14)
+                .accessibilityHidden(true)
+        }
     }
 }
 

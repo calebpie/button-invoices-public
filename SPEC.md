@@ -1,6 +1,6 @@
 # Button Invoices — specification
 
-Revision 7, October 8, 2026 (sizes for every shape, colors picked from chips, keyboard handling; see Design guidelines). Source of truth for the project; propose changes to Caleb
+Revision 8, October 8, 2026 (color dots on the chips, photo and action cards; see Design guidelines). Source of truth for the project; propose changes to Caleb
 rather than diverging. Status and test results: Docs/progress.md.
 
 ## Goal
@@ -41,7 +41,7 @@ and iPad can be switched on later without a migration (see Open questions).
   quantity, price each, discount each in dollars (and the percentage, if she entered
   one). Later catalog edits update lines on Draft invoices only.
 - **Button history**: a copy of a button's name, SKU, price and photo, saved before each
-  change to it (shown under "Before your changes" when she edits the button).
+  change to it (shown under "Earlier versions" when she edits the button).
 - **Shipping charge**: amount, a note for her, optional receipt photo.
 - **Business details** (Settings tab): seller name and address, bill-to, routing and
   account numbers, the "BUTTON" and "daphné verley ceramics" lines, the PDF name prefix.
@@ -222,7 +222,9 @@ Four steps, from an invoice or from the Buttons tab:
    picked are listed too. "It's a New Button" continues.
 3. **Shape, colors and price**: as filled in so far, cleaned up as she types (Names), with
    the SKU suggested (SKUs). A button with the same name or SKU can't be saved twice.
-   Colors are tapped, not typed (Caleb, Oct 8, 2026): every color used so far is a chip;
+   Colors are tapped, not typed (Caleb, Oct 8, 2026): every color used so far is a chip
+   with a dot of that color (her glazes as measured from her photos, then common color
+   words; InvoiceKit/Swatch.swift; a word it doesn't know gets no dot);
    the ones she picks show first, in order, each with ✕ to take it off, and the first is
    the main color. "New Color" adds one by name; it is kept for future buttons even before
    a saved button uses it.
@@ -337,6 +339,10 @@ Applied (HIG page in parentheses):
 - No confirmation for Finish; a success haptic marks it (Alerts, Playing haptics).
   Confirmations stay for deleting and for reopening a sent invoice.
 - Every swipe action is also in the touch-and-hold menu (Context menus, Gestures).
+- Grouped rows always form whole rounded cards: a button photo sits on its card with
+  Take Photo and Choose from Photos; a bare prominent button never has a card row under
+  it (Skip Photo is plain text; Remove from Invoice has its own card). Destructive rows
+  carry an icon like the rows beside them (Lists and tables, Buttons).
 - Keyboards: no Done bar above the number pads (Caleb, Oct 8, 2026). Tapping anywhere
   outside a field puts the keyboard away, as does dragging it down. Tapping anywhere in a
   field's row, its label included, goes into the field (SwiftUI otherwise takes only the

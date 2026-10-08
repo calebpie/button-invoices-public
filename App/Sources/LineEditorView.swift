@@ -119,13 +119,15 @@ struct LineEditorView: View {
                 .disabled(!isValid)
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
-                if case .edit(let line) = mode {
-                    Button("Remove from Invoice", role: .destructive) {
+            }
+            if case .edit(let line) = mode {
+                // Its own card: under the bare Save button it had square top corners.
+                Section {
+                    Button("Remove from Invoice", systemImage: "trash", role: .destructive) {
                         context.undoManager?.setActionName("Remove Button")
                         context.delete(line)
                         dismiss()
                     }
-                    .frame(maxWidth: .infinity)
                 }
             }
         }
