@@ -14,6 +14,7 @@ Configs/Signing.xcconfig
 # Real invoices, photos and bank details stay local (SPEC.md, "Privacy")
 Examples/
 App/Resources/Seed/business.json
+App/Resources/Seed/invoices.json
 
 # Python
 __pycache__/

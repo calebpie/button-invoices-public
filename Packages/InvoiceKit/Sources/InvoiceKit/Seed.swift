@@ -62,3 +62,39 @@ public struct SeedCatalog: Codable, Sendable {
     public var source: String
     public var variants: [Variant]
 }
+
+/// Invoices already sent before the app, loaded as paid on first launch. Written by
+/// Tools/seed/extract_seed.py from the invoice workbooks.
+public struct SeedInvoices: Codable, Sendable {
+    public struct Line: Codable, Sendable {
+        public var sku: String
+        /// As it was printed ("Pineaple, Yellow / Brown"); the app uses the catalog's name.
+        public var description: String
+        public var quantity: Int
+        public var unitPriceCents: Int
+        public var discountCents: Int
+    }
+
+    public struct Invoice: Codable, Sendable {
+        public var number: String
+        /// "2026-04-25"
+        public var date: String
+        public var lines: [Line]
+        public var shippingCents: [Int]
+        public var printedTotalCents: Int
+        public var source: String
+
+        /// Noon local time on the invoice date, so the printed day can't shift.
+        public var day: Date? {
+            let parts = date.split(separator: "-").compactMap { Int($0) }
+            guard parts.count == 3 else { return nil }
+            return Calendar.current.date(from: DateComponents(year: parts[0], month: parts[1], day: parts[2], hour: 12))
+        }
+
+        public var total: Money {
+            Money(cents: lines.reduce(0) { $0 + ($1.unitPriceCents - $1.discountCents) * $1.quantity } + shippingCents.reduce(0, +))
+        }
+    }
+
+    public var invoices: [Invoice]
+}

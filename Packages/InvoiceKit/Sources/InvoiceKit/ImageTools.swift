@@ -28,6 +28,19 @@ public enum ImageTools {
         encode(image, type: .jpeg, properties: [kCGImageDestinationLossyCompressionQuality: quality])
     }
 
+    /// The image flattened onto white and re-decoded from JPEG data, so a PDF context can
+    /// embed the JPEG bytes directly.
+    public static func jpegOnWhite(_ image: CGImage, quality: Double = 0.85) -> CGImage? {
+        guard let ctx = rgbaContext(width: image.width, height: image.height) else { return nil }
+        let rect = CGRect(x: 0, y: 0, width: image.width, height: image.height)
+        ctx.setFillColor(gray: 1, alpha: 1)
+        ctx.fill(rect)
+        ctx.draw(image, in: rect)
+        guard let flat = ctx.makeImage(), let data = jpegData(flat, quality: quality),
+              let provider = CGDataProvider(data: data as CFData) else { return nil }
+        return CGImage(jpegDataProviderSource: provider, decode: nil, shouldInterpolate: true, intent: .defaultIntent)
+    }
+
     /// Decodes PNG/JPEG/HEIC data, applying the EXIF orientation so the result is upright,
     /// and scaling so the longer side is at most `maxSide`.
     public static func uprightImage(from data: Data, maxSide: Int) -> CGImage? {

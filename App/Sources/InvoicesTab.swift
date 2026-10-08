@@ -7,7 +7,8 @@ import SwiftUI
 struct InvoicesTab: View {
     @Environment(\.modelContext) private var context
     @Environment(BusinessSettings.self) private var settings
-    @Query(sort: \Invoice.date, order: .reverse) private var invoices: [Invoice]
+    @Query(sort: [SortDescriptor(\Invoice.date, order: .reverse), SortDescriptor(\Invoice.number, order: .reverse)])
+    private var invoices: [Invoice]
     @State private var path: [Invoice] = []
     @State private var pendingDelete: Invoice?
 

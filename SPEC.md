@@ -1,6 +1,6 @@
 # Button Invoices — specification
 
-Revision 3, October 8, 2026 (three tabs instead of a home screen; archive; Settings frozen into finished invoices; template typos corrected). Source of truth for the project; propose changes to Caleb
+Revision 4, October 8, 2026 (the nine sent invoices preloaded as paid; smaller PDFs). Source of truth for the project; propose changes to Caleb
 rather than diverging. Status and test results: Docs/progress.md.
 
 ## Goal
@@ -77,6 +77,17 @@ thumbnail). The invoice names are kept; the file names say:
 | Nautilus, Cotton Tail | Nautilus, White (26NW) |
 | Star, Burgundy, Mini | Star, Burgundy, Small (26SBS) |
 | Dogwood Flower, … | Dogwood, … |
+
+Sent invoices: the nine invoices in Examples/ (0260426-1 … 0260903) are extracted into
+Seed/invoices.json (gitignored) from the values Excel saved in each workbook: number,
+the date printed (=TODAY() as last calculated; it matches each PDF), each line's SKU,
+quantity, price and discount, and the shipping rows. The script stops if lines plus
+shipping don't equal the printed total. On first launch the app loads them as Paid
+invoices, finished the way the app finishes one (business details stored, PDF rendered
+and stored), with lines taking the catalog's current names and photos (so "Ladybug, Red /
+White", "Pineapple", "Suite 100"). SKUs, quantities, prices, shipping and totals are as
+sent. Invoice numbers already in the app are skipped. Probe, Oct 8, 2026: all nine load
+with the printed totals; first launch takes 0.86 s in the Simulator.
 
 Kept: Pineapple's 26PYB (on sent invoice 0260812, though Brown is BR elsewhere), and
 "Rose, White / Green" (the edited photo is named "White : Blue", but its leaves are the
@@ -265,7 +276,8 @@ US Letter, laid out like the Excel printout (InvoiceKit/InvoicePDF.swift; positi
 measured from 0260903.pdf): logo, seller block, grey INVOICE, invoice # and date box,
 BILL TO, the table (SKU, IMAGE, DESCRIPTION, QTY, PRICE, DISCOUNT, SUBTOT) with 58 pt
 rows, SUBTOTAL / SHIPPING… / TOTAL, routing and account beside the last two total rows.
-Accounting-style amounts ("$ 9.00", "$ -"). Nine buttons fit on page 1 as in Excel;
+Accounting-style amounts ("$ 9.00", "$ -"). Button photos are embedded as 200 px JPEGs on
+white, so an invoice is 66–212 KB (the nine examples; 153 KB–1.1 MB as PNGs). Nine buttons fit on page 1 as in Excel;
 later pages repeat the column header (Excel's didn't). Named
 "Daphné Verley Invoice - AOB <number>.pdf".
 

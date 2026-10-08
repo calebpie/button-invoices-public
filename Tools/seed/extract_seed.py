@@ -6,12 +6,16 @@ Writes, into --out (default App/Resources/Seed):
                  there is one, otherwise the small copy embedded in the workbook
   business.json  seller, bill-to, routing and account from the Invoice sheet (gitignored:
                  it holds bank details)
+  invoices.json  every invoice workbook in the same folder as --xlsx ("… Invoice - AOB
+                 <number>.xlsx"), as sent: number, date, lines, shipping, printed total.
+                 Loaded as paid invoices on first launch (gitignored: real sales)
 
 Standard library only. Usage (from the repo root; `make seed` runs this):
   python3 Tools/seed/extract_seed.py [--xlsx <workbook>] [--photos <dir>] [--out <dir>]
 """
 
 import argparse
+import datetime
 import json
 import re
 import shutil
@@ -174,6 +178,42 @@ def slug(text):
     return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
 
 
+def cents(text):
+    return round(float(text) * 100) if text not in (None, "") else 0
+
+
+def extract_invoices(folder):
+    """The sent invoices, from the cached values Excel saved in each workbook."""
+    invoices = []
+    # Glob without the "é": macOS file names may store it decomposed.
+    for path in sorted(folder.glob("*Invoice - AOB *.xlsx")):
+        cells = Workbook(path).cells("Invoice")
+        value = lambda ref: (cells.get(ref, (None, None))[0] or "").strip()
+        serial = value("H8")  # =TODAY(), as last calculated: the date printed on the PDF
+        date = datetime.date(1899, 12, 30) + datetime.timedelta(days=int(float(serial)))
+        lines = []
+        for row in range(16, 400, 5):  # one 5-row block per button
+            description = value(f"C{row + 2}")
+            if not description:
+                continue
+            lines.append({
+                "sku": value(f"A{row}"), "description": description,
+                "quantity": int(float(value(f"F{row}"))),
+                "unitPriceCents": cents(value(f"G{row}")), "discountCents": cents(value(f"H{row}")),
+            })
+        rows = sorted(cells.items(), key=lambda kv: (int(re.sub(r"[A-Z]+", "", kv[0])), kv[0]))
+        shipping = [cents(value("I" + re.sub(r"[A-Z]+", "", ref))) for ref, (v, _) in rows if v == "SHIPPING:"]
+        total = next(cents(value("I" + re.sub(r"[A-Z]+", "", ref))) for ref, (v, _) in rows if v == "TOTAL:")
+        computed = sum((l["unitPriceCents"] - l["discountCents"]) * l["quantity"] for l in lines) + sum(shipping)
+        if computed != total:
+            sys.exit(f"{path.name}: lines and shipping add up to {computed} cents, the invoice says {total}")
+        invoices.append({
+            "number": value("F8"), "date": date.isoformat(), "lines": lines,
+            "shippingCents": [c for c in shipping if c], "printedTotalCents": total, "source": path.name,
+        })
+    return invoices
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--xlsx", type=Path, default=DEFAULT_XLSX)
@@ -265,6 +305,13 @@ def main():
         "account": beside("Account:"),
     }
     (args.out / "business.json").write_text(json.dumps(business, indent=2, ensure_ascii=False) + "\n")
+
+    invoices = extract_invoices(args.xlsx.parent)
+    (args.out / "invoices.json").write_text(json.dumps({"invoices": invoices}, indent=2, ensure_ascii=False) + "\n")
+    print(f"{len(invoices)} sent invoices: " + ", ".join(f"{i['number']} ${i['printedTotalCents'] / 100:,.2f}" for i in invoices))
+    unknown = sorted({l["sku"] for i in invoices for l in i["lines"]} - {v["sku"] for v in variants})
+    if unknown:
+        print(f"  note: invoiced SKUs not in the catalog: {', '.join(unknown)}")
 
     priced = sum(1 for v in variants if v["priceCents"])
     print(f"{len(variants)} buttons ({priced} with prices) from {args.xlsx.name} → {args.out}")

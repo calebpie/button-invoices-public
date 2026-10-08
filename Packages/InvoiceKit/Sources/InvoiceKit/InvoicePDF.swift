@@ -343,9 +343,15 @@ private struct Page {
     }
 
     func image(_ image: CGImage, in rect: CGRect, fit: Bool = false) {
-        var small = ImageTools.downscaled(image, maxSide: 300)
+        var small = ImageTools.downscaled(image, maxSide: fit ? 400 : 300)
         if fit, let bounds = Cutout.opaqueBounds(small), let trimmed = small.cropping(to: bounds) {
             small = trimmed // photos are square with a margin; the cell should hold the button itself
+        }
+        if fit {
+            // Button photos go in as small JPEGs on white, which PDF stores as they are:
+            // about 15 KB each instead of 100 KB as transparent PNGs. 200 px is over three
+            // pixels per point in a 58 pt cell.
+            small = ImageTools.jpegOnWhite(ImageTools.downscaled(small, maxSide: 200)) ?? small
         }
         var target = rect
         if fit {

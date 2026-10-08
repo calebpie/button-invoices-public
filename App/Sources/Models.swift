@@ -195,6 +195,15 @@ enum InvoiceStatus: String, CaseIterable, Identifiable {
         copyDetails(from: variant)
     }
 
+    /// A line whose button isn't in the catalog (a sent invoice with an unknown SKU).
+    init(position: Int, sku: String, description: String, quantity: Int, unitPrice: Money) {
+        self.position = position
+        self.sku = sku
+        self.itemDescription = description
+        self.quantity = quantity
+        self.unitPriceCents = unitPrice.cents
+    }
+
     /// For "Copy" on an invoice: the same button and quantity with the button's current name,
     /// photo and price (or the old line's, if the button has since been deleted).
     init(copying other: InvoiceLine) {

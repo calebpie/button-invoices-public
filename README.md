@@ -49,10 +49,12 @@ xcrun simctl addmedia booted Examples/Images/Raw/IMG_8516.heic "Examples/Images/
 ```bash
 make seed
 ```
-Rebuilds the starting catalog from the 0260903 workbook in Examples/ (another workbook:
+Rebuilds the starting catalog and the nine sent invoices (loaded as paid) from the
+workbooks in Examples/; the catalog comes from 0260903 (another workbook:
 `python3 Tools/seed/extract_seed.py --xlsx <file>`) and the edited PNGs in
 `Examples/Images/Edited`. Only affects a fresh install: the app loads the
-seed once, on first launch. To start the Simulator over with a fresh seed:
+seed once, on first launch. business.json and invoices.json are gitignored (bank details,
+real sales), so a fresh clone needs Examples/ and `make seed` before building. To start the Simulator over with a fresh seed:
 ```bash
 xcrun simctl uninstall booted com.calebpietrafesa.ButtonInvoices
 ```

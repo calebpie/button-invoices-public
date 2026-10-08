@@ -17,7 +17,13 @@ struct ButtonInvoicesApp: App {
         } catch {
             fatalError("Couldn't open the app's data: \(error)")
         }
+        let start = Date()
         Seeder.seedCatalogIfNeeded(container.mainContext)
+        Seeder.seedSentInvoicesIfNeeded(container.mainContext)
+        #if DEBUG
+        Logger(subsystem: "InvoiceKit", category: "Probe").notice("probe: startup seeding took \(Date().timeIntervalSince(start)) s")
+        if UserDefaults.standard.bool(forKey: "ExportFinishedPDFs") { Self.exportFinishedPDFs(container.mainContext) }
+        #endif
         #if DEBUG
         Self.runCutoutProbeIfAsked()
         if UserDefaults.standard.bool(forKey: "FreezeProbe") { Self.runFreezeProbe(container.mainContext) }
@@ -25,6 +31,18 @@ struct ButtonInvoicesApp: App {
     }
 
     #if DEBUG
+    /// Probe: writes every finished invoice's stored PDF to tmp/StoredPDFs and logs totals.
+    static func exportFinishedPDFs(_ context: ModelContext) {
+        let log = Logger(subsystem: "InvoiceKit", category: "Probe")
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("StoredPDFs")
+        try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        for invoice in (try? context.fetch(FetchDescriptor<Invoice>(sortBy: [SortDescriptor(\.date)]))) ?? [] {
+            guard let pdf = invoice.finishedPDF else { continue }
+            try? pdf.write(to: folder.appendingPathComponent("\(invoice.number).pdf"))
+            log.notice("probe: stored \(invoice.number, privacy: .public) \(invoice.status.label, privacy: .public) \(InvoiceDocument.formatDate(invoice.date), privacy: .public) lines=\(invoice.sortedLines.count) total=\(invoice.total.formatted, privacy: .public) pdfBytes=\(pdf.count)")
+        }
+    }
+
     /// Probe for SPEC.md, "Settings" and "Button history": finishes an invoice, then changes
     /// Settings and the button's name, price and photo, and logs whether the finished PDF and
     /// lines changed. Uses a temporary in-memory store, so her data isn't touched.

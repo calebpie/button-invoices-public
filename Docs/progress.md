@@ -65,6 +65,15 @@ eye: all match. All 37 buttons now have an edited photo (600 px, 13 MB in the bu
 same shape other color 0.241–0.313, different shapes ≥ 0.338. Sample PDF 0260607 shows the
 same photos as the Excel PDF.
 
+## Sent invoices preloaded (Oct 8, 2026)
+
+The nine example invoices load as Paid on first launch (Seed/invoices.json from the
+workbooks; numbers, dates and totals cross-checked against the PDFs' text). Stored PDFs
+from the Simulator (ExportFinishedPDFs probe): 0260426-1 $947.21, -2 $1,321.14,
+-3 $440.14, -4 $4,192.90, -5 $1,876.18, 0260607 $7,422.11, 0260812 $976.90 (2 pages),
+0260819 $2,656.21, 0260903 $4,178.69: all equal the printed totals. First launch 0.86 s.
+PDF size with JPEG photos: 66–212 KB (was 153 KB–1.1 MB). `make test`: 35 passed.
+
 ## M2 results (Caleb)
 
 Pending. Use the Part N, step M labels from Docs/m2-test.md.

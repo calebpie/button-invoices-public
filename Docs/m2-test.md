@@ -6,7 +6,7 @@ labels below. Commands run in Terminal from the project folder
 
 ## Part 1: Logic and PDF
 
-1. Run `make test`. Expected: "Test run with 34 tests in 8 suites passed".
+1. Run `make test`. Expected: "Test run with 35 tests in 9 suites passed".
 2. Run `make sample-pdfs`. A Finder window opens on build/sample-pdfs.
 3. Open "Daphné Verley Invoice - AOB 0260903.pdf" there and the same file in
    Examples/Invoice Excel and Output PDFs side by side (select both in Finder, press
@@ -22,7 +22,10 @@ labels below. Commands run in Terminal from the project folder
 1. Start fresh: `xcrun simctl uninstall booted com.calebpietrafesa.ButtonInvoices`
    (an error that nothing is installed is fine), then `make sim`. The Simulator opens
    the app. Expected: tab bar Invoices · Buttons · Settings; Invoices shows "Hello,
-   Daphné. What would you like to do today?" and New Invoice. Buttons lists 37 buttons by
+   Daphné. What would you like to do today?", New Invoice, and under Paid the nine sent
+   invoices, newest first (0260903 $4,178.69 … 0260426-1 $947.21). Open 0260812: two pages,
+   $976.90, same lines as Examples/…/0260812.pdf with "Ladybug, Red / White" and
+   "Pineapple" spelled that way. Buttons lists 37 buttons by
    shape (Bunny first) with **Add a Button** floating bottom right; Pineapple, Celadon,
    Ellipse, "Ladybug, Red / White", Crab 26CBL and Shell 26SY are spelled that way.
    Settings shows "123 Example St, Suite 100".
