@@ -10,6 +10,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 1 | Grey strip under the tab bar as the keyboard goes away | Buttons, search | Open |
 | 2 | "Hello, Daphné." fades in place instead of sliding with the page | Invoices, opening an invoice | Open |
 | 3 | The receipt photo can't be opened full size to check the amount | Invoice step 2, Shipping | Open |
+| 4 | Swipe-delete: the row vanishes before she confirms; after she confirms, it vanishes with no animation | Invoices list | Open |
 
 ## 1. Grey strip under the tab bar as the keyboard goes away
 
@@ -112,3 +113,51 @@ own resolution; zooming further would show them larger but softer.
   Look's round trip (look, Done, tap the amount) proves awkward.
 - If the zoomed digits look too soft on her iPhone, keep receipts at a higher resolution
   (for example 3000 pixels, as dropping a photo in on iPad already reads them).
+
+## 4. Swipe-delete: the row vanishes before she confirms; after she confirms, it vanishes with no animation
+
+**Reported** (Caleb, Oct 8, 2026, iPhone, Docs/m3-test.md, Part 1, step 10): on the
+Invoices tab, swiping an invoice left and tapping **Delete** makes the row disappear for a
+moment, then come back with the "Delete invoice…?" question pointing at it. The row
+shouldn't go anywhere until she taps **Delete Invoice**. And once she does, the row vanishes
+without an animation and everything below jumps up without a transition.
+
+**Reproduced** (iOS 27.0 Simulator, iPhone 17, screen recording at 30 fps; a test draft made
+with Duplicate from Invoice 0261008, deleted in the recording):
+
+- **Delete** tapped at about 8.43 s. 8.47–8.53 s: the row shrinks away and the Drafts
+  section is left with only its footer. 8.60–8.80 s: the Paid section has slid up about 94
+  points (the row's height). 8.87 s: the row is back in a single frame and Paid jumps down
+  again, with no animation either way. 9.27–9.40 s: the question appears over the row.
+- **Delete Invoice** tapped at about 17.0 s. 17.15–17.35 s: the question shrinks back into
+  the row. 17.68 s: the row is still there. 17.75 s: in one frame, the Drafts header, the row
+  and its footer are gone and everything below has moved up 169 points (the "Paid" header,
+  measured in screenshots before and after: 411 → 242 points from the top).
+- Not checked yet: the same question from touching and holding the row (**Delete…** in its
+  menu). From the code, that path shouldn't make the row vanish first (no swipe action is
+  involved), but the final delete should jump the same way.
+- Also seen: for a draft, the question reads "Delete draft 0261008-2?" but its button says
+  **Delete Invoice**; the invoice screen's ⋯ menu says **Delete Draft…**.
+
+**Cause:**
+
+- The vanishing row: the swipe's Delete button has the destructive role
+  (`role: .destructive`, InvoicesTab.swift). SwiftUI's list treats a destructive swipe
+  action as the delete itself and animates the row out at once. Nothing was deleted (the
+  question is asked 0.4 s later), so the next update puts it back, unanimated. The 0.4 s
+  wait in that button ("Asked once the row has slid closed") was likely working around
+  this same removal.
+- The jump after confirming: `InvoiceActions.delete` deletes outside an animation, and the
+  list's `@Query` has none of its own, so the list redraws without the row in one step.
+  Because it was the only draft, the whole Drafts section went with it.
+
+**To try in the bug bash:**
+
+- The swipe button without the destructive role, colored red with `.tint(.red)`, so the
+  row only slides closed. Then check whether the 0.4 s wait is still needed; drop it if the
+  question appears without it.
+- Delete inside `withAnimation` (or give the `@Query` an animation), so the row collapses
+  and the rows below slide up. Check undo too (shaking puts the invoice back): it should
+  slide back in, not pop.
+- Match the button to the question: **Delete Draft** for a draft, **Delete Invoice** for
+  the others.
