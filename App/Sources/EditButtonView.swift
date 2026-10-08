@@ -120,12 +120,13 @@ struct EditButtonView: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 CancelButton { if isDirty { askDiscard = true } else { dismiss() } }
+                    .discardQuestion(isAsking: $askDiscard) { dismiss() }
             }
             ToolbarItem(placement: .confirmationAction) {
                 ConfirmButton(title: "Save", action: save).disabled(problem != nil)
             }
         }
-        .confirmsDiscard(isDirty, isAsking: $askDiscard) { dismiss() }
+        .confirmsDiscard(isDirty) { dismiss() }
         .fullScreenCover(item: $cutoutSource) { source in
             PhotoCutoutView(source: source.image) { png in draft.photo = png }
         }
@@ -175,11 +176,12 @@ struct NewButtonSheet: View {
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         CancelButton { if draft.hasContent { askDiscard = true } else { dismiss() } }
+                            .discardQuestion(isAsking: $askDiscard) { dismiss() }
                     }
                 }
                 .navigationDestination(for: NewButtonStep.self) { step($0) }
         }
-        .confirmsDiscard(draft.hasContent, isAsking: $askDiscard) { dismiss() }
+        .confirmsDiscard(draft.hasContent) { dismiss() }
     }
 
     private func step(_ s: NewButtonStep) -> some View {

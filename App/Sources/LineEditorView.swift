@@ -44,6 +44,7 @@ struct LineEditorView: View {
                 HStack {
                     TextField("Quantity", text: $quantityText)
                         .keyboardType(.numberPad)
+                        .numericInput($quantityText, .whole)
                         .font(.title.monospacedDigit())
                         .focused($quantityFocused)
                     Stepper("Quantity", value: Binding(
@@ -75,6 +76,7 @@ struct LineEditorView: View {
                         if !discountIsPercent { Text("$").foregroundStyle(.secondary) }
                         TextField(discountIsPercent ? "Percent off" : "Dollars off each button", text: $discountText)
                             .keyboardType(.decimalPad)
+                            .numericInput($discountText, .decimal)
                             .font(.title3.monospacedDigit())
                         if discountIsPercent { Text("%").foregroundStyle(.secondary) }
                         if discount == nil {
@@ -127,21 +129,21 @@ struct LineEditorView: View {
                 }
             }
         }
-        .scrollDismissesKeyboard(.immediately)
-        .keyboardDoneButton()
+        .scrollDismissesKeyboard(.interactively)
         .navigationTitle(isNew ? "Add to Invoice" : "Change Line")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if case .edit = mode {
                 ToolbarItem(placement: .cancellationAction) {
                     CancelButton { if isDirty { askDiscard = true } else { dismiss() } }
+                        .discardQuestion(isAsking: $askDiscard) { dismiss() }
                 }
             }
             ToolbarItem(placement: .confirmationAction) {
                 ConfirmButton(title: isNew ? "Add" : "Save", action: save).disabled(!isValid)
             }
         }
-        .confirmsDiscard(isEditing && isDirty, isAsking: $askDiscard) { dismiss() }
+        .confirmsDiscard(isEditing && isDirty) { dismiss() }
         .onAppear(perform: load)
     }
 
@@ -279,6 +281,7 @@ struct MoneyField: View {
             Text("$").foregroundStyle(.secondary)
             TextField(title, text: $text)
                 .keyboardType(.decimalPad)
+                .numericInput($text, .decimal)
                 .font(.title3.monospacedDigit())
             if !text.isEmpty && Money(parsing: text) == nil {
                 Image(systemName: "exclamationmark.circle.fill").foregroundStyle(.orange)

@@ -1,6 +1,6 @@
 # M2 test: the app in the Simulator
 
-About 40 minutes. Record results in Docs/progress.md under "M2", using the Part N, step M
+About 45 minutes. Record results in Docs/progress.md under "M2", using the Part N, step M
 labels below. Commands run in Terminal from the project folder
 (`cd "/Users/calebpietrafesa/Developer/DV Button Invoicer"`).
 
@@ -37,12 +37,13 @@ labels below. Commands run in Terminal from the project folder
    at the bottom, "Total so far · saved $0.00", and Next disabled with "Add at least one
    button to go on."
 4. Tap **Add a Button** → **Heart** → **Navy**. Expected: "Heart, Navy, Medium, $4.00 ·
-   26HNM" and **Use This Button**. Tap it, type 12 as the quantity (or tap **+**), tap **Add
+   26HNM", "Which size?" with **Medium** ticked and **Another Size**, and **Use This
+   Button**. Tap it, type 12 as the quantity (or tap **+**), tap **Add
    to Invoice**. Expected: line "12 × $4.00 … $48.00", total $48.00, Next enabled.
 5. **Add Another Button** → type `500 navy blue mushrooms @ $8` in the search field.
    Expected: heading "Which button? Tap it.", "500 buttons · $8.00 each. Now tap the
    button." and Mushroom, Navy / White first. Tap it. Expected: quantity 500, price 8. Tap
-   **Add Discount** → **Percent** → type 10 → keyboard **Done**. Expected: "$0.80 off each
+   **Add Discount** → **Percent** → type 10 → tap the Line total row. Expected: "$0.80 off each
    button", line total $3,600.00. Tap **Add to Invoice**.
 6. **Add Another Button** → **Daisy** → **Red / White** → **Large**. Expected: "There's no
    Daisy, Red / White, Large saved yet." Tap **Add as a New Button**.
@@ -53,7 +54,9 @@ labels below. Commands run in Terminal from the project folder
    (photo matching needs a real device; on the Mac it picks the strawberry) and "Your saved
    Daisy buttons:" with the four daisies, each with **It's This One** and **Same Shape, New
    Color or Size**. Tap **It's a New Button**.
-9. Expected: shape Daisy, colors Red / White, size Large, price $7.50, SKU 26DRWL. Tap
+9. Expected: shape Daisy; under Colors, **Red ✕** and **White ✕** in orange above the other
+   colors; size Large, price $7.50, SKU 26DRWL. Tap **White ✕**: it moves back into the
+   list. Tap **White** again. Tap
    **Next** → **Save and Add to Invoice**, quantity 10, **Add to Invoice**.
 10. Tap the back arrow at the top left. Expected: the Invoices tab lists this invoice under
     Drafts. Quit the app (Device Hub menu bar → **Controls → App Switcher**, then drag
@@ -115,7 +118,8 @@ Checks for SPEC.md, "Design guidelines". Use the iPhone Simulator from Part 2.
    **⌘Z**. Expected: the line is back. (Device Hub has no Shake; ⌘Z runs the same undo.
    Shaking the phone, with its "Undo Remove Button" question, is checked in M3.)
 4. Go back to the Invoices tab, swipe the duplicate left → **Delete**. Expected: the
-   question points at that invoice. Tap **Delete Invoice**. Press **⇧⌘H** (Home Screen), touch and hold the **Invoices** icon. Expected:
+   question points at that invoice. Tap **Delete Invoice**. Press **⇧⌘H** (Home Screen),
+   touch and hold the **Invoices** icon. Expected:
    **New Invoice** and **Add a Button**. Tap **Add a Button**. Expected: the app opens on
    the Buttons tab with the new-button steps. Tap **✕**.
 5. In Terminal:
@@ -129,6 +133,19 @@ Checks for SPEC.md, "Design guidelines". Use the iPhone Simulator from Part 2.
 7. Device Hub menu bar → **Controls → Rotate Left**. Expected: the iPhone turns, but the
    app stays upright (portrait only on iPhone). **Controls → Rotate Right** to return.
 8. Home Screen: expected app icon, a terracotta button with four holes on cream.
+9. Open the app, **New Invoice** → **Add a Button** → **Heart** → **Red** → **Use This
+   Button**. Type `12ab` on the Mac keyboard. Expected: the quantity shows 12. (Device Hub
+   sends the Mac keyboard as a hardware keyboard; Daphné's number pad has no letters.)
+10. Device Hub menu bar → **Device → Keyboard → Toggle Software Keyboard** (⌥⌘K) so the
+    on-screen keyboard shows. Tap the top edge of the Price each row, above the digits.
+    Expected: the number pad opens for the price, with no Done bar above it and the whole
+    price row above the keypad. Tap the heart photo. Expected: the keypad closes.
+11. Tap **‹** twice and **✕**, then the back arrow (the empty draft is removed). Buttons tab
+    → **Add a Button** → **Skip Photo**. Under Colors, tap **Navy**, then **New Color**,
+    type `Sage`, **Add**. Expected: **Navy ✕** and **Sage ✕** in orange, and the footer
+    "Tap one or more colors. The first one is the main color." Tap **✕** at the top left →
+    **Discard Changes** (the question comes from the ✕). Open **Add a Button** → **Skip
+    Photo** again. Expected: **Sage** is in the list. ⌥⌘K again to hide the keyboard.
 
 ## Notes for the results
 

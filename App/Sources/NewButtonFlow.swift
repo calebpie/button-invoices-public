@@ -108,7 +108,7 @@ enum NewButtonPurpose {
     /// Why it can't be saved yet, in her words, or nil.
     func problem(_ designs: [ButtonDesign], _ variants: [ButtonVariant], editing: ButtonVariant?) -> String? {
         if designName(designs).isEmpty { return "Pick the shape or type its name." }
-        if colors.isEmpty { return "Type at least one color." }
+        if colors.isEmpty { return "Pick at least one color." }
         if price == nil { return "Enter the price for one button." }
         if sku.isEmpty { return "The SKU can't be empty." }
         if let clash = variants.first(where: { $0 !== editing && $0.sku.caseInsensitiveCompare(sku) == .orderedSame }) {
@@ -526,22 +526,15 @@ struct ButtonDetailsSections: View {
 
     @Query(sort: [SortDescriptor(\ButtonDesign.name, comparator: .localizedStandard)]) private var designs: [ButtonDesign]
     @Query private var variants: [ButtonVariant]
+    /// Colors she added by name, kept for future buttons (see `AddedColors`).
+    @AppStorage(AddedColors.key) private var addedColorsText = ""
+    @State private var askNewColor = false
+    @State private var newColorText = ""
 
     var body: some View {
         Group {
             designSection
-            Section {
-                TextField("Colors, like Navy / White", text: $draft.colorsText)
-                    .textInputAutocapitalization(.words)
-                colorChips
-                if let fix = Spelling.suggestion(for: draft.colorsText, known: knownWords) {
-                    suggestion(fix) { draft.colorsText = fix }
-                }
-            } header: {
-                Text("Colors")
-            } footer: {
-                Text("Main color first. Separate two colors with “/”.")
-            }
+            colorsSection
             Section("Size") {
                 Picker("Size", selection: $draft.size) {
                     Text("One size").tag("")
@@ -633,18 +626,99 @@ struct ButtonDetailsSections: View {
         }
     }
 
-    private var colorChips: some View {
-        let current = Set(draft.colors.map { $0.lowercased() })
-        let chips = Catalog.knownColors(variants).filter { !current.contains($0.lowercased()) }.prefix(14)
-        return ScrollView(.horizontal, showsIndicators: false) {
-            HStack {
-                ForEach(Array(chips), id: \.self) { color in
-                    Button(color) { draft.colorsText = (draft.colors + [color]).joined(separator: " / ") }
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
+    // MARK: Colors
+
+    /// Colors are tapped, not typed: the ones she picked, in order, each with ✕ to take it
+    /// off, then every color she has used, then New Color for one she hasn't.
+    private var colorsSection: some View {
+        Section {
+            if !draft.colors.isEmpty {
+                FlowChips {
+                    ForEach(Array(draft.colors.enumerated()), id: \.offset) { index, color in
+                        Button { removeColor(at: index) } label: {
+                            HStack(spacing: 6) {
+                                Text(color)
+                                Image(systemName: "xmark").font(.caption.weight(.bold))
+                            }
+                        }
+                        .prominentButton()
+                        .buttonBorderShape(.capsule)
+                        .accessibilityLabel(index == 0 ? "\(color), main color" : color)
+                        .accessibilityHint("Removes this color")
+                    }
                 }
             }
+            FlowChips {
+                ForEach(colorChoices, id: \.self) { color in
+                    Button(color) { addColors([color]) }
+                        .buttonStyle(.bordered)
+                        .buttonBorderShape(.capsule)
+                        .tint(.primary)
+                }
+                Button { askNewColor = true } label: {
+                    // Not a Label: in a list row a Label stretches to the row's height.
+                    HStack(spacing: 4) {
+                        Image(systemName: "plus")
+                        Text("New Color")
+                    }
+                }
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.capsule)
+                .fixedSize()
+            }
+            if let fix = Spelling.suggestion(for: draft.colorsText, known: knownWords) {
+                suggestion(fix) { useSpelling(fix) }
+            }
+        } header: {
+            Text("Colors")
+        } footer: {
+            Text("Tap one or more colors. The first one is the main color. Tap ✕ to take one off.")
         }
+        .alert("New Color", isPresented: $askNewColor) {
+            TextField("Like Sage or Coral", text: $newColorText)
+                .textInputAutocapitalization(.words)
+            Button("Cancel", role: .cancel) { newColorText = "" }
+            Button("Add") {
+                let colors = Naming.cleanColors(newColorText)
+                newColorText = ""
+                addedColorsText = AddedColors.adding(colors, to: addedColorsText, known: Catalog.knownColors(variants))
+                addColors(colors)
+            }
+        } message: {
+            Text("It's added to this button and kept in the list for future buttons.")
+        }
+    }
+
+    /// Every color used so far, most used first, then ones she added that no button uses
+    /// yet; the ones already picked are left out.
+    private var colorChoices: [String] {
+        let picked = Set(draft.colors.map { $0.lowercased() })
+        return AddedColors.all(Catalog.knownColors(variants), addedColorsText).filter { !picked.contains($0.lowercased()) }
+    }
+
+    private func addColors(_ colors: [String]) {
+        var result = draft.colors
+        for color in colors {
+            // A color she already has, typed in other letters, is used as saved.
+            let known = AddedColors.all(Catalog.knownColors(variants), addedColorsText)
+            let name = known.first { $0.caseInsensitiveCompare(color) == .orderedSame } ?? color
+            if !result.contains(where: { $0.caseInsensitiveCompare(name) == .orderedSame }) { result.append(name) }
+        }
+        draft.colorsText = result.joined(separator: " / ")
+    }
+
+    private func removeColor(at index: Int) {
+        var colors = draft.colors
+        colors.remove(at: index)
+        draft.colorsText = colors.joined(separator: " / ")
+    }
+
+    /// Fixes the spelling in the draft and in the kept list.
+    private func useSpelling(_ fix: String) {
+        for (old, new) in zip(draft.colors, Naming.cleanColors(fix)) where old != new {
+            addedColorsText = AddedColors.replacing(old, with: new, in: addedColorsText)
+        }
+        draft.colorsText = fix
     }
 
     private func suggestion(_ fix: String, apply: @escaping () -> Void) -> some View {
@@ -666,7 +740,8 @@ struct ButtonDetailsSections: View {
     }
 
     private var knownWords: Set<String> {
-        let text = (variants.map(\.title) + designs.map(\.name)).joined(separator: " ")
+        // Colors she added on purpose count as known words too.
+        let text = (variants.map(\.title) + designs.map(\.name) + [addedColorsText]).joined(separator: " ")
         return Set(Naming.splitWords(text.replacingOccurrences(of: ",", with: " ").replacingOccurrences(of: "/", with: " "))
             .map { $0.lowercased() })
     }

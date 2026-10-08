@@ -112,7 +112,8 @@ lasts 90 days. Steps will be added to this README when the paid team exists (SPE
 Three tabs at the bottom: **Invoices**, **Buttons**, **Settings**.
 
 1. **Invoices → New Invoice.** The number and date are filled in.
-2. **Step 1, Buttons.** **Add a Button**: tap its shape, then its color (and size).
+2. **Step 1, Buttons.** **Add a Button**: tap its shape, its color, then its size
+   (**Another Size** for a new one).
    Or type the line from her notes in the search field ("125 burgundy mushrooms @ $8") and
    tap the photo. Check the quantity (type it, or **−** / **+**) and price, add a discount
    if any (**Dollars** or **Percent**), tap **Add to Invoice** (or ✓ at the top right).

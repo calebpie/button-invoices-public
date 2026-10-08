@@ -50,6 +50,7 @@ struct AddLineSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     CancelButton { if startedNewButton { askDiscard = true } else { dismiss() } }
+                        .discardQuestion(isAsking: $askDiscard) { dismiss() }
                 }
             }
             .navigationDestination(for: AddRoute.self) { route in
@@ -74,7 +75,7 @@ struct AddLineSheet: View {
                 }
             }
         }
-        .confirmsDiscard(startedNewButton, isAsking: $askDiscard) { dismiss() }
+        .confirmsDiscard(startedNewButton) { dismiss() }
     }
 
     private func startNewButton(_ draft: ButtonDraft) {
@@ -201,7 +202,8 @@ struct ButtonTile: View {
 // MARK: - Color and size
 
 /// The colors and sizes she has saved for one shape. Picking both fills in the button; a
-/// combination that isn't saved offers to add it.
+/// combination that isn't saved offers to add it. Sizes are offered for every shape, even one
+/// she has only made in one size, so a new size is always one tap away.
 struct VariantPickerView: View {
     let design: ButtonDesign
     let pick: (ButtonVariant) -> Void
@@ -223,19 +225,20 @@ struct VariantPickerView: View {
                             color = option
                             let sizes = Set(variants.filter { $0.colorsText == option }.map(\.size))
                             if sizes.count == 1 { size = sizes.first }
+                            else if let size, !sizes.contains(size) { self.size = nil }
                         } label: {
                             ColorTile(photo: variants.first { $0.colorsText == option && $0.photo != nil }?.photo,
                                       label: option, selected: color == option)
                         }
                         .buttonStyle(.plain)
                     }
-                    Button { newVariant([], hasSizes ? (size ?? "") : (sizeOptions.first ?? "")) } label: {
+                    Button { newVariant([], size ?? (sizeOptions.count == 1 ? sizeOptions[0] : "")) } label: {
                         ColorTile(photo: nil, label: "Another Color", selected: false, systemImage: "plus")
                     }
                     .buttonStyle(.plain)
                 }
 
-                if hasSizes, color != nil {
+                if color != nil {
                     Text("Which size?").font(.title3.weight(.semibold)).heading()
                     FlowChips {
                         ForEach(sizeOptions, id: \.self) { option in
@@ -256,6 +259,7 @@ struct VariantPickerView: View {
                         }
                         Button("Another Size", systemImage: "plus") { newVariant(chosenColors, "") }
                             .buttonStyle(.bordered)
+                            .buttonBorderShape(.capsule)
                     }
                 }
 
@@ -292,7 +296,7 @@ struct VariantPickerView: View {
                 .prominentButton()
             }
             .card()
-        } else if color != nil, !hasSizes || size != nil {
+        } else if color != nil, size != nil {
             VStack(alignment: .leading, spacing: 12) {
                 Text("There's no \(Naming.description(design: design.name, colors: chosenColors, size: chosenSize)) saved yet.")
                     .font(.headline)
@@ -317,13 +321,12 @@ struct VariantPickerView: View {
         return Set(variants.map(\.size)).sorted { (order.firstIndex(of: $0) ?? 99, $0) < (order.firstIndex(of: $1) ?? 99, $1) }
     }
 
-    private var hasSizes: Bool { sizeOptions.count > 1 }
     private var chosenColors: [String] { color.map { Naming.cleanColors($0) } ?? [] }
-    private var chosenSize: String { hasSizes ? (size ?? "") : (sizeOptions.first ?? "") }
+    private var chosenSize: String { size ?? "" }
 
     private var match: ButtonVariant? {
-        guard let color else { return nil }
-        return variants.first { $0.colorsText == color && $0.size == chosenSize && (hasSizes ? size != nil : true) }
+        guard let color, let size else { return nil }
+        return variants.first { $0.colorsText == color && $0.size == size }
     }
 }
 

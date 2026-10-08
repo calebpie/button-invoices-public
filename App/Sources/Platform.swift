@@ -67,20 +67,6 @@ extension View {
         }
     }
 
-    /// A Done button above every keyboard. The number pads have no Return key, so without it
-    /// the keyboard covers the rest of the form.
-    func keyboardDoneButton() -> some View {
-        toolbar {
-            ToolbarItemGroup(placement: .keyboard) {
-                Spacer()
-                Button("Done") {
-                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                }
-                .fontWeight(.semibold)
-            }
-        }
-    }
-
     /// On iPad, keeps forms and lists to a comfortable reading width instead of the full screen.
     func readableWidth() -> some View {
         frame(maxWidth: 760).frame(maxWidth: .infinity).background(Color(.systemGroupedBackground))
@@ -135,17 +121,34 @@ struct ConfirmButton: View {
 // MARK: - Unsaved changes
 
 extension View {
-    /// Asks before throwing away edits in a sheet, whether she taps Cancel or swipes the
-    /// sheet down (Sheets, "If people have unsaved changes … use an action sheet").
-    /// Call `requestDismiss` from the Cancel button.
-    func confirmsDiscard(_ isDirty: Bool, isAsking: Binding<Bool>, onDiscard: @escaping () -> Void) -> some View {
-        self
+    /// Asks before throwing away edits when she swipes a sheet down (Sheets, "If people have
+    /// unsaved changes … use an action sheet"). The ✕ asks with `discardQuestion` on the
+    /// button itself, so on iOS 26 that question points at the ✕.
+    func confirmsDiscard(_ isDirty: Bool, onDiscard: @escaping () -> Void) -> some View {
+        modifier(DiscardOnSwipe(isDirty: isDirty, onDiscard: onDiscard))
+    }
+
+    /// "Discard your changes?" with Discard Changes and Keep Editing. Attach it to the button
+    /// that asks.
+    func discardQuestion(_ title: String = "Discard your changes?", isAsking: Binding<Bool>,
+                         onDiscard: @escaping () -> Void) -> some View {
+        confirmationDialog(title, isPresented: isAsking, titleVisibility: .visible) {
+            Button("Discard Changes", role: .destructive, action: onDiscard)
+            Button("Keep Editing", role: .cancel) {}
+        }
+    }
+}
+
+private struct DiscardOnSwipe: ViewModifier {
+    let isDirty: Bool
+    let onDiscard: () -> Void
+    @State private var asking = false
+
+    func body(content: Content) -> some View {
+        content
             .interactiveDismissDisabled(isDirty)
-            .background(DismissAttemptDetector { if isDirty { isAsking.wrappedValue = true } })
-            .confirmationDialog("Discard your changes?", isPresented: isAsking, titleVisibility: .visible) {
-                Button("Discard Changes", role: .destructive, action: onDiscard)
-                Button("Keep Editing", role: .cancel) {}
-            }
+            .background(DismissAttemptDetector { if isDirty { asking = true } })
+            .discardQuestion(isAsking: $asking, onDiscard: onDiscard)
     }
 }
 
@@ -196,6 +199,233 @@ private struct DismissAttemptDetector: UIViewControllerRepresentable {
         func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
             original?.presentationControllerDidDismiss?(presentationController)
         }
+    }
+}
+
+// MARK: - Keyboard
+
+/// What a number field accepts. The number pads only type digits (and a decimal point), but
+/// a hardware keyboard or a paste can put anything in, so the text is cleaned as it changes.
+enum NumericInput {
+    /// Whole numbers: digits only.
+    case whole
+    /// Dollars or a percent: digits and one decimal point, at most two digits after it.
+    case decimal
+
+    func clean(_ text: String) -> String {
+        switch self {
+        case .whole:
+            return String(text.filter { $0.isASCII && $0.isNumber })
+        case .decimal:
+            var result = ""
+            var seenPoint = false
+            var decimals = 0
+            for c in text {
+                if c.isASCII && c.isNumber {
+                    if seenPoint {
+                        guard decimals < 2 else { continue }
+                        decimals += 1
+                    }
+                    result.append(c)
+                } else if c == ".", !seenPoint {
+                    seenPoint = true
+                    result.append(c)
+                }
+            }
+            return result
+        }
+    }
+}
+
+extension View {
+    func numericInput(_ text: Binding<String>, _ kind: NumericInput) -> some View {
+        onChange(of: text.wrappedValue, initial: true) { _, new in
+            let clean = kind.clean(new)
+            if clean != new { text.wrappedValue = clean }
+        }
+    }
+
+    /// Tapping outside a text field puts the keyboard away, and a field that gets the keyboard
+    /// is scrolled clear of it. Installed once, on the app's window.
+    func keyboardHandling() -> some View {
+        background(KeyboardAssistant.Installer())
+    }
+}
+
+/// The number pads have no Return or Done key; she puts the keyboard away by tapping
+/// anywhere else, as in Apple's own apps. When a field gets the keyboard, its whole row (not
+/// just the text) is scrolled above it with a little room to spare.
+@MainActor final class KeyboardAssistant: NSObject, UIGestureRecognizerDelegate {
+    static let shared = KeyboardAssistant()
+
+    private weak var window: UIWindow?
+    private weak var field: UIView?
+    /// In screen coordinates, while the keyboard is showing.
+    private var keyboardFrame: CGRect?
+    /// Space left between the row and the top of the keyboard.
+    private let margin: CGFloat = 16
+
+    struct Installer: UIViewRepresentable {
+        func makeUIView(context: Context) -> Probe {
+            let probe = Probe()
+            probe.isUserInteractionEnabled = false
+            return probe
+        }
+        func updateUIView(_ view: Probe, context: Context) {}
+
+        final class Probe: UIView {
+            override func didMoveToWindow() {
+                super.didMoveToWindow()
+                if let window { KeyboardAssistant.shared.install(in: window) }
+            }
+        }
+    }
+
+    private func install(in window: UIWindow) {
+        guard self.window !== window else { return }
+        self.window = window
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapped))
+        tap.cancelsTouchesInView = false
+        tap.delegate = self
+        window.addGestureRecognizer(tap)
+
+        let center = NotificationCenter.default
+        center.addObserver(self, selector: #selector(keyboardDidShow(_:)), name: UIResponder.keyboardDidShowNotification, object: nil)
+        center.addObserver(self, selector: #selector(keyboardDidChange(_:)), name: UIResponder.keyboardDidChangeFrameNotification, object: nil)
+        center.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        center.addObserver(self, selector: #selector(editingBegan(_:)), name: UITextField.textDidBeginEditingNotification, object: nil)
+        center.addObserver(self, selector: #selector(editingBegan(_:)), name: UITextView.textDidBeginEditingNotification, object: nil)
+    }
+
+    // MARK: Taps
+
+    private enum TapAction {
+        case focus(UITextField)
+        case dismiss(UIView)
+    }
+
+    private var pending: TapAction?
+
+    @objc private func tapped() {
+        switch pending {
+        case .focus(let target):
+            target.becomeFirstResponder()
+        case .dismiss(let editing):
+            // Wait for the tap to land: if it moved her into another field, keep the keyboard.
+            // Putting it away at once would undo the move.
+            Task {
+                try? await Task.sleep(for: .milliseconds(150))
+                if editing === field, editing.isFirstResponder { window?.endEditing(true) }
+            }
+        case nil:
+            break
+        }
+        pending = nil
+    }
+
+    func gestureRecognizer(_ recognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        pending = nil
+        if let target = missedField(touch) {
+            pending = .focus(target)
+            return true
+        }
+        guard keyboardFrame != nil, let field, field.isFirstResponder else { return false }
+        // A tap in the field's own row moves the cursor; a tap in any other field moves to it.
+        if let cell = cell(of: touch.view), field.isDescendant(of: cell) { return false }
+        if field.bounds.insetBy(dx: -8, dy: -8).contains(touch.location(in: field)) { return false }
+        var view = touch.view
+        while let v = view {
+            if v is UITextField || v is UITextView { return false }
+            view = v.superview
+        }
+        pending = .dismiss(field)
+        return true
+    }
+
+    /// A tap in a form row with one text field that misses the field itself. SwiftUI sizes a
+    /// field to its text, so in a 56-point row only the middle 26 points took the tap; the
+    /// rest of the row, and its label, now do too. Taps beside the field, where a row keeps
+    /// its own buttons (the stepper, Reset), are left alone.
+    private func missedField(_ touch: UITouch) -> UITextField? {
+        var view = touch.view
+        while let v = view, !(v is UICollectionViewCell || v is UITableViewCell) {
+            if v is UITextField || v is UITextView || v is UIControl { return nil }
+            view = v.superview
+        }
+        guard let cell = view else { return nil }
+        let fields = textFields(in: cell)
+        guard fields.count == 1, let target = fields.first, target.isEnabled, !target.isFirstResponder else { return nil }
+        let point = touch.location(in: target)
+        guard point.x <= target.bounds.maxX, !target.bounds.contains(point) else { return nil }
+        return target
+    }
+
+    private func textFields(in view: UIView) -> [UITextField] {
+        (view as? UITextField).map { [$0] } ?? view.subviews.flatMap(textFields)
+    }
+
+    private func cell(of view: UIView?) -> UIView? {
+        var view = view
+        while let v = view {
+            if v is UICollectionViewCell || v is UITableViewCell { return v }
+            view = v.superview
+        }
+        return nil
+    }
+
+    func gestureRecognizer(_ recognizer: UIGestureRecognizer,
+                           shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool { true }
+
+    // MARK: Keep the field clear of the keyboard
+
+    @objc private func keyboardDidShow(_ note: Notification) {
+        keyboardFrame = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
+        reveal()
+    }
+
+    /// The number pad and the full keyboard differ in height; only tracked while showing.
+    @objc private func keyboardDidChange(_ note: Notification) {
+        guard keyboardFrame != nil else { return }
+        keyboardFrame = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
+    }
+
+    @objc private func keyboardWillHide() {
+        keyboardFrame = nil
+    }
+
+    @objc private func editingBegan(_ note: Notification) {
+        field = note.object as? UIView
+        // Moving between fields with the keyboard already up: let the system scroll first.
+        guard keyboardFrame != nil else { return }
+        Task {
+            try? await Task.sleep(for: .milliseconds(350))
+            reveal()
+        }
+    }
+
+    private func reveal() {
+        guard let field, let window = field.window, let keyboardFrame else { return }
+        // The row the field sits in, so the whole row clears the keyboard.
+        var row: UIView = field
+        var scrollView: UIScrollView?
+        var view = field.superview
+        while let v = view {
+            if row === field, v is UICollectionViewCell || v is UITableViewCell { row = v }
+            if let s = v as? UIScrollView, !(s is UITextView), s.contentSize.height > s.bounds.height || s is UICollectionView {
+                scrollView = s
+                break
+            }
+            view = v.superview
+        }
+        guard let scrollView else { return }
+        let keyboardTop = window.convert(keyboardFrame, from: window.screen.coordinateSpace).minY
+        let rowBottom = row.convert(row.bounds, to: window).maxY
+        let overlap = rowBottom + margin - keyboardTop
+        guard overlap > 0 else { return }
+        let maxOffset = scrollView.contentSize.height + scrollView.adjustedContentInset.bottom - scrollView.bounds.height
+        let target = min(scrollView.contentOffset.y + overlap, maxOffset)
+        guard target > scrollView.contentOffset.y else { return }
+        scrollView.setContentOffset(CGPoint(x: scrollView.contentOffset.x, y: target), animated: true)
     }
 }
 

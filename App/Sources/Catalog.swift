@@ -70,3 +70,31 @@ enum Catalog {
         return (nil, Naming.cleanDesign(name), rest.joined(separator: " "), size)
     }
 }
+
+/// Colors she added by name with New Color that no saved button uses yet, so they're offered
+/// for future buttons. Kept in UserDefaults as one color per line; once a saved button uses a
+/// color it comes from the catalog instead.
+enum AddedColors {
+    static let key = "addedColors"
+
+    private static func list(_ text: String) -> [String] {
+        text.split(separator: "\n").map(String.init)
+    }
+
+    /// The catalog's colors, then the added ones it doesn't have yet.
+    static func all(_ known: [String], _ text: String) -> [String] {
+        known + list(text).filter { added in !known.contains { $0.caseInsensitiveCompare(added) == .orderedSame } }
+    }
+
+    static func adding(_ colors: [String], to text: String, known: [String]) -> String {
+        var result = list(text)
+        for color in colors where !(known + result).contains(where: { $0.caseInsensitiveCompare(color) == .orderedSame }) {
+            result.append(color)
+        }
+        return result.joined(separator: "\n")
+    }
+
+    static func replacing(_ old: String, with new: String, in text: String) -> String {
+        list(text).map { $0 == old ? new : $0 }.joined(separator: "\n")
+    }
+}

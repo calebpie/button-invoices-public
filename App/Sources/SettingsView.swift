@@ -105,6 +105,12 @@ struct SettingsView: View {
             TextField(label, text: text, prompt: Text(prompt))
                 .multilineTextAlignment(.trailing)
                 .keyboardType(keyboard)
+                .onChange(of: text.wrappedValue) { _, new in
+                    // Bank numbers are digits only.
+                    if keyboard == .numberPad, NumericInput.whole.clean(new) != new {
+                        text.wrappedValue = NumericInput.whole.clean(new)
+                    }
+                }
         }
     }
 

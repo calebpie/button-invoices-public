@@ -1,6 +1,6 @@
 # Button Invoices — specification
 
-Revision 6, October 8, 2026 (iPhone portrait only; fixes from Caleb's first M2 run; see Design guidelines). Source of truth for the project; propose changes to Caleb
+Revision 7, October 8, 2026 (sizes for every shape, colors picked from chips, keyboard handling; see Design guidelines). Source of truth for the project; propose changes to Caleb
 rather than diverging. Status and test results: Docs/progress.md.
 
 ## Goal
@@ -188,7 +188,8 @@ returns to Draft; she then finishes and sends it again) and Delete….
 ## Adding a line
 
 Shape first: a grid of shapes with photos. Picking one lists its saved colors (with
-photos), then its sizes if it has more than one. A saved combination fills in the button
+photos), then, once she picks a color, its sizes with "Another Size", even for a shape
+made in one size so far (Caleb, Oct 8, 2026). A saved combination fills in the button
 ("Use This Button"); one that isn't saved offers "Add as a New Button" with the shape,
 color and size filled in, as do "Another Color" and "Another Size". Typing in the search
 field above the shapes ("12 red hearts @ $4") is a shortcut straight to matching buttons
@@ -221,6 +222,10 @@ Four steps, from an invoice or from the Buttons tab:
    picked are listed too. "It's a New Button" continues.
 3. **Shape, colors and price**: as filled in so far, cleaned up as she types (Names), with
    the SKU suggested (SKUs). A button with the same name or SKU can't be saved twice.
+   Colors are tapped, not typed (Caleb, Oct 8, 2026): every color used so far is a chip;
+   the ones she picks show first, in order, each with ✕ to take it off, and the first is
+   the main color. "New Color" adds one by name; it is kept for future buttons even before
+   a saved button uses it.
 4. **Review**: photo, name, SKU, price, and whether it's a new shape; "Save and Add to
    Invoice" goes straight to the quantity screen.
 
@@ -325,12 +330,20 @@ Applied (HIG page in parentheses):
   the system scroll edge effect (Layout).
 - Sheets: Cancel (✕) at the top left and the confirm action (✓) at the top right, the
   one prominent button. Edits in a sheet are never lost silently: Cancel or swiping the
-  sheet down asks "Discard your changes?" (Sheets, Toolbars).
+  sheet down asks "Discard your changes?", from the ✕ when she tapped it (Sheets,
+  Toolbars).
 - One prominent button per screen; title-case labels; "…" on menu items that ask a
   question first (Buttons, Menus, Writing).
 - No confirmation for Finish; a success haptic marks it (Alerts, Playing haptics).
   Confirmations stay for deleting and for reopening a sent invoice.
 - Every swipe action is also in the touch-and-hold menu (Context menus, Gestures).
+- Keyboards: no Done bar above the number pads (Caleb, Oct 8, 2026). Tapping anywhere
+  outside a field puts the keyboard away, as does dragging it down. Tapping anywhere in a
+  field's row, its label included, goes into the field (SwiftUI otherwise takes only the
+  middle 26 points of a 56-point row). A field's whole row is kept clear of the keyboard
+  (Virtual keyboards, Text fields).
+- Number fields take only digits, and dollars and percents one decimal point with two
+  places, whether typed on a hardware keyboard or pasted (Text fields).
 - A question before deleting or changing an invoice comes from what she tapped: the
   invoice's row, or ⋯ (Action sheets).
 - Share uses the system share sheet and the standard Share button (Collaboration and

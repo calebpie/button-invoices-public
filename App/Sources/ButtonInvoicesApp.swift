@@ -138,7 +138,7 @@ struct ButtonInvoicesApp: App {
             RootView()
                 .environment(settings)
                 .environment(AppRouter.shared)
-                .keyboardDoneButton()
+                .keyboardHandling()
         }
         .modelContainer(container)
         .onChange(of: scenePhase) { _, phase in

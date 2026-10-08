@@ -78,19 +78,19 @@ struct ShippingEditorView: View {
                 }
             }
         }
-        .scrollDismissesKeyboard(.immediately)
-        .keyboardDoneButton()
+        .scrollDismissesKeyboard(.interactively)
         .navigationTitle("Shipping")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 CancelButton { if isDirty { askDiscard = true } else { dismiss() } }
+                    .discardQuestion(isAsking: $askDiscard) { dismiss() }
             }
             ToolbarItem(placement: .confirmationAction) {
                 ConfirmButton(title: charge == nil ? "Add" : "Save", action: save).disabled(amount == nil)
             }
         }
-        .confirmsDiscard(isDirty, isAsking: $askDiscard) { dismiss() }
+        .confirmsDiscard(isDirty) { dismiss() }
         .dropDestination(for: Data.self) { items, _ in
             // Drag a receipt photo in from Photos or Files on iPad (Drag and drop).
             guard let data = items.first, let image = ImageTools.uprightImage(from: data, maxSide: 3000) else { return false }

@@ -40,6 +40,7 @@ struct PhotoCutoutView: View {
                     // Touch-up work isn't thrown away without asking (Photo editing, "Confirm
                     // cancellation of edits").
                     CancelButton { if canvas?.canUndo == true { askDiscard = true } else { dismiss() } }
+                        .discardQuestion("Discard your touch-up?", isAsking: $askDiscard) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     ConfirmButton(title: touchingUp ? "Done" : "Use Photo") {
@@ -48,10 +49,6 @@ struct PhotoCutoutView: View {
                     .disabled(cutout == nil || saving)
                 }
             }
-        }
-        .confirmationDialog("Discard your touch-up?", isPresented: $askDiscard, titleVisibility: .visible) {
-            Button("Discard Changes", role: .destructive) { dismiss() }
-            Button("Keep Editing", role: .cancel) {}
         }
         .task {
             let result = await Cutout.lift(source)

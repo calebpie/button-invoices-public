@@ -135,6 +135,39 @@ checked later the same day), Siri phrases, drag and drop, ⌘N with a keyboard.
   Hub: New Invoice, Share PDF, Add a Button, Add Shipping, Next, Finish, the sheet's ✓ and
   the Buttons tab's Add a Button all show their icons.
 
+## Caleb's five notes (Oct 8, 2026)
+
+Checked by Claude in Device Hub, iPhone 17, iOS 27.0, with its on-screen keyboard.
+
+1. Quantity took letters from a hardware keyboard ("text"). Number fields now keep only
+   digits (dollars and percents: one decimal point, two places), however the text
+   arrives. The filter on sample inputs: "12ab" → "12", "1,234" → "1234", "$1,234.567" →
+   "1234.56", "4.5.6" → "4.56", "-3" → "3". Pasting "nothing is pushed" into the quantity
+   left it empty. Settings' routing and account numbers take digits only too.
+2. Done bar removed. Tapping outside a field puts the keyboard away: checked from the
+   quantity (tap on the heart card) and the SKU (tap on a section header). The editors now
+   close the keyboard only when she drags it down, not on any scroll.
+3. After a color, sizes are always offered: Heart → Red shows "Which size?" with
+   **✓ Medium** and **+ Another Size**.
+4. Colors are chips: picked ones in orange with ✕ (White ✕ took White off and put it back
+   in the list; Black joined as Blue ✕ Black ✕). New Color → "Sage" → Add picked it and
+   kept it in the list after it was taken off. A touch-and-hold "Remove from List" on
+   added colors didn't open inside the form row in the Simulator, so it was dropped; an
+   added color stays in the list. The test color was cleared afterwards.
+5. Keyboard overlap: the price row ended about 19 points above the number pad; the SKU
+   row, which Caleb's screenshot showed cut off, now sits fully above the keyboard.
+
+Found while checking:
+
+- A tap in the top or bottom 15 points of a 56-point field row missed the field (the
+  price field is 26 points tall; logged frame (34, 15, 320 × 26) and tap at y = 42). It
+  happened in the previous build too. Any tap in a row with one field, its label
+  included, now goes into the field; tapping "SKU" opened the SKU field.
+- "Discard your changes?" appeared mid-form. It now comes from the ✕ that asked;
+  swiping the form down still asks. Discard Changes left Clover as Blue / White.
+- The New Color chip first rendered as a tall "+" pill (a Label in a list row stretches);
+  fixed.
+
 ## M2 results (Caleb)
 
 Use the Part N, step M labels from Docs/m2-test.md.
