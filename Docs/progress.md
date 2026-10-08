@@ -6,7 +6,7 @@
 |---|---|
 | M1 Core logic and PDF | Done: Caleb ran Docs/m2-test.md, Part 1, steps 1–5, all pass (Oct 8, 2026) |
 | M2 App in the Simulator | Done: Caleb ran Docs/m2-test.md, Parts 2–4, all pass (Oct 8, 2026; results below) |
-| M3 App on her iPhone | Started: Personal Team signing set up; first `make ios` failed (below), fixed, rerun pending |
+| M3 App on her iPhone | Started: on Caleb's iPhone with the Personal Team (`make ios`, Oct 8, 2026); Docs/m3-test.md, Part 1, pending |
 
 ## Automated results (Claude, Oct 8, 2026, M4 Max, Xcode 27.0, iOS 27.0 Simulator)
 
@@ -304,6 +304,13 @@ tap-outside handling the cause; tighten the gap under "Hello, Daphné.".
   simulator isn't; Developer Mode off prints the steps). Not yet run with a phone.
 - README, "Installing on her iPhone or iPad": updated steps, and registering through
   Xcode once if the build still finds no devices.
+- Rerun (Caleb, after Developer Mode and a restart): "Building for iPhone 17" (his
+  phone's name), "App installed" under /private/var/containers/Bundle/Application (on the
+  phone, not a Simulator), "Launched application". The app is on his iPhone.
+- Docs/m3-test.md: Part 1 checks on his iPhone what the Simulator couldn't (Vision
+  background removal and photo matching, camera, shake to undo, the Finish haptic,
+  sharing); Part 2 is TestFlight to her iPhone once the paid team exists; Part 3 is
+  SPEC.md's test, her next real invoice.
 
 ## M2 results (Caleb)
 
