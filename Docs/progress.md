@@ -218,6 +218,29 @@ Built and checked in Device Hub:
 - Add a Button is now the + circle (VoiceOver: "Add a Button"); the empty catalog says
   "Tap + to save your first one."
 
+## Titles on all tabs; search that wouldn't close (Oct 8, 2026)
+
+- Invoices and Settings now use the Buttons tab's title style. Invoices' title is
+  "Hello, Daphné." (from Settings' greeting name; "Hello." if it's empty) with "What would
+  you like to do today?" just under it; the "Invoices" title is gone (the tab is still
+  Invoices). Opening an invoice still shows its own title and the back arrow.
+- Caleb's recording (13:24): tapping ✕ on the expanded search closed it for a moment,
+  then it reopened with the old text, again and again. Reproduced in Device Hub. Probes,
+  each with ✕ tapped after opening search:
+  - Keyboard handler off: still reopened. Title tracking off: still reopened. On-screen
+    keyboard instead of the hardware keyboard: still reopened.
+  - Search circle placed by iOS (after +) instead of before + with
+    `DefaultToolbarItem(kind: .search)`: the first close worked, but the second time
+    search opened it stuck as a wide capsule with no ✕, with the handler off and also with
+    the standard system title.
+  - So iOS 26's minimized search (`searchToolbarBehavior(.minimize)`) is unreliable in
+    this tab layout. Replaced: our own search circle (search, then +, as in Caleb's
+    mockup) shows the system search field under the title, focused; ✕ removes it.
+    Three open, type and ✕ cycles in a row worked with the on-screen keyboard, and two
+    with the hardware keyboard on; typing "Red" listed the red buttons.
+- The keyboard handler no longer acts on taps in the navigation, tab or search bars,
+  which run their own controls.
+
 ## M2 results (Caleb)
 
 Use the Part N, step M labels from Docs/m2-test.md.

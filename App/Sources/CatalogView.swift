@@ -12,6 +12,7 @@ struct CatalogView: View {
     @Query private var variants: [ButtonVariant]
 
     @State private var search = ""
+    @State private var searching = false
     @State private var showArchived = false
     @State private var editing: ButtonVariant?
     @State private var adding: NewButton?
@@ -74,7 +75,7 @@ struct CatalogView: View {
         .listStyle(.insetGrouped)
         .shrinkingTitle("Buttons")
         .toolbar {
-            searchCircle
+            ToolbarItem(placement: .topBarTrailing) { searchButton }
             ToolbarItem(placement: .topBarTrailing) { addButton }
         }
         .overlay {
@@ -85,10 +86,7 @@ struct CatalogView: View {
                 ContentUnavailableView.search(text: search)
             }
         }
-        // On iOS 26 search is a circle in the bar that opens into a field above the keyboard
-        // (Search fields, "Search in a toolbar"); on iOS 18 it's the field under the title.
-        .searchable(text: $search, placement: .toolbar, prompt: "Search buttons")
-        .minimizedSearch()
+        .searchOnRequest(text: $search, isSearching: $searching, prompt: "Search buttons")
         .readableWidth()
         .sheet(item: $editing) { variant in
             NavigationStack { EditButtonView(variant: variant) }
@@ -118,14 +116,12 @@ struct CatalogView: View {
         variants.filter(\.isHidden).sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
     }
 
-    /// Search, then Add, as circles in the bar, level with the title and there at any scroll
+    /// Search and add as circles in the bar, level with the title and there at any scroll
     /// position: symbols, the add one prominent (Toolbars, "Prefer simple, recognizable
     /// symbols"; "Use the .prominent style for key actions").
-    @ToolbarContentBuilder private var searchCircle: some ToolbarContent {
-        if #available(iOS 26.0, *) {
-            DefaultToolbarItem(kind: .search, placement: .topBarTrailing)
-            ToolbarSpacer(.fixed, placement: .topBarTrailing)
-        }
+    private var searchButton: some View {
+        Button("Search Buttons", systemImage: "magnifyingglass") { searching = true }
+            .keyboardShortcut("f", modifiers: .command)
     }
 
     private var addButton: some View {
@@ -199,17 +195,6 @@ struct CatalogView: View {
             for line in variant.invoiceLines ?? [] where line.invoice?.status == .draft {
                 line.copyDetails(from: variant)
             }
-        }
-    }
-}
-
-extension View {
-    /// iOS 26: the search field folds into a circle in the bar until she taps it.
-    @ViewBuilder func minimizedSearch() -> some View {
-        if #available(iOS 26.0, *) {
-            searchToolbarBehavior(.minimize)
-        } else {
-            self
         }
     }
 }

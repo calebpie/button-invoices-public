@@ -22,15 +22,17 @@ labels below. Commands run in Terminal from the project folder
 1. Start fresh: `xcrun simctl uninstall booted com.calebpietrafesa.ButtonInvoices`
    (an error that nothing is installed is fine), then `make sim`. Device Hub (Xcode 27's
    Simulator) opens with the app on the iPhone 17; if it shows another device, click
-   **iPhone 17** in its sidebar. Expected: tab bar Invoices · Buttons · Settings; Invoices shows "Hello,
-   Daphné. What would you like to do today?", New Invoice, and under Paid the nine sent
+   **iPhone 17** in its sidebar. Expected: tab bar Invoices · Buttons · Settings; Invoices has
+   the large title "Hello, Daphné." (no "Invoices" title) with "What would you like to do
+   today?" under it, New Invoice, and under Paid the nine sent
    invoices, newest first (0260903 $4,178.69 … 0260426-1 $947.21). Open 0260812: two pages,
    $976.90, same lines as Examples/…/0260812.pdf with "Ladybug, Red / White" and
    "Pineapple" spelled that way. Buttons lists 37 buttons by shape (Bunny first), with
    the large title "Buttons" level with a search circle and an orange **+** circle. Scroll
    down slowly: the title shrinks as you drag, the circles stay, and the list fades under
    the bar. Tap the search circle, type `heart`: three hearts; type `qq`: "No Results for
-   'qq'"; tap **✕**. Pineapple, Celadon, Ellipse, "Ladybug, Red / White", Crab 26CBL and Shell 26SY are spelled that way.
+   'qq'"; tap **✕**: the field goes away and stays away. Open and close search twice
+   more. Settings has the same large title style. Pineapple, Celadon, Ellipse, "Ladybug, Red / White", Crab 26CBL and Shell 26SY are spelled that way.
    Settings shows "123 Example St, Suite 100".
 2. Add test photos to the Simulator:
    `xcrun simctl addmedia booted Examples/Images/Raw/IMG_8516.heic "Examples/Images/Shipping Receipts/IMG_9049.heic"`

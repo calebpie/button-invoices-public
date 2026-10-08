@@ -94,8 +94,8 @@ struct SettingsView: View {
                 Text("Everything is kept on this device and included in its iCloud Backup. The bank numbers are kept in the device's keychain.")
             }
         }
+        .shrinkingTitle("Settings")
         .readableWidth()
-        .navigationTitle("Settings")
         .quickLookPreview($preview)
     }
 

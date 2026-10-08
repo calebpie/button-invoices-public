@@ -84,6 +84,46 @@ extension View {
     }
 }
 
+// MARK: - Search
+
+extension View {
+    /// The system search field, shown only while she searches: a search circle in the bar
+    /// opens it focused, and its Cancel takes it away again (Search fields, "Search in a
+    /// toolbar"). iOS 26's own minimized search does the same, but in this tab layout it
+    /// stuck half open the second time it was used, with or without the custom title and
+    /// keyboard handling (iOS 27.0 Simulator, Oct 8, 2026).
+    func searchOnRequest(text: Binding<String>, isSearching: Binding<Bool>, prompt: String) -> some View {
+        modifier(SearchOnRequest(text: text, isSearching: isSearching, prompt: prompt))
+    }
+}
+
+private struct SearchOnRequest: ViewModifier {
+    @Binding var text: String
+    @Binding var isSearching: Bool
+    let prompt: String
+    @State private var focused = false
+
+    func body(content: Content) -> some View {
+        if isSearching {
+            content
+                .searchable(text: $text, isPresented: $focused,
+                            placement: .navigationBarDrawer(displayMode: .always), prompt: prompt)
+                .task {
+                    // Focus once the field exists.
+                    focused = true
+                }
+                .onChange(of: focused) { _, isFocused in
+                    if !isFocused {
+                        text = ""
+                        isSearching = false
+                    }
+                }
+        } else {
+            content
+        }
+    }
+}
+
 // MARK: - Destructive rows
 
 /// A destructive list row's label with its icon in the same red as its text. A list colors a
@@ -403,6 +443,13 @@ extension View {
 
     func gestureRecognizer(_ recognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         pending = nil
+        // The bars run their own controls, search included; putting the keyboard away under
+        // the search field's ✕ left search half closed (Oct 8, 2026).
+        var bar = touch.view
+        while let v = bar {
+            if v is UINavigationBar || v is UIToolbar || v is UITabBar || v is UISearchBar { return false }
+            bar = v.superview
+        }
         if let target = missedField(touch) {
             pending = .focus(target)
             return true

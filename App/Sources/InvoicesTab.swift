@@ -21,13 +21,12 @@ struct InvoicesTab: View {
         NavigationStack(path: $router.invoicePath) {
             List {
                 Section {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Hello, \(settings.profile.greetingName).").font(.title.bold()).heading()
-                        Text("What would you like to do today?").foregroundStyle(.secondary)
-                    }
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-                    .listRowInsets(EdgeInsets(top: 4, leading: 4, bottom: 8, trailing: 4))
+                    // The greeting itself is the screen's title, in the bar (`shrinkingTitle`).
+                    Text("What would you like to do today?")
+                        .foregroundStyle(.secondary)
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                        .listRowInsets(EdgeInsets(top: 0, leading: 4, bottom: 8, trailing: 4))
                     Button(action: newInvoice) {
                         Label("New Invoice", systemImage: "plus.circle.fill")
                             .font(.title3.weight(.semibold))
@@ -97,6 +96,9 @@ struct InvoicesTab: View {
                     }
                 }
             }
+            // The question reads as the greeting's second line, not a section away.
+            .contentMargins(.top, 0, for: .scrollContent)
+            .shrinkingTitle(greeting)
             .overlay {
                 if invoices.isEmpty {
                     ContentUnavailableView("No Invoices Yet", systemImage: "doc.text",
@@ -105,8 +107,6 @@ struct InvoicesTab: View {
                 }
             }
             .readableWidth()
-            .navigationTitle("Invoices")
-            .toolbarTitleDisplayMode(.inline)
             .navigationDestination(for: Invoice.self) { InvoiceScreen(invoice: $0) }
             .onAppear(perform: removeEmptyDrafts)
             .onAppear(perform: handleRequest)
@@ -115,6 +115,12 @@ struct InvoicesTab: View {
                 ShareSheet(url: url).presentationDetents([.medium, .large])
             }
         }
+    }
+
+    /// "Hello, Daphné." from Settings, as the tab's title (Caleb, Oct 8, 2026).
+    private var greeting: String {
+        let name = settings.profile.greetingName.trimmingCharacters(in: .whitespaces)
+        return name.isEmpty ? "Hello." : "Hello, \(name)."
     }
 
     static func heading(_ status: InvoiceStatus) -> String {

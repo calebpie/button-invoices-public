@@ -140,8 +140,8 @@ or deletion.
 Shortcuts: touch and hold the app icon on the Home Screen for **New Invoice** and **Add a
 Button**. Siri knows them too: "Start an invoice in Invoices", "Add a button in Invoices".
 
-**Buttons tab**: every button by shape. **+** at the top right adds a new one and the
-magnifying glass beside it searches; both stay put as you scroll. Tap a button to change
+**Buttons tab**: every button by shape. The magnifying glass at the top right searches
+(tap ✕ to close it) and **+** adds a new button; both stay put as you scroll. Tap a button to change
 its photo, name or price; swipe left to **Archive** it. Neither
 changes invoices that are already finished.
 
