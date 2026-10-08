@@ -188,6 +188,9 @@ red") from matching everything.
 starts more than 4 designs ("s": 4; "c": 3); by buttons, the biggest is "n" with 9
 (Nautilus). "h" starts only Heart: 3 buttons.
 
+**Decided** (Caleb, Oct 8, 2026): the recommended fix below, one letter matching design
+names. Not the "Keep typing" hint.
+
 **To try in the bug bash:**
 
 - Recommended: let a search of one letter match the start of design names only ("h" →
