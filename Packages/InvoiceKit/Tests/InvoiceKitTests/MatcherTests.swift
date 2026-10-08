@@ -44,6 +44,21 @@ import Testing
         #expect(!ranked.isEmpty && ranked.allSatisfy { $0.candidate.design == "Mushroom" })
     }
 
+    /// Docs/ui-nits.md, nit 5: "h" found nothing.
+    @Test func oneLetterMatchesDesignNames() throws {
+        let all = try Self.candidates()
+        let h = Matcher.rank("h", among: all).map(\.candidate.design)
+        #expect(h.count == 3 && h.allSatisfy { $0 == "Heart" })
+        // Star, Shell, Sailboat, Strawberry; not Cowrie Shell, whose name starts with C.
+        let s = Set(Matcher.rank("S", among: all).map(\.candidate.design))
+        #expect(s == ["Star", "Shell", "Sailboat", "Strawberry"])
+        #expect(Matcher.rank("s", among: all).count == 5)
+        #expect(Matcher.rank("b", among: all).map(\.candidate.design) == ["Bunny"]) // not black, blue, burgundy
+        #expect(Matcher.rank("z", among: all).isEmpty)
+        // In a longer search a lone letter is still ignored.
+        #expect(Matcher.rank("red h", among: all).map(\.candidate.design) == Matcher.rank("red", among: all).map(\.candidate.design))
+    }
+
     @Test func learnsNewWords() throws {
         let green = try Self.candidates().first { $0.sku == "26NG" }!
         #expect(Matcher.newAliases(from: "97 olive nautilus @ $9", chosen: green) == []) // olive is already known

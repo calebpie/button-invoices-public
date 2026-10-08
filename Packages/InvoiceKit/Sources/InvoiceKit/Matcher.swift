@@ -106,6 +106,11 @@ public enum Matcher {
         let size = Set(tokens(c.size))
         let aliases = Set(c.aliases.flatMap(tokens))
         if words.contains(c.sku.lowercased()) { return 1000 }
+        // One letter on its own: designs that start with it ("h" → the Hearts), not colors,
+        // which would match most buttons. In longer searches stray letters still don't count.
+        if words.count == 1, let w = words.first, w.count == 1 {
+            return tokens(c.design).first?.hasPrefix(w) == true ? 3 : 0
+        }
         var total = 0
         var matchedDesign = Set<String>()
         var matchedColors = Set<String>()

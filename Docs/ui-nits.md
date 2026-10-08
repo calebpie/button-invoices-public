@@ -11,7 +11,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 2 | "Hello, Daphné." fades in place instead of sliding with the page | Invoices, opening an invoice | Open |
 | 3 | The receipt photo can't be opened full size to check the amount | Invoice step 2, Shipping | Open |
 | 4 | Swipe-delete: the row vanishes before she confirms; after she confirms, it vanishes with no animation | Invoices list | Open |
-| 5 | One letter in search finds nothing and says "No Results" | Buttons search; Add a Button in an invoice | Open |
+| 5 | One letter in search finds nothing and says "No Results" | Buttons search; Add a Button in an invoice | Fixed; Caleb to check |
 
 ## 1. Grey strip under the tab bar as the keyboard goes away
 
@@ -201,3 +201,15 @@ names. Not the "Keep typing" hint.
 - Caleb's suggestion, if one letter should still match nothing: in place of "No Results",
   show a hint such as "Keep typing to search buttons." while only one letter is typed, in
   both the Buttons tab and Add a Button.
+
+**Fixed** (bug bash, Oct 8, 2026): when the whole search is one letter, `Matcher.score`
+matches it against the start of the design name only, so "h" lists the 3 Hearts and "s"
+lists Star, Shell, Sailboat and Strawberry (5 buttons), not Cowrie Shell or any color.
+In longer searches a single letter still counts for nothing. New test:
+`MatcherTests.oneLetterMatchesDesignNames` ("h", "S", "s", "b" → only Bunny, "z" → none,
+"red h" ranks like "red"); all 38 InvoiceKit tests pass. Simulator (iPhone 17): Buttons,
+search, "H" → Heart, Burgundy / Navy / Red, Medium.
+
+**Check** (Caleb, iPhone): Buttons → search → type "H": the three Hearts. Then type "S":
+Sailboat, Shell, Star (2), Strawberry. Then in an invoice, Add a Button → type "h": the
+three Hearts.
