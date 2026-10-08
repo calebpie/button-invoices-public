@@ -9,6 +9,7 @@ to try. App code isn't changed for a nit until the bug bash.
 |---|---|---|---|
 | 1 | Grey strip under the tab bar as the keyboard goes away | Buttons, search | Open |
 | 2 | "Hello, Daphné." fades in place instead of sliding with the page | Invoices, opening an invoice | Open |
+| 3 | The receipt photo can't be opened full size to check the amount | Invoice step 2, Shipping | Open |
 
 ## 1. Grey strip under the tab bar as the keyboard goes away
 
@@ -69,3 +70,45 @@ bar (`safeAreaBar`), part of the page.
 all three tabs stay identical), so the title moves with the page. Then watch the push and
 pop, including the back swipe: the Invoices page hides the navigation bar and the invoice
 screen shows its own, and that bar's appearance should look clean while sliding.
+
+## 3. The receipt photo can't be opened full size to check the amount
+
+**Reported** (Caleb, Oct 8, 2026): when adding shipping from a receipt photo, on the screen
+where she taps the amount for this order, tapping the receipt should open it full size so
+she can pan and zoom and check the amount with her own eyes.
+
+**Reproduced** (iOS 27.0 Simulator, iPhone 17; a test draft, deleted afterwards): New
+Invoice → Bunny, Black / White, quantity 1 → step **2 Shipping** → **Add Shipping** →
+**Choose from Photos** → the receipt (IMG_9049). The sheet shows $36.48 filled in and the
+amounts $36.48 / $19.58 / $16.90 under the photo.
+
+- Tapping the photo: nothing happens. Pinching it (two fingers spreading over 0.3 s):
+  nothing happens.
+- The photo is 165 × 220 points on screen (measured from a 3x screenshot: x 118.7–283.7,
+  y 301.3–521.3).
+- On it, the digits of the Subtotal "$36.48" are 3.7 points tall and 10.3 wide, against
+  17-point text elsewhere in the sheet. The receipt's amounts can't be read at that size.
+- The same screen opens when she taps a saved shipping line to change it, so it has the
+  same gap.
+
+**Cause:** the photo is a plain picture capped at 220 points tall
+(`.frame(maxHeight: 220)` in ShippingEditorView.swift), with nothing attached to a tap.
+What's stored is enough to zoom: the photo comes in at 1600 pixels on its long side
+(`Photos.workingSize`), 2.4 times the 660 pixels shown. Fitted to the full screen width it
+would be about 536 points tall, so the same digits would be about 9 points, at the photo's
+own resolution; zooming further would show them larger but softer.
+
+**To try in the bug bash:**
+
+- Tap the photo to open it in Quick Look, as the Review and finished-invoice screens already
+  do for the PDF (`quickLookPreview`, "Tap the page to see it full size."). Quick Look gives
+  pinch, double-tap and pan zoom and a Done button. Write the receipt to a temporary JPEG
+  for it, and add the same hint under the photo and to its VoiceOver label ("Double-tap to
+  see it full size").
+- Check Quick Look opens from inside the Shipping sheet, and how its Share button looks to
+  her (it would let her save or send the receipt, which is harmless).
+- Alternative, if she'd want the amounts beside the zoomed receipt: our own full-screen
+  view with a zoomable photo and the amount buttons at the bottom. More code; only if Quick
+  Look's round trip (look, Done, tap the amount) proves awkward.
+- If the zoomed digits look too soft on her iPhone, keep receipts at a higher resolution
+  (for example 3000 pixels, as dropping a photo in on iPad already reads them).
