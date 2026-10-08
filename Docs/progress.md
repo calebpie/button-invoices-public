@@ -197,6 +197,27 @@ Checked in Device Hub: Bunny's Change Button screen (photo card, dots on all 16 
 trash icon, Earlier versions), new-button step 1, and a line's Change Line screen in a
 throwaway draft, deleted afterwards.
 
+## Buttons tab header (Oct 8, 2026)
+
+Caleb's mockup: the title on the same row as search and add circles, shrinking on scroll.
+Built and checked in Device Hub:
+
+- At the top: "Buttons" at 34 points, level with the search circle and the orange +.
+  Scrolled: "Buttons" at 17 points on the left, the circles unchanged, the list blurred
+  under the bar (scroll edge effect).
+- The size follows the scroll position (full at 0, standard by 52 points of scroll). The
+  computer-use drags move the list in a single frame (screen recording at 30 fps: one frame
+  large, the next small), so the in-between sizes were not seen; Docs/m2-test.md, Part 2,
+  step 1 asks for a slow drag.
+- Search: iOS 26's minimized search (`searchToolbarBehavior(.minimize)`) folds the field
+  into the system search circle, placed before + with `DefaultToolbarItem(kind: .search)`.
+  Probe first: in this tab layout, with the system large title, the system search circle
+  never appeared and the field stayed under the title. Tapping the circle opens the field
+  with ✕ and the keyboard; "heart" filtered the list; "Qq" showed "No Results for 'Qq'"
+  (new).
+- Add a Button is now the + circle (VoiceOver: "Add a Button"); the empty catalog says
+  "Tap + to save your first one."
+
 ## M2 results (Caleb)
 
 Use the Part N, step M labels from Docs/m2-test.md.

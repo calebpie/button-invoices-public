@@ -26,9 +26,11 @@ labels below. Commands run in Terminal from the project folder
    Daphné. What would you like to do today?", New Invoice, and under Paid the nine sent
    invoices, newest first (0260903 $4,178.69 … 0260426-1 $947.21). Open 0260812: two pages,
    $976.90, same lines as Examples/…/0260812.pdf with "Ladybug, Red / White" and
-   "Pineapple" spelled that way. Buttons lists 37 buttons by
-   shape (Bunny first) with **+ Add a Button** at the top right, still there when the list is scrolled; Pineapple, Celadon,
-   Ellipse, "Ladybug, Red / White", Crab 26CBL and Shell 26SY are spelled that way.
+   "Pineapple" spelled that way. Buttons lists 37 buttons by shape (Bunny first), with
+   the large title "Buttons" level with a search circle and an orange **+** circle. Scroll
+   down slowly: the title shrinks as you drag, the circles stay, and the list fades under
+   the bar. Tap the search circle, type `heart`: three hearts; type `qq`: "No Results for
+   'qq'"; tap **✕**. Pineapple, Celadon, Ellipse, "Ladybug, Red / White", Crab 26CBL and Shell 26SY are spelled that way.
    Settings shows "123 Example St, Suite 100".
 2. Add test photos to the Simulator:
    `xcrun simctl addmedia booted Examples/Images/Raw/IMG_8516.heic "Examples/Images/Shipping Receipts/IMG_9049.heic"`
@@ -141,11 +143,11 @@ Checks for SPEC.md, "Design guidelines". Use the iPhone Simulator from Part 2.
     Expected: the number pad opens for the price, with no Done bar above it and the whole
     price row above the keypad. Tap the heart photo. Expected: the keypad closes.
 11. Tap **‹** twice and **✕**, then the back arrow (the empty draft is removed). Buttons tab
-    → **Add a Button** → **Skip Photo**. Under Colors, tap **Navy**, then **New Color**,
+    → **+** → **Skip Photo**. Under Colors, tap **Navy**, then **New Color**,
     type `Sage`, **Add**. Expected: **Navy ✕** and **Sage ✕** in orange, each with a dot of
     its color, every other color chip with its dot too, and the footer
     "Tap one or more colors. The first one is the main color." Tap **✕** at the top left →
-    **Discard Changes** (the question comes from the ✕). Open **Add a Button** → **Skip
+    **Discard Changes** (the question comes from the ✕). Tap **+** → **Skip
     Photo** again. Expected: **Sage** is in the list. ⌥⌘K again to hide the keyboard.
 
 ## Notes for the results

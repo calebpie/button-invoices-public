@@ -107,6 +107,61 @@ struct DestructiveLabel: View {
     }
 }
 
+// MARK: - Title
+
+extension View {
+    /// The screen's title on the bar's own row, level with its buttons: large at the top of
+    /// the list, shrinking to the standard size as she scrolls, with the system's scroll edge
+    /// effect under the bar (Caleb's design, Oct 8, 2026). The size follows the scroll
+    /// position, so it moves with her finger rather than jumping.
+    func shrinkingTitle(_ title: String) -> some View {
+        modifier(ShrinkingTitle(title: title))
+    }
+}
+
+private struct ShrinkingTitle: ViewModifier {
+    let title: String
+    @State private var progress: CGFloat = 0
+    @ScaledMetric(relativeTo: .largeTitle) private var large: CGFloat = 34
+    @ScaledMetric(relativeTo: .headline) private var small: CGFloat = 17
+
+    func body(content: Content) -> some View {
+        content
+            .onScrollGeometryChange(for: CGFloat.self) { geometry in
+                geometry.contentOffset.y + geometry.contentInsets.top
+            } action: { _, offset in
+                progress = min(max(offset / 52, 0), 1)
+            }
+            // Kept for VoiceOver and the app switcher; drawn by the item below instead.
+            .navigationTitle(title)
+            .toolbarTitleDisplayMode(.inline)
+            .toolbar(removing: .title)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    // Capped so the largest text sizes still fit the bar.
+                    let size = min(large, 44) + (min(small, 24) - min(large, 44)) * progress
+                    Text(title)
+                        .font(.system(size: size, weight: .bold))
+                        .lineLimit(1)
+                        .fixedSize()
+                        .accessibilityAddTraits(.isHeader)
+                }
+                .hidingSharedBackground()
+            }
+    }
+}
+
+extension ToolbarContent {
+    /// Text in the bar without the glass capsule iOS 26 puts behind toolbar items.
+    @ToolbarContentBuilder func hidingSharedBackground() -> some ToolbarContent {
+        if #available(iOS 26.0, *) {
+            sharedBackgroundVisibility(.hidden)
+        } else {
+            self
+        }
+    }
+}
+
 // MARK: - Toolbar buttons
 
 /// The standard Cancel for sheets: an xmark on iOS 26, the word Cancel before that

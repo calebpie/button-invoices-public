@@ -1,6 +1,6 @@
 # Button Invoices — specification
 
-Revision 9, October 8, 2026 (Add a Button in the Buttons tab's navigation bar; see Design guidelines). Source of truth for the project; propose changes to Caleb
+Revision 10, October 8, 2026 (Buttons tab title level with search and + circles; see Design guidelines). Source of truth for the project; propose changes to Caleb
 rather than diverging. Status and test results: Docs/progress.md.
 
 ## Goal
@@ -143,9 +143,11 @@ Three tabs in the floating Liquid Glass tab bar (Caleb, Oct 8, 2026):
   leaves the app; a new invoice left with nothing on it is discarded. The app reopens on
   the tab, and the draft, she left.
 - **Buttons**: every saved button, a section per shape (with a count) and a row per color
-  and size. Add a Button, in the navigation bar beside the title and still there when
-  the title shrinks into the bar as she scrolls (Caleb, Oct 8, 2026), starts the
-  new-button steps; each shape's ⋯ menu adds a color or size or renames the shape. Swipe left (or open a button)
+  and size. The title sits on the bar's row, level with a search circle and an orange +
+  circle: large at the top of the list, shrinking with the scroll to the standard size,
+  with the scroll edge effect under the bar (Caleb, Oct 8, 2026). + starts the
+  new-button steps; search opens a field above the keyboard ("No Results" when nothing
+  matches); each shape's ⋯ menu adds a color or size or renames the shape. Swipe left (or open a button)
   to Archive; archived buttons are listed at the bottom, aren't offered for new lines,
   and can be unarchived. A button can be deleted only if it has never been invoiced.
 - **Settings**: each field printed on the invoice, in page order (your business, bill to,
@@ -340,6 +342,10 @@ Applied (HIG page in parentheses):
 - No confirmation for Finish; a success haptic marks it (Alerts, Playing haptics).
   Confirmations stay for deleting and for reopening a sent invoice.
 - Every swipe action is also in the touch-and-hold menu (Context menus, Gestures).
+- Buttons tab: search and add are symbols in the bar, add the prominent one; search
+  opens into a field above the keyboard (Toolbars, Search fields, "Search in a toolbar").
+  The title is custom so it can sit level with them; it keeps the system title for
+  VoiceOver and the app switcher. On iOS 18, search is the field under the title.
 - Grouped rows always form whole rounded cards: a button photo sits on its card with
   Take Photo and Choose from Photos; a bare prominent button never has a card row under
   it (Skip Photo is plain text; Remove from Invoice has its own card). Destructive rows

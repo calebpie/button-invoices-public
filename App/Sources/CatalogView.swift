@@ -3,7 +3,7 @@ import SwiftData
 import SwiftUI
 
 /// The Buttons tab (SPEC.md, "Buttons"): every saved button, a section per shape with a row
-/// per color and size, Add a Button in the navigation bar, and Archive. Archiving or changing a button
+/// per color and size, Search and Add a Button in the navigation bar, and Archive. Archiving or changing a button
 /// never changes an invoice that already has it.
 struct CatalogView: View {
     @Environment(\.modelContext) private var context
@@ -72,18 +72,24 @@ struct CatalogView: View {
             }
         }
         .listStyle(.insetGrouped)
+        .shrinkingTitle("Buttons")
         .toolbar {
+            searchCircle
             ToolbarItem(placement: .topBarTrailing) { addButton }
         }
         .overlay {
             if variants.isEmpty {
                 ContentUnavailableView("No Buttons Yet", systemImage: "circle.grid.2x2",
-                                       description: Text("Tap Add a Button to save your first one."))
+                                       description: Text("Tap + to save your first one."))
+            } else if !search.isEmpty, Catalog.search(search, in: variants, includeArchived: true).isEmpty {
+                ContentUnavailableView.search(text: search)
             }
         }
-        .searchable(text: $search, prompt: "Search buttons")
+        // On iOS 26 search is a circle in the bar that opens into a field above the keyboard
+        // (Search fields, "Search in a toolbar"); on iOS 18 it's the field under the title.
+        .searchable(text: $search, placement: .toolbar, prompt: "Search buttons")
+        .minimizedSearch()
         .readableWidth()
-        .navigationTitle("Buttons")
         .sheet(item: $editing) { variant in
             NavigationStack { EditButtonView(variant: variant) }
         }
@@ -112,22 +118,19 @@ struct CatalogView: View {
         variants.filter(\.isHidden).sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
     }
 
-    /// In the navigation bar, beside the large title and staying in the bar when the title
-    /// shrinks into it as she scrolls; the screen's one prominent action (Toolbars, "Use the
-    /// .prominent style for key actions"). Title and icon, so it says what it does.
-    private var addButton: some View {
-        Button {
-            adding = NewButton(design: nil)
-        } label: {
-            // Not a Label: a toolbar shows a Label as its icon alone.
-            HStack(spacing: 4) {
-                Image(systemName: "plus")
-                Text("Add a Button")
-            }
-            .fontWeight(.semibold)
+    /// Search, then Add, as circles in the bar, level with the title and there at any scroll
+    /// position: symbols, the add one prominent (Toolbars, "Prefer simple, recognizable
+    /// symbols"; "Use the .prominent style for key actions").
+    @ToolbarContentBuilder private var searchCircle: some ToolbarContent {
+        if #available(iOS 26.0, *) {
+            DefaultToolbarItem(kind: .search, placement: .topBarTrailing)
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
         }
-        .accessibilityLabel("Add a Button")
-        .glassProminentButton()
+    }
+
+    private var addButton: some View {
+        Button("Add a Button", systemImage: "plus") { adding = NewButton(design: nil) }
+            .glassProminentButton()
     }
 
     private func row(_ variant: ButtonVariant) -> some View {
@@ -196,6 +199,17 @@ struct CatalogView: View {
             for line in variant.invoiceLines ?? [] where line.invoice?.status == .draft {
                 line.copyDetails(from: variant)
             }
+        }
+    }
+}
+
+extension View {
+    /// iOS 26: the search field folds into a circle in the bar until she taps it.
+    @ViewBuilder func minimizedSearch() -> some View {
+        if #available(iOS 26.0, *) {
+            searchToolbarBehavior(.minimize)
+        } else {
+            self
         }
     }
 }
