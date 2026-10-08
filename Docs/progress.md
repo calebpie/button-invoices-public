@@ -6,6 +6,7 @@
 |---|---|
 | M1 Core logic and PDF | Done: Caleb ran Docs/m2-test.md, Part 1, steps 1–5, all pass (Oct 8, 2026) |
 | M2 App in the Simulator | Done: Caleb ran Docs/m2-test.md, Parts 2–4, all pass (Oct 8, 2026; results below) |
+| Bug bash | Pending: the nits in Docs/ui-nits.md (2 open), fixed together before the build goes to her iPhone |
 | M3 App on her iPhone | Started: on Caleb's iPhone with the Personal Team (`make ios`, Oct 8, 2026); Docs/m3-test.md, Part 1, pending |
 
 ## Automated results (Claude, Oct 8, 2026, M4 Max, Xcode 27.0, iOS 27.0 Simulator)
@@ -345,6 +346,12 @@ Use the Part N, step M labels from Docs/m2-test.md.
 | Part 3, step 1 | Pass. |
 | Part 3, step 2 | Pass. |
 | Part 4, steps 1–11 | Pass. |
+| Part 5, step 1 | Pass. |
+| Part 5, step 2 |  Pass.|
+| Part 5, step 3 |  Pass, photo looks clean. |
+| Part 5, step 4 |  Pass.|
+| Part 5, step 5 | Pass. |
+|  |  |
 
 
 

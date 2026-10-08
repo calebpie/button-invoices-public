@@ -1,6 +1,6 @@
 # Button Invoices — specification
 
-Revision 12, October 8, 2026 (Buttons search grows out of its circle; the Invoices question sits just under the greeting; see Design guidelines). Source of truth for the project; propose changes to Caleb
+Revision 13, October 8, 2026 (a bug bash for the UI nits in Docs/ui-nits.md before the app goes to her iPhone; see Milestones). Source of truth for the project; propose changes to Caleb
 rather than diverging. Status and test results: Docs/progress.md.
 
 ## Goal
@@ -417,6 +417,7 @@ Not adopted, and why:
 |---|---|---|
 | M1 | Core logic and PDF in InvoiceKit | `make test` passes; Caleb compares `make sample-pdfs` with Examples/ |
 | M2 | App in the Simulator | Caleb runs Docs/m2-test.md in the Simulator; Part 2 results in Docs/progress.md |
+| Bug bash | Before the app goes to her iPhone | Every open item in Docs/ui-nits.md fixed together, then rechecked by Caleb |
 | M3 | App on her iPhone | She makes her next real invoice with it; Caleb checks the PDF before it goes to AOB |
 
 ## Open questions (for Caleb)

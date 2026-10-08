@@ -43,6 +43,8 @@ app is on your iPhone from `make ios`; with the free team it stops opening after
 
 ## Part 2: Her iPhone (once the paid team is approved)
 
+First, the bug bash: every open item in Docs/ui-nits.md fixed and rechecked.
+
 TestFlight steps will be added here and in the README when the paid team exists: upload a
 build, invite her, she installs TestFlight and the app, no cable. Expected: the app opens
 on her iPhone with her saved data seeded, as in Part 1, step 1.
