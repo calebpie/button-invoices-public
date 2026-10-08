@@ -96,9 +96,8 @@ lasts 90 days. Steps will be added to this README when the paid team exists (SPE
 
 - Settings tab: check the address, bill-to, and the routing and account numbers (copied
   from the template, with "Suit 100" corrected to "Suite 100").
-- Buttons tab: 29 of the 37 starting photos are the small copies from the workbook. Retake
-  any that look blurry (tap the button → Retake Photo), or run `make seed` with the
-  original edited PNGs first.
+- Buttons tab: check the names. Six photo file names disagree with the invoice names (SPEC.md,
+  "Data"); the app uses the invoice names.
 - Data lives on the device and is included in its iCloud Backup. Deleting the app deletes
   the invoices and buttons.
 

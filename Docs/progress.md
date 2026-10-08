@@ -55,6 +55,16 @@ Template typos corrected in the seed and in both template files (SPEC.md, "Data"
 files pass zip and XML checks and macOS QuickLook renders them. Opening them in Excel is
 Docs/m2-test.md, Part 3. `make test`: 34 tests passed.
 
+## Edited photos (Oct 8, 2026)
+
+Caleb added the edited PNG of every button. Feature-print matching against the ~70 px
+workbook thumbnails was unreliable (distances 0.45–0.80, wrong first match for 17 of 27
+files), so each file was paired with its SKU by name and the 35 pairs were checked by
+eye: all match. All 37 buttons now have an edited photo (600 px, 13 MB in the bundle).
+`make test`: 34 passed; duplicate check with the new photos: same button 0.041–0.103,
+same shape other color 0.241–0.313, different shapes ≥ 0.338. Sample PDF 0260607 shows the
+same photos as the Excel PDF.
+
 ## M2 results (Caleb)
 
 Pending. Use the Part N, step M labels from Docs/m2-test.md.

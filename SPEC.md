@@ -63,6 +63,21 @@ in Examples/…/Originals before typo fixes):
 | Crab, Blue 26CBLW (the clover's SKU) | Crab, Blue 26CBL |
 | Shell, Yellow 26SW | Shell, Yellow 26SY |
 
+Photos: Caleb's edited PNG of every button (Examples/Images/Edited, added Oct 8, 2026),
+at most 600 px, mapped to SKUs by an explicit table in the seed script because the file
+names differ from the invoice names (each pair checked by eye against the workbook
+thumbnail). The invoice names are kept; the file names say:
+
+| File name | Invoiced as |
+|---|---|
+| Daisy, Red : White, Large | Daisy, Red / White, Small (26DRWS) |
+| Elipse, Lilac | Ellipse, Lavender, Mini (26ELM) |
+| Flower, Bue : White, Large | Clover, Blue / White (26CBLW) |
+| Flower Burst, Burgundy : White, Medium | Flower Burst, Burgundy / White (26FBBW) |
+| Nautilus, Cotton Tail | Nautilus, White (26NW) |
+| Star, Burgundy, Mini | Star, Burgundy, Small (26SBS) |
+| Dogwood Flower, … | Dogwood, … |
+
 Kept: Pineapple's 26PYB (on sent invoice 0260812, though Brown is BR elsewhere), and
 "Rose, White / Green" (the edited photo is named "White : Blue", but its leaves are the
 same teal she calls Green on the strawberry). The sent invoices themselves are unchanged.
@@ -188,8 +203,8 @@ Archived buttons are included in the photo check; choosing one ("It's this one")
 unarchives it.
 
 Photo-match thresholds (probe, October 8, 2026: her 8 raw photos against the 37 saved
-ones; LookAlikeTests): the same button 0.040–0.098, the same shape in another color (red
-vs navy heart) 0.241–0.312, different shapes 0.337 and up. The app warns "looks like" below
+edited photos; LookAlikeTests): the same button 0.041–0.103, the same shape in another
+color (hearts, mushrooms) 0.241–0.313, different shapes 0.338 and up. The app warns "looks like" below
 0.2 and lists "similar" below 0.4. Hypothesis until checked with a new photo of a button
 that is already saved. Vision's feature prints fail in the Simulator ("Failed to create
 espresso context", Oct 8, 2026); the step then says it couldn't compare photos and still
@@ -279,7 +294,9 @@ example invoices for side-by-side comparison.
 ## Open questions (for Caleb)
 
 1. Template data, corrected Oct 8, 2026 (Data). Still open: Nautilus, Unglazed shares
-   Matte White's photo and Nautilus, Brown, Large shares Brown's; Pineapple keeps 26PYB.
+   Matte White's photo and Nautilus, Brown, Large shares Brown's; Pineapple keeps 26PYB;
+   the photo file names suggest different sizes or colors for six buttons (Data, second
+   table): which names are right?
 2. SKU year: fixed at first save (assumed), or re-yeared every January?
 3. Same-day numbering: the April batch was -1…-5 from the first; the app gives the first
    one no suffix and the second "-2". Fine?
@@ -288,6 +305,4 @@ example invoices for side-by-side comparison.
    the percentage instead?
 4. iCloud sync between her iPhone and iPad needs the paid account and an iCloud container.
    Worth turning on then?
-5. 29 of the 37 starting photos are the small copies embedded in the workbook (~70 px).
-   If the original edited PNGs exist, put them in Examples/Images/Edited and run
-   `make seed` before installing.
+5. Done Oct 8, 2026: all 37 starting photos are now Caleb's edited PNGs.

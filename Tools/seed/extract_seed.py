@@ -2,8 +2,8 @@
 
 Writes, into --out (default App/Resources/Seed):
   catalog.json   every button: description parts, SKU, price, photo file name
-  Photos/*.png   one photo per button; the high-resolution edited PNG where one exists in
-                 --photos, otherwise the small copy embedded in the workbook
+  Photos/*.png   one photo per button, at most 600 px; the edited PNG from --photos where
+                 there is one, otherwise the small copy embedded in the workbook
   business.json  seller, bill-to, routing and account from the Invoice sheet (gitignored:
                  it holds bank details)
 
@@ -99,6 +99,49 @@ SKU_FIXES = {
 }
 ADDRESS_FIXES = {"Suit 100": "Suite 100"}
 
+# Longest side of the bundled photos. The app shows them at up to 450 px and the PDF at 300.
+PHOTO_SIZE = 600
+
+# Edited photo file name (without .png) → the SKUs it shows. Two buttons share a photo in
+# the workbook: Nautilus Brown / Brown Large, and Matte White / Unglazed.
+EDITED_PHOTOS = {
+    "Bunny, Black : White": ["26BBW"],
+    "Cowrie Shell, Black": ["26CSB"],
+    "Cowrie Shell, Pale Pink": ["26CSPP"],
+    "Crab, Blue": ["26CBL"],
+    "Daisy, Black : White, Large": ["26DBWL"],
+    "Daisy, Black : White, Small": ["26DBWS"],
+    "Daisy, Red : White, Large": ["26DRWS"],  # invoiced as Small
+    "Dogwood Flower, Celedon": ["26DC"],
+    "Dogwood Flower, Ivory": ["26DI"],
+    "Elipse, Lilac": ["26ELM"],  # invoiced as Ellipse, Lavender, Mini
+    "Flower Burst, Burgundy : White, Medium": ["26FBBW"],
+    "Flower, Bue : White, Large": ["26CBLW"],  # invoiced as Clover, Blue / White
+    "Heart, Burgundy, Medium": ["26HBM"],
+    "Heart, Navy": ["26HNM"],
+    "Heart, Red": ["26HRM"],
+    "Ladybug, Red : White": ["26LRW"],
+    "Lips, Red": ["26LR"],
+    "Mushroom, Blue : White": ["26MBLW"],
+    "Mushroom, Burgundy : White": ["26MBW"],
+    "Mushroom, Navy : White": ["26MNW"],
+    "Mushroom, Red : White": ["26MRW"],
+    "Natuilus, Green": ["26NG"],
+    "Nautilus, Black": ["26NB"],
+    "Nautilus, Brown": ["26NBR", "26NBRL"],
+    "Nautilus, Cotton Tail": ["26NW"],  # invoiced as Nautilus, White
+    "Nautilus, Matte Pink": ["26NMP"],
+    "Nautilus, Matte White": ["26NMW", "26NUG"],
+    "Nautilus, Pale Pink": ["26NPP"],
+    "Pineapple, Yellow : Brown": ["26PYB"],
+    "Rose, White : Blue": ["26RWG"],
+    "Sailboat, Black : White": ["26SBW"],
+    "Shell, Yellow": ["26SY"],
+    "Star, Burgundy, Mini": ["26SBS"],  # invoiced as Small
+    "Star, Navy, Mini": ["26SNM"],
+    "Strawberry, Red : Green": ["26SRG"],
+}
+
 
 def fix_name(text):
     text = DESCRIPTION_FIXES.get(text, text)
@@ -170,21 +213,36 @@ def main():
         })
         row += 1
 
-    # Higher-resolution edited photos, named like "Rose, White : Blue.png", replace the
-    # thumbnails embedded in the workbook. Matched on design and first color.
+    # Caleb's edited photos replace the small copies embedded in the workbook. Their file
+    # names don't always match the invoice names, so known files are mapped to SKUs
+    # explicitly (each pair checked by eye against the workbook thumbnail, Oct 8, 2026);
+    # other files are matched on design and first color.
+    by_sku = {v["sku"]: v for v in variants}
+    used = set()
     if args.photos.is_dir():
         for png in sorted(args.photos.glob("*.png")):
-            design, colors, _ = split_description(png.stem.replace(":", "/"))
-            matches = [v for v in variants if loose(v["design"]) == loose(design)
-                       and v["colors"][:1] and colors[:1] and loose(v["colors"][0]) == loose(colors[0])]
-            if len(matches) != 1:
-                print(f"  edited photo not matched to one button: {png.name} ({len(matches)} matches)")
-                continue
-            v = matches[0]
-            v["photo"] = v["photo"] or slug(v["design"] + " " + " ".join(v["colors"])) + ".png"
-            subprocess.run(["sips", "-Z", "800", str(png), "--out", str(photos_dir / v["photo"])],
-                           check=True, capture_output=True)
-            print(f"  {png.name} → {v['sku']} ({v['design']}, {' / '.join(v['colors'])})")
+            skus = EDITED_PHOTOS.get(png.stem)
+            if skus is None:
+                design, colors, _ = split_description(png.stem.replace(":", "/"))
+                matches = [v["sku"] for v in variants if loose(v["design"]) == loose(design)
+                           and v["colors"][:1] and colors[:1] and loose(v["colors"][0]) == loose(colors[0])]
+                if len(matches) != 1:
+                    print(f"  edited photo not matched to one button: {png.name} ({len(matches)} matches)")
+                    continue
+                skus = matches
+            for sku in skus:
+                v = by_sku.get(sku)
+                if v is None:
+                    print(f"  edited photo {png.name}: no button with SKU {sku}")
+                    continue
+                v["photo"] = v["photo"] or slug(v["design"] + " " + " ".join(v["colors"]) + " " + v["size"]) + ".png"
+                subprocess.run(["sips", "-Z", str(PHOTO_SIZE), str(png), "--out", str(photos_dir / v["photo"])],
+                               check=True, capture_output=True)
+                used.add(sku)
+        print(f"  {len(used)} of {len(variants)} buttons have an edited photo")
+        for v in variants:
+            if v["sku"] not in used:
+                print(f"  still the workbook's small photo: {v['sku']} {v['design']}, {' / '.join(v['colors'])}")
 
     catalog = {"source": args.xlsx.name, "variants": variants}
     (args.out / "catalog.json").write_text(json.dumps(catalog, indent=2, ensure_ascii=False) + "\n")
