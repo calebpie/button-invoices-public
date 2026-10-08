@@ -53,7 +53,14 @@ struct InvoicesTab: View {
                             ForEach(group) { invoice in
                                 NavigationLink(value: invoice) { InvoiceRow(invoice: invoice) }
                                     .swipeActions(edge: .trailing) {
-                                        Button("Delete", systemImage: "trash", role: .destructive) { pendingDelete = invoice }
+                                        Button("Delete", systemImage: "trash", role: .destructive) {
+                                            // Asked once the row has slid closed; asked while
+                                            // it closes, the question never appears.
+                                            Task {
+                                                try? await Task.sleep(for: .milliseconds(400))
+                                                pendingDelete = invoice
+                                            }
+                                        }
                                     }
                                     .swipeActions(edge: .leading) {
                                         Button("Duplicate", systemImage: "plus.square.on.square") { duplicate(invoice) }
@@ -68,6 +75,19 @@ struct InvoicesTab: View {
                                         }
                                         Divider()
                                         Button("Delete…", systemImage: "trash", role: .destructive) { pendingDelete = invoice }
+                                    }
+                                    // On the row, so on iOS 26 the question points at the
+                                    // invoice being deleted (Action sheets).
+                                    .confirmationDialog(deleteTitle(invoice), isPresented: isDeleting(invoice),
+                                                        titleVisibility: .visible) {
+                                        Button("Delete Invoice", role: .destructive) {
+                                            InvoiceActions.delete(invoice, context)
+                                            pendingDelete = nil
+                                        }
+                                    } message: {
+                                        Text(invoice.status == .draft
+                                             ? "The buttons stay saved; only this draft is removed."
+                                             : "This removes the invoice and its PDF from the app. Copies you already sent aren't affected.")
                                     }
                             }
                         } header: {
@@ -95,18 +115,6 @@ struct InvoicesTab: View {
             .sheet(item: $sharing) { url in
                 ShareSheet(url: url).presentationDetents([.medium, .large])
             }
-            .confirmationDialog(deleteTitle, isPresented: .init(get: { pendingDelete != nil },
-                                                               set: { if !$0 { pendingDelete = nil } }),
-                                titleVisibility: .visible) {
-                Button("Delete Invoice", role: .destructive) {
-                    if let invoice = pendingDelete { InvoiceActions.delete(invoice, context) }
-                    pendingDelete = nil
-                }
-            } message: {
-                Text(pendingDelete?.status == .draft
-                     ? "The buttons stay saved; only this draft is removed."
-                     : "This removes the invoice and its PDF from the app. Copies you already sent aren't affected.")
-            }
         }
     }
 
@@ -118,9 +126,13 @@ struct InvoicesTab: View {
         }
     }
 
-    private var deleteTitle: String {
-        guard let invoice = pendingDelete else { return "" }
-        return invoice.status == .draft ? "Delete draft \(invoice.number)?" : "Delete invoice \(invoice.number)?"
+    private func deleteTitle(_ invoice: Invoice) -> String {
+        invoice.status == .draft ? "Delete draft \(invoice.number)?" : "Delete invoice \(invoice.number)?"
+    }
+
+    private func isDeleting(_ invoice: Invoice) -> Binding<Bool> {
+        Binding(get: { pendingDelete?.persistentModelID == invoice.persistentModelID },
+                set: { if !$0 { pendingDelete = nil } })
     }
 
     private func handleRequest() {

@@ -23,6 +23,11 @@ if [ -z "$UDID" ]; then
 fi
 
 xcrun simctl boot "$UDID" 2>/dev/null || true
-open -a Simulator --args -CurrentDeviceUDID "$UDID"
+# Show the device. Xcode 27 replaced the Simulator app with Device Hub; earlier Xcodes
+# still have Simulator. The app installs and runs either way.
+if open -b com.apple.iphonesimulator --args -CurrentDeviceUDID "$UDID" 2>/dev/null; then :
+elif open -b com.apple.dt.Devices 2>/dev/null; then echo "Opened Device Hub; select $NAME in its sidebar if it isn't shown."
+else echo "Couldn't open Simulator or Device Hub; the app is still installed and launched."
+fi
 xcrun simctl install "$UDID" "$APP"
 xcrun simctl launch "$UDID" "$BUNDLE_ID"

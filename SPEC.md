@@ -1,6 +1,6 @@
 # Button Invoices — specification
 
-Revision 5, October 8, 2026 (Apple's Human Interface Guidelines applied; see Design guidelines). Source of truth for the project; propose changes to Caleb
+Revision 6, October 8, 2026 (iPhone portrait only; fixes from Caleb's first M2 run; see Design guidelines). Source of truth for the project; propose changes to Caleb
 rather than diverging. Status and test results: Docs/progress.md.
 
 ## Goal
@@ -303,7 +303,7 @@ example invoices for side-by-side comparison.
 
 - iPhone and iPad, iOS 18 or later (every iPhone since the XS/XR). Public APIs only.
 - Swift 6, SwiftUI, SwiftData, Vision, TipKit, App Intents. No third-party code in the app.
-- iPhone in portrait and landscape; iPad in every orientation.
+- iPhone in portrait only; iPad in every orientation.
 - Project from project.yml (XcodeGen pinned in Tools/BuildTools); logic in the
   Packages/InvoiceKit Swift package, tested on the Mac with `make test`.
 - Distribution to her devices: TestFlight once Caleb's paid developer account is approved
@@ -331,6 +331,8 @@ Applied (HIG page in parentheses):
 - No confirmation for Finish; a success haptic marks it (Alerts, Playing haptics).
   Confirmations stay for deleting and for reopening a sent invoice.
 - Every swipe action is also in the touch-and-hold menu (Context menus, Gestures).
+- A question before deleting or changing an invoice comes from what she tapped: the
+  invoice's row, or ⋯ (Action sheets).
 - Share uses the system share sheet and the standard Share button (Collaboration and
   sharing). The paid switch sits in a list row (Toggles).
 - Larger text: rows stack their parts at the accessibility sizes, photo above text;
@@ -356,7 +358,6 @@ Applied (HIG page in parentheses):
   the Shortcuts app: New Invoice, Add a Button. ⌘N on an iPad keyboard (Home Screen quick
   actions, App Shortcuts, Keyboards).
 - Photos can be dragged in from another app on iPad (Drag and drop).
-- Landscape on iPhone (Layout, "Designing for iOS").
 - A layered app icon made with Icon Composer, so iOS 26 can render it in Liquid Glass,
   dark and tinted (App icons).
 - Launch: invoice PDFs are made when first opened, not at first launch (Launching).
@@ -367,6 +368,8 @@ Not adopted, and why:
 
 - Widgets, Live Activities, notifications, Spotlight indexing: nothing in her week needs
   them, and each is something more for her to learn or dismiss.
+- Landscape on iPhone: the invoice steps are cramped sideways, so the iPhone app stays
+  upright (Caleb, Oct 8, 2026). iPad turns every way.
 - An iPad sidebar: three tabs fit; the system tab bar already moves to the top on iPad.
 - Assistive Access: a whole separate mode, out of scope unless she needs it.
 - Sign in with Apple, in-app purchase, Apple Pay, SharePlay: not used.

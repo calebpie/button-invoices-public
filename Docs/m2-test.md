@@ -20,8 +20,9 @@ labels below. Commands run in Terminal from the project folder
 ## Part 2: The app
 
 1. Start fresh: `xcrun simctl uninstall booted com.calebpietrafesa.ButtonInvoices`
-   (an error that nothing is installed is fine), then `make sim`. The Simulator opens
-   the app. Expected: tab bar Invoices · Buttons · Settings; Invoices shows "Hello,
+   (an error that nothing is installed is fine), then `make sim`. Device Hub (Xcode 27's
+   Simulator) opens with the app on the iPhone 17; if it shows another device, click
+   **iPhone 17** in its sidebar. Expected: tab bar Invoices · Buttons · Settings; Invoices shows "Hello,
    Daphné. What would you like to do today?", New Invoice, and under Paid the nine sent
    invoices, newest first (0260903 $4,178.69 … 0260426-1 $947.21). Open 0260812: two pages,
    $976.90, same lines as Examples/…/0260812.pdf with "Ladybug, Red / White" and
@@ -55,8 +56,8 @@ labels below. Commands run in Terminal from the project folder
 9. Expected: shape Daisy, colors Red / White, size Large, price $7.50, SKU 26DRWL. Tap
    **Next** → **Save and Add to Invoice**, quantity 10, **Add to Invoice**.
 10. Tap the back arrow at the top left. Expected: the Invoices tab lists this invoice under
-    Drafts. Quit the app (in the Simulator: swipe up from the bottom edge and hold, swipe
-    the app away), reopen it from the Home Screen ("Invoices"). Expected: the draft is
+    Drafts. Quit the app (Device Hub menu bar → **Controls → App Switcher**, then drag
+    the app's card up and away), reopen it from the Home Screen ("Invoices"). Expected: the draft is
     still there with 3 lines; tapping it reopens at step 2, Shipping.
 11. **Add Shipping** → **Choose from Photos** → the receipt. Expected: $36.48 filled in,
     $36.48 / $19.58 / $16.90 to tap, note "Shipped 8/31/2026". Tap **Add Shipping**.
@@ -72,7 +73,8 @@ labels below. Commands run in Terminal from the project folder
     Files** → **On My iPhone** → **Save**, then close.
 16. Back on the Invoices tab it's listed under "Finished, waiting for payment". Open it.
     Expected: total, **Share PDF**, a Share button and **⋯** at the top right, the switch
-    **Alix of Bohemia has paid**, and the PDF. Turn the switch on, go back. Expected: it's
+    **Alix of Bohemia has paid**, and the PDF. Tap **⋯**. Expected: **Duplicate**, **Make
+    Changes…** and **Delete…** right away; tap outside to close it. Turn the switch on, go back. Expected: it's
     under "Paid".
 17. Buttons tab → Heart section → tap **Navy, Medium** → change the price to 4.50 →
     **Save Changes**. Tap it again. Expected: "Before your changes" shows the $4.00
@@ -86,7 +88,7 @@ labels below. Commands run in Terminal from the project folder
     **Unarchive This Button**).
 19. Repeat Part 2, steps 1–4 with `SIMULATOR="iPad Air 11-inch (M4)" make sim`. Expected:
     the same screens, with the tabs at the top and the content centered at a readable
-    width.
+    width. Then **Controls → Rotate Left**. Expected: the iPad app turns to landscape.
 
 ## Part 3: Template typo fixes
 
@@ -109,10 +111,11 @@ Checks for SPEC.md, "Design guidelines". Use the iPhone Simulator from Part 2.
    top. Expected: "Discard your changes?" with **Discard Changes**. Tap it. Expected: the
    line still says 500. Open it again, change to 400, tap **✕**. Expected: the same
    question; tap outside it to keep editing, then **✕** → **Discard Changes**.
-3. Swipe left on the mushroom line → **Delete**. Then in the Simulator's menu bar choose
-   **Device → Shake**. Expected: "Undo Remove Button"; tap **Undo**. The line is back.
-4. Go back to the Invoices tab, swipe the duplicate left → **Delete** → **Delete
-   Invoice**. Press **⇧⌘H** (Home Screen), touch and hold the **Invoices** icon. Expected:
+3. Swipe left on the mushroom line → **Delete**. Then click the Device Hub window and press
+   **⌘Z**. Expected: the line is back. (Device Hub has no Shake; ⌘Z runs the same undo.
+   Shaking the phone, with its "Undo Remove Button" question, is checked in M3.)
+4. Go back to the Invoices tab, swipe the duplicate left → **Delete**. Expected: the
+   question points at that invoice. Tap **Delete Invoice**. Press **⇧⌘H** (Home Screen), touch and hold the **Invoices** icon. Expected:
    **New Invoice** and **Add a Button**. Tap **Add a Button**. Expected: the app opens on
    the Buttons tab with the new-button steps. Tap **✕**.
 5. In Terminal:
@@ -123,9 +126,8 @@ Checks for SPEC.md, "Design guidelines". Use the iPhone Simulator from Part 2.
 6. In Terminal: `xcrun simctl ui booted appearance dark`. Expected: dark screens, the
    accent a lighter terracotta, the photo checkerboard dark gray. Put it back:
    `xcrun simctl ui booted appearance light`
-7. Simulator menu bar → **Device → Rotate Left**. Expected: the app turns to landscape and
-   stays usable (the draft's step content scrolls between the bars). **Device → Rotate
-   Right** to return.
+7. Device Hub menu bar → **Controls → Rotate Left**. Expected: the iPhone turns, but the
+   app stays upright (portrait only on iPhone). **Controls → Rotate Right** to return.
 8. Home Screen: expected app icon, a terracotta button with four holes on cream.
 
 ## Notes for the results

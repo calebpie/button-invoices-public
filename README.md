@@ -35,7 +35,11 @@ first page, and cutouts of the raw photos) and opens the folder, for comparison 
 ```bash
 make sim
 ```
-Builds the app and opens it in the iPhone 17 Simulator. Another device:
+Builds the app and opens it in the iPhone 17 Simulator, shown in Device Hub (Xcode 27
+replaced the Simulator app with Device Hub; Spotlight finds it by name). Its menus:
+Controls → Home (⇧⌘H), App Switcher (⌃⇧⌘H), Rotate Left (⌘←) and Rotate Right (⌘→);
+Device → Appearance, Accessibility and Orientation. It has no Shake; with its window in
+front, ⌘Z undoes instead. Another device:
 `SIMULATOR="iPad Air 11-inch (M4)" make sim`. In the Simulator, background removal falls
 back to removing the background by color (Vision's subject lifting fails there with
 "Could not create inference context"). The photo duplicate check fails there too ("Failed
@@ -65,7 +69,7 @@ Steps 1–5 are done on Caleb's M4 Max as of October 8, 2026 (Xcode 27.0 install
 
 1. Install Xcode from the Mac App Store, open it once, accept the license, and let it
    install the iOS platform when asked.
-2. `make test` should pass. `make sim` should open the Simulator with the app.
+2. `make test` should pass. `make sim` should open Device Hub with the app on the iPhone 17.
 3. Signing: Xcode → Settings… (⌘,) → Accounts → select the Apple ID → select the team →
    Manage Certificates… → + → Apple Development → Done.
 4. Run `make setup` (paid team) or `ALLOW_PERSONAL_TEAM=1 make setup` (free Personal Team),

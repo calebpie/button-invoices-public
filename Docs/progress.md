@@ -4,8 +4,8 @@
 
 | Milestone | State |
 |---|---|
-| M1 Core logic and PDF | Built; automated tests pass; Caleb's comparison (Docs/m2-test.md, Part 1) pending |
-| M2 App in the Simulator | Built and walked through by Claude in the Simulator; Caleb's run of Docs/m2-test.md, Parts 2 and 4 pending |
+| M1 Core logic and PDF | Built; automated tests pass; Caleb ran Docs/m2-test.md, Part 1, steps 1–2 (pass); his comparison, Part 1, steps 3–5, not reported yet |
+| M2 App in the Simulator | Built and walked through by Claude; Caleb's first run stopped at Part 2, step 1 (`make sim`, Xcode 27 has no Simulator app), fixed; Parts 2 and 4 pending |
 | M3 App on her iPhone | Not started (needs signing, README "Installing on her iPhone or iPad") |
 
 ## Automated results (Claude, Oct 8, 2026, M4 Max, Xcode 27.0, iOS 27.0 Simulator)
@@ -94,22 +94,47 @@ and the iPad Air 11-inch (M4) Simulator:
   to #EA7A5E (2.82:1, the same as Apple's red) with accent text on dark cards at 5.49:1.
 - Landscape (forced with the DEBUG `-OrientationProbe landscape` launch argument, since
   the Simulator here runs without a window): draft flow usable, content scrolls between
-  the bars.
+  the bars. Later the same day Caleb chose portrait only on iPhone (below).
 - Home Screen: the new icon renders; touch and hold shows New Invoice and Add a Button;
   Add a Button opened the new-button steps on the Buttons tab.
 - Finished invoice: Share and ⋯ at the top right, paid switch in its own row. The Share PDF
   button touched the summary card; moved to its own section.
 - iPad: tabs at the top, readable width, the Repeat an Order tip shown.
 
-Not checked by Claude: shake to undo (the Simulator here has no Device menu), Siri
-phrases, drag and drop, ⌘N with a keyboard. Docs/m2-test.md, Part 4 covers the first one.
+Not checked by Claude: shake to undo (Device Hub has no Shake; ⌘Z, the same undo, was
+checked later the same day), Siri phrases, drag and drop, ⌘N with a keyboard.
 
 `make test`: 35 tests in 9 suites passed.
 
+## Fixes after Caleb's first M2 run (Claude, Oct 8, 2026)
+
+- `make sim` (Part 2, step 1): Xcode 27.0 (27A266a) ships no Simulator app; its
+  Contents/Applications has Device Hub (com.apple.dt.Devices) instead. run-sim.sh now opens
+  Simulator if present, otherwise Device Hub, and no longer fails if neither opens.
+  Rerun: exit 0, Device Hub showed the iPhone 17 with the app.
+- Device Hub's menus: Controls → Home ⇧⌘H, App Switcher ⌃⇧⌘H, Rotate Left ⌘←, Rotate
+  Right ⌘→; Device → Accessibility, Appearance, Orientation. No Shake in Device, Controls
+  or Edit. With its window in front, ⌘Z undid a deleted invoice (0260903 came back), so
+  Docs/m2-test.md, Part 4, step 3 uses ⌘Z; shaking is left to M3 on a real phone.
+- iPhone portrait only (Caleb's call): built Info.plist has
+  UISupportedInterfaceOrientations~iphone = Portrait, ~ipad = all four. ⌘← turned the
+  iPhone; the app stayed upright.
+- Found while checking: ⋯ on a finished invoice and on a draft opened a menu holding only
+  "More ›" (the secondary toolbar placement puts the item inside the system's own overflow
+  menu), so every action took two taps. Now one tap shows Duplicate, Make Changes… and
+  Delete… (finished) or Delete Draft… (draft).
+- Delete questions on iOS 26 point at their source. From the list, the question pointed
+  near the top of the screen instead of the invoice. Attached to the row it pointed at the
+  row from touch and hold, but never appeared from a swipe until it waited 0.4 s for the
+  row to slide closed. Now both point at the row; from ⋯ it points at ⋯.
+
 ## M2 results (Caleb)
 
-Pending. Use the Part N, step M labels from Docs/m2-test.md.
+Use the Part N, step M labels from Docs/m2-test.md.
 
 | Step | Result |
 |---|---|
-| | |
+| Part 1, step 1 | Pass: "Test run with 35 tests in 9 suites passed after 6.765 seconds" |
+| Part 1, step 2 | Pass: "Wrote build/sample-pdfs (cutouts of the raw photos are in build/sample-pdfs/cutouts)" |
+| Part 1, steps 3–5 | Not reported |
+| Part 2, step 1 | Fail (Oct 8): `make sim` built the app, then stopped with "Unable to find application named 'Simulator'" and "make: *** [sim] Error 1". Fixed (above); rerun |

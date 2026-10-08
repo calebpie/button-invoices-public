@@ -54,11 +54,19 @@ struct InvoiceFlowView: View {
         .navigationTitle("Invoice \(invoice.number)")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .secondaryAction) {
+            ToolbarItem(placement: .topBarTrailing) {
                 Menu {
                     Button("Delete Draft…", systemImage: "trash", role: .destructive) { confirmDelete = true }
                 } label: {
                     Label("More", systemImage: "ellipsis")
+                }
+                .confirmationDialog("Delete draft \(invoice.number)?", isPresented: $confirmDelete, titleVisibility: .visible) {
+                    Button("Delete Draft", role: .destructive) {
+                        dismiss()
+                        InvoiceActions.delete(invoice, context)
+                    }
+                } message: {
+                    Text("The buttons stay saved; only this draft is removed.")
                 }
             }
         }
@@ -70,14 +78,6 @@ struct InvoiceFlowView: View {
         }
         .onChange(of: step) { try? context.save() }
         .onDisappear { try? context.save() }
-        .confirmationDialog("Delete draft \(invoice.number)?", isPresented: $confirmDelete, titleVisibility: .visible) {
-            Button("Delete Draft", role: .destructive) {
-                dismiss()
-                InvoiceActions.delete(invoice, context)
-            }
-        } message: {
-            Text("The buttons stay saved; only this draft is removed.")
-        }
     }
 
     // MARK: Steps

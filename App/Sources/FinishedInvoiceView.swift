@@ -73,7 +73,9 @@ struct FinishedInvoiceView: View {
             ToolbarItem(placement: .primaryAction) {
                 if let pdfURL { ShareLink(item: pdfURL) }
             }
-            ToolbarItem(placement: .secondaryAction) {
+            // Top bar trailing, not secondary: a secondary item lands inside the system's own
+            // overflow menu, which made her tap ⋯ and then More.
+            ToolbarItem(placement: .topBarTrailing) {
                 moreMenu
             }
         }
@@ -95,6 +97,20 @@ struct FinishedInvoiceView: View {
             }
         }
         .quickLookPreview($fullScreen)
+    }
+
+    private var moreMenu: some View {
+        Menu {
+            Button("Duplicate", systemImage: "plus.square.on.square") {
+                router.invoicePath = [InvoiceActions.duplicate(invoice, context, existing: allInvoices.map(\.number))]
+            }
+            Button("Make Changes…", systemImage: "pencil") { confirmChanges = true }
+            Divider()
+            Button("Delete…", systemImage: "trash", role: .destructive) { confirmDelete = true }
+        } label: {
+            Label("More", systemImage: "ellipsis")
+        }
+        // On the menu, so on iOS 26 the questions point at ⋯.
         .confirmationDialog("Make changes to invoice \(invoice.number)?", isPresented: $confirmChanges, titleVisibility: .visible) {
             Button("Make Changes") {
                 invoice.status = .draft
@@ -111,19 +127,6 @@ struct FinishedInvoiceView: View {
             }
         } message: {
             Text("This removes the invoice and its PDF from the app. Copies you already sent aren't affected.")
-        }
-    }
-
-    private var moreMenu: some View {
-        Menu {
-            Button("Duplicate", systemImage: "plus.square.on.square") {
-                router.invoicePath = [InvoiceActions.duplicate(invoice, context, existing: allInvoices.map(\.number))]
-            }
-            Button("Make Changes…", systemImage: "pencil") { confirmChanges = true }
-            Divider()
-            Button("Delete…", systemImage: "trash", role: .destructive) { confirmDelete = true }
-        } label: {
-            Label("More", systemImage: "ellipsis")
         }
     }
 }
