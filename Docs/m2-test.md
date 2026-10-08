@@ -27,7 +27,7 @@ labels below. Commands run in Terminal from the project folder
    invoices, newest first (0260903 $4,178.69 … 0260426-1 $947.21). Open 0260812: two pages,
    $976.90, same lines as Examples/…/0260812.pdf with "Ladybug, Red / White" and
    "Pineapple" spelled that way. Buttons lists 37 buttons by
-   shape (Bunny first) with **Add a Button** floating bottom right; Pineapple, Celadon,
+   shape (Bunny first) with **+ Add a Button** at the top right, still there when the list is scrolled; Pineapple, Celadon,
    Ellipse, "Ladybug, Red / White", Crab 26CBL and Shell 26SY are spelled that way.
    Settings shows "123 Example St, Suite 100".
 2. Add test photos to the Simulator:

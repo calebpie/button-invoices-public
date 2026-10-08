@@ -123,12 +123,13 @@ struct LineEditorView: View {
             if case .edit(let line) = mode {
                 // Its own card: under the bare Save button it had square top corners.
                 Section {
-                    Button("Remove from Invoice", systemImage: "trash", role: .destructive) {
+                    Button(role: .destructive) {
                         context.undoManager?.setActionName("Remove Button")
                         context.delete(line)
                         dismiss()
+                    } label: {
+                        DestructiveLabel("Remove from Invoice", systemImage: "trash")
                     }
-                    .tint(.red) // the icon too, not just the text
                 }
             }
         }

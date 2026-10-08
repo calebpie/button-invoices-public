@@ -84,6 +84,29 @@ extension View {
     }
 }
 
+// MARK: - Destructive rows
+
+/// A destructive list row's label with its icon in the same red as its text. A list colors a
+/// row's icon with the accent, and neither the role nor `.tint` reaches it.
+struct DestructiveLabel: View {
+    let title: String
+    let systemImage: String
+
+    init(_ title: String, systemImage: String) {
+        self.title = title
+        self.systemImage = systemImage
+    }
+
+    var body: some View {
+        Label {
+            Text(title)
+        } icon: {
+            Image(systemName: systemImage).foregroundStyle(.red)
+        }
+        .foregroundStyle(.red)
+    }
+}
+
 // MARK: - Toolbar buttons
 
 /// The standard Cancel for sheets: an xmark on iOS 26, the word Cancel before that

@@ -1,6 +1,6 @@
 # Button Invoices — specification
 
-Revision 8, October 8, 2026 (color dots on the chips, photo and action cards; see Design guidelines). Source of truth for the project; propose changes to Caleb
+Revision 9, October 8, 2026 (Add a Button in the Buttons tab's navigation bar; see Design guidelines). Source of truth for the project; propose changes to Caleb
 rather than diverging. Status and test results: Docs/progress.md.
 
 ## Goal
@@ -143,8 +143,9 @@ Three tabs in the floating Liquid Glass tab bar (Caleb, Oct 8, 2026):
   leaves the app; a new invoice left with nothing on it is discarded. The app reopens on
   the tab, and the draft, she left.
 - **Buttons**: every saved button, a section per shape (with a count) and a row per color
-  and size. A floating Add a Button (Liquid Glass) starts the new-button steps; each
-  shape's ⋯ menu adds a color or size or renames the shape. Swipe left (or open a button)
+  and size. Add a Button, in the navigation bar beside the title and still there when
+  the title shrinks into the bar as she scrolls (Caleb, Oct 8, 2026), starts the
+  new-button steps; each shape's ⋯ menu adds a color or size or renames the shape. Swipe left (or open a button)
   to Archive; archived buttons are listed at the bottom, aren't offered for new lines,
   and can be unarchived. A button can be deleted only if it has never been invoiced.
 - **Settings**: each field printed on the invoice, in page order (your business, bill to,

@@ -74,9 +74,9 @@ struct EditButtonView: View {
                     dismiss()
                 }
                 if neverInvoiced {
-                    // In a list the icon takes the accent color, not the destructive red.
-                    Button("Delete This Button", systemImage: "trash", role: .destructive) { confirmDelete = true }
-                        .tint(.red)
+                    Button(role: .destructive) { confirmDelete = true } label: {
+                        DestructiveLabel("Delete This Button", systemImage: "trash")
+                    }
                 }
             } footer: {
                 Text(neverInvoiced

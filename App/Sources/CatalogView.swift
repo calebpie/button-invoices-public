@@ -3,7 +3,7 @@ import SwiftData
 import SwiftUI
 
 /// The Buttons tab (SPEC.md, "Buttons"): every saved button, a section per shape with a row
-/// per color and size, a floating Add a Button, and Archive. Archiving or changing a button
+/// per color and size, Add a Button in the navigation bar, and Archive. Archiving or changing a button
 /// never changes an invoice that already has it.
 struct CatalogView: View {
     @Environment(\.modelContext) private var context
@@ -70,11 +70,11 @@ struct CatalogView: View {
                     ForEach(Catalog.search(search, in: variants, includeArchived: true)) { row($0) }
                 }
             }
-            // Room so the last row can scroll clear of the floating button.
-            Color.clear.frame(height: 56).listRowBackground(Color.clear)
         }
         .listStyle(.insetGrouped)
-        .overlay(alignment: .bottomTrailing) { addButton }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) { addButton }
+        }
         .overlay {
             if variants.isEmpty {
                 ContentUnavailableView("No Buttons Yet", systemImage: "circle.grid.2x2",
@@ -112,19 +112,22 @@ struct CatalogView: View {
         variants.filter(\.isHidden).sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
     }
 
-    /// Floats above the tab bar, bottom right.
+    /// In the navigation bar, beside the large title and staying in the bar when the title
+    /// shrinks into it as she scrolls; the screen's one prominent action (Toolbars, "Use the
+    /// .prominent style for key actions"). Title and icon, so it says what it does.
     private var addButton: some View {
         Button {
             adding = NewButton(design: nil)
         } label: {
-            Label("Add a Button", systemImage: "plus")
-                .font(.headline)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 6)
+            // Not a Label: a toolbar shows a Label as its icon alone.
+            HStack(spacing: 4) {
+                Image(systemName: "plus")
+                Text("Add a Button")
+            }
+            .fontWeight(.semibold)
         }
+        .accessibilityLabel("Add a Button")
         .glassProminentButton()
-        .padding(.trailing, 20)
-        .padding(.bottom, 12)
     }
 
     private func row(_ variant: ButtonVariant) -> some View {

@@ -185,8 +185,13 @@ Found while checking:
   Skip Photo is plain text under Next, and Remove from Invoice has its own card, for the
   same reason.
 - Change Button: Delete This Button has a trash icon; "Before your changes" is now
-  "Earlier versions". The trash icon first took the accent color while the text was red
-  (a list colors row icons with the accent); it is red now, as is Remove from Invoice's.
+  "Earlier versions". The trash icon took the accent color while the text was red; `.tint(.red)`
+  didn't reach it (Caleb's screenshot), so the icon is now set red explicitly
+  (`DestructiveLabel`), as is Remove from Invoice's. Checked: both rows the same red.
+- Buttons tab: Add a Button moved from the bottom-right float into the navigation bar,
+  prominent, as "+ Add a Button" (a Label there shows only "+"). It sits top right above
+  the large title, stays in the bar beside the small title after scrolling, and opens
+  the new-button steps.
 
 Checked in Device Hub: Bunny's Change Button screen (photo card, dots on all 16 colors,
 trash icon, Earlier versions), new-button step 1, and a line's Change Line screen in a
