@@ -1,0 +1,9 @@
+// Template for Configs/Signing.xcconfig, which `make setup` creates and fills in.
+// That file is gitignored because the team ID belongs to one Apple ID.
+
+// Your Apple development team. A free Apple ID gets a "Personal Team".
+DEVELOPMENT_TEAM =
+
+// Bundle IDs become $(BUNDLE_ID_PREFIX).ButtonInvoices. They must be
+// unique across all Apple accounts, so change this if Xcode says the ID is taken.
+BUNDLE_ID_PREFIX = com.calebpietrafesa

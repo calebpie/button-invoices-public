@@ -1,0 +1,389 @@
+{
+  "source": "Daphné Verley Invoice - AOB 0260903.xlsx",
+  "variants": [
+    {
+      "design": "Bunny",
+      "colors": [
+        "Black",
+        "White"
+      ],
+      "size": "",
+      "sku": "26BBW",
+      "priceCents": 1200,
+      "photo": "bunny-black-white.png"
+    },
+    {
+      "design": "Cowrie Shell",
+      "colors": [
+        "Black"
+      ],
+      "size": "",
+      "sku": "26CSB",
+      "priceCents": 900,
+      "photo": "cowrie-shell-black.png"
+    },
+    {
+      "design": "Cowrie Shell",
+      "colors": [
+        "Pale Pink"
+      ],
+      "size": "",
+      "sku": "26CSPP",
+      "priceCents": 900,
+      "photo": "cowrie-shell-pale-pink.png"
+    },
+    {
+      "design": "Crab",
+      "colors": [
+        "Blue"
+      ],
+      "size": "",
+      "sku": "26CBLW",
+      "priceCents": 1200,
+      "photo": "crab-blue.png"
+    },
+    {
+      "design": "Daisy",
+      "colors": [
+        "Black",
+        "White"
+      ],
+      "size": "Large",
+      "sku": "26DBWL",
+      "priceCents": 750,
+      "photo": "daisy-black-white-large.png"
+    },
+    {
+      "design": "Daisy",
+      "colors": [
+        "Black",
+        "White"
+      ],
+      "size": "Small",
+      "sku": "26DBWS",
+      "priceCents": 550,
+      "photo": "daisy-black-white-small.png"
+    },
+    {
+      "design": "Daisy",
+      "colors": [
+        "Red",
+        "White"
+      ],
+      "size": "Small",
+      "sku": "26DRWS",
+      "priceCents": 550,
+      "photo": "daisy-red-white-small.png"
+    },
+    {
+      "design": "Dogwood",
+      "colors": [
+        "Celedon"
+      ],
+      "size": "",
+      "sku": "26DC",
+      "priceCents": 800,
+      "photo": "dogwood-celedon.png"
+    },
+    {
+      "design": "Dogwood",
+      "colors": [
+        "Ivory"
+      ],
+      "size": "",
+      "sku": "26DI",
+      "priceCents": 800,
+      "photo": "dogwood-ivory.png"
+    },
+    {
+      "design": "Elipse",
+      "colors": [
+        "Lavender"
+      ],
+      "size": "Mini",
+      "sku": "26ELM",
+      "priceCents": 350,
+      "photo": "elipse-lavender-mini.png"
+    },
+    {
+      "design": "Flower Burst",
+      "colors": [
+        "Burgundy",
+        "White"
+      ],
+      "size": "",
+      "sku": "26FBBW",
+      "priceCents": 600,
+      "photo": "flower-burst-burgundy-white.png"
+    },
+    {
+      "design": "Clover",
+      "colors": [
+        "Blue",
+        "White"
+      ],
+      "size": "",
+      "sku": "26CBLW",
+      "priceCents": 650,
+      "photo": "clover-blue-white.png"
+    },
+    {
+      "design": "Heart",
+      "colors": [
+        "Burgundy"
+      ],
+      "size": "Medium",
+      "sku": "26HBM",
+      "priceCents": 400,
+      "photo": "heart-burgundy-medium.png"
+    },
+    {
+      "design": "Heart",
+      "colors": [
+        "Red"
+      ],
+      "size": "Medium",
+      "sku": "26HRM",
+      "priceCents": 400,
+      "photo": "heart-red-medium.png"
+    },
+    {
+      "design": "Heart",
+      "colors": [
+        "Navy"
+      ],
+      "size": "Medium",
+      "sku": "26HNM",
+      "priceCents": 400,
+      "photo": "heart-navy-medium.png"
+    },
+    {
+      "design": "Lips",
+      "colors": [
+        "Red"
+      ],
+      "size": "",
+      "sku": "26LR",
+      "priceCents": null,
+      "photo": "lips-red.png"
+    },
+    {
+      "design": "Mushroom",
+      "colors": [
+        "Blue",
+        "White"
+      ],
+      "size": "",
+      "sku": "26MBLW",
+      "priceCents": 800,
+      "photo": "mushroom-blue-white.png"
+    },
+    {
+      "design": "Mushroom",
+      "colors": [
+        "Burgundy",
+        "White"
+      ],
+      "size": "",
+      "sku": "26MBW",
+      "priceCents": 800,
+      "photo": "mushroom-burgundy-white.png"
+    },
+    {
+      "design": "Mushroom",
+      "colors": [
+        "Navy",
+        "White"
+      ],
+      "size": "",
+      "sku": "26MNW",
+      "priceCents": 800,
+      "photo": "mushroom-navy-white.png"
+    },
+    {
+      "design": "Mushroom",
+      "colors": [
+        "Red",
+        "White"
+      ],
+      "size": "",
+      "sku": "26MRW",
+      "priceCents": 800,
+      "photo": "mushroom-red-white.png"
+    },
+    {
+      "design": "Nautilus",
+      "colors": [
+        "Green"
+      ],
+      "size": "",
+      "sku": "26NG",
+      "priceCents": 900,
+      "photo": "nautilus-green.png"
+    },
+    {
+      "design": "Nautilus",
+      "colors": [
+        "Black"
+      ],
+      "size": "",
+      "sku": "26NB",
+      "priceCents": 900,
+      "photo": "nautilus-black.png"
+    },
+    {
+      "design": "Nautilus",
+      "colors": [
+        "Brown"
+      ],
+      "size": "",
+      "sku": "26NBR",
+      "priceCents": 900,
+      "photo": "nautilus-brown.png"
+    },
+    {
+      "design": "Nautilus",
+      "colors": [
+        "Brown"
+      ],
+      "size": "Large",
+      "sku": "26NBRL",
+      "priceCents": 900,
+      "photo": "nautilus-brown-large.png"
+    },
+    {
+      "design": "Nautilus",
+      "colors": [
+        "White"
+      ],
+      "size": "",
+      "sku": "26NW",
+      "priceCents": 900,
+      "photo": "nautilus-white.png"
+    },
+    {
+      "design": "Nautilus",
+      "colors": [
+        "Matte Pink"
+      ],
+      "size": "",
+      "sku": "26NMP",
+      "priceCents": 900,
+      "photo": "nautilus-matte-pink.png"
+    },
+    {
+      "design": "Nautilus",
+      "colors": [
+        "Matte White"
+      ],
+      "size": "",
+      "sku": "26NMW",
+      "priceCents": 900,
+      "photo": "nautilus-matte-white.png"
+    },
+    {
+      "design": "Nautilus",
+      "colors": [
+        "Pale Pink"
+      ],
+      "size": "",
+      "sku": "26NPP",
+      "priceCents": 900,
+      "photo": "nautilus-pale-pink.png"
+    },
+    {
+      "design": "Nautilus",
+      "colors": [
+        "Unglazed"
+      ],
+      "size": "",
+      "sku": "26NUG",
+      "priceCents": 900,
+      "photo": "nautilus-unglazed.png"
+    },
+    {
+      "design": "Shell",
+      "colors": [
+        "Yellow"
+      ],
+      "size": "",
+      "sku": "26SW",
+      "priceCents": 800,
+      "photo": "shell-yellow.png"
+    },
+    {
+      "design": "Star",
+      "colors": [
+        "Burgundy"
+      ],
+      "size": "Small",
+      "sku": "26SBS",
+      "priceCents": 400,
+      "photo": "star-burgundy-small.png"
+    },
+    {
+      "design": "Star",
+      "colors": [
+        "Navy"
+      ],
+      "size": "Mini",
+      "sku": "26SNM",
+      "priceCents": 400,
+      "photo": "star-navy-mini.png"
+    },
+    {
+      "design": "Ladybug",
+      "colors": [
+        "Red"
+      ],
+      "size": "",
+      "sku": "26LRW",
+      "priceCents": 800,
+      "photo": "ladybug-red.png"
+    },
+    {
+      "design": "Pineaple",
+      "colors": [
+        "Yellow",
+        "Brown"
+      ],
+      "size": "",
+      "sku": "26PYB",
+      "priceCents": 900,
+      "photo": "pineaple-yellow-brown.png"
+    },
+    {
+      "design": "Rose",
+      "colors": [
+        "White",
+        "Green"
+      ],
+      "size": "",
+      "sku": "26RWG",
+      "priceCents": 800,
+      "photo": "rose-white-green.png"
+    },
+    {
+      "design": "Sailboat",
+      "colors": [
+        "Black",
+        "White"
+      ],
+      "size": "",
+      "sku": "26SBW",
+      "priceCents": 900,
+      "photo": "sailboat-black-white.png"
+    },
+    {
+      "design": "Strawberry",
+      "colors": [
+        "Red",
+        "Green"
+      ],
+      "size": "",
+      "sku": "26SRG",
+      "priceCents": 800,
+      "photo": "strawberry-red-green.png"
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+# Button Invoices
+
+An iPhone and iPad app for Daphné Verley to invoice Alix of Bohemia for buttons: pick
+buttons by typing the way she texts ("12 red hearts @ $4"), add new ones with a photo
+(background removed for you), add shipping, check the total, and send a PDF that looks
+like the Excel invoices. Design and decisions: [SPEC.md](SPEC.md). Status: [Docs/progress.md](Docs/progress.md).
+
+## Layout
+
+| Path | What |
+|---|---|
+| `App/Sources` | The app's screens (SwiftUI) and saved data (SwiftData) |
+| `App/Resources/Seed` | Starting catalog from the Excel template, loaded on first launch (`make seed`) |
+| `Packages/InvoiceKit` | Everything testable on the Mac: names, SKUs, search, totals, PDF, photo cutout, receipts |
+| `Tools/seed/extract_seed.py` | Reads an invoice workbook's Reference sheet into the seed (standard-library Python) |
+| `Examples/` | Real invoices, photos and messages (gitignored) |
+| `project.yml` | Xcode project definition; `make generate` writes `ButtonInvoices.xcodeproj` (never edit that) |
+
+## Commands
+
+```bash
+make test
+```
+Runs the InvoiceKit tests (34, about 10 s): name cleanup, SKUs against the template, her
+17 message lines against the catalog, the nine example totals, PDF pagination, photo
+cutouts, and the photo duplicate check.
+
+```bash
+make sample-pdfs
+```
+Re-creates the nine example invoices as PDFs in `build/sample-pdfs` (with a PNG of each
+first page, and cutouts of the raw photos) and opens the folder, for comparison with
+`Examples/Invoice Excel and Output PDFs`.
+
+```bash
+make sim
+```
+Builds the app and opens it in the iPhone 17 Simulator. Another device:
+`SIMULATOR="iPad Air 11-inch (M4)" make sim`. In the Simulator, background removal falls
+back to removing the background by color (Vision's subject lifting fails there with
+"Could not create inference context"). The photo duplicate check fails there too ("Failed
+to create espresso context") and the app says it couldn't compare photos. Both ran on the
+Mac in `make test`; on a real iPhone they are checked in M3. Receipt reading works in the
+Simulator. To try photos there, add some to its Photos library first:
+```bash
+xcrun simctl addmedia booted Examples/Images/Raw/IMG_8516.heic "Examples/Images/Shipping Receipts/IMG_9049.heic"
+```
+
+```bash
+make seed
+```
+Rebuilds the starting catalog from the 0260903 workbook in Examples/ (another workbook:
+`python3 Tools/seed/extract_seed.py --xlsx <file>`) and the edited PNGs in
+`Examples/Images/Edited`. Only affects a fresh install: the app loads the
+seed once, on first launch. To start the Simulator over with a fresh seed:
+```bash
+xcrun simctl uninstall booted com.calebpietrafesa.ButtonInvoices
+```
+
+## First-time setup (Mac)
+
+Steps 1–5 are done on Caleb's M4 Max as of October 8, 2026 (Xcode 27.0 installed, signed in).
+
+1. Install Xcode from the Mac App Store, open it once, accept the license, and let it
+   install the iOS platform when asked.
+2. `make test` should pass. `make sim` should open the Simulator with the app.
+3. Signing: Xcode → Settings… (⌘,) → Accounts → select the Apple ID → select the team →
+   Manage Certificates… → + → Apple Development → Done.
+4. Run `make setup` (paid team) or `ALLOW_PERSONAL_TEAM=1 make setup` (free Personal Team),
+   and check that the team name it prints is yours. It writes `Configs/Signing.xcconfig`.
+5. If Xcode says the bundle ID is taken, change `BUNDLE_ID_PREFIX` in
+   `Configs/Signing.xcconfig` and run `make ios` again.
+
+## Installing on her iPhone or iPad
+
+### Now: over a cable (free or paid team)
+
+1. Connect the iPhone to the Mac with a cable, unlock it, tap **Trust** and enter the passcode.
+2. On the iPhone: Settings → Privacy & Security → Developer Mode → on, then restart and
+   confirm. (The switch appears after the iPhone has been connected to Xcode once; if it
+   isn't there, run `make ios` once first.)
+3. `make ios` builds, installs and opens the app.
+4. First launch only: if the iPhone says "Untrusted Developer", go to Settings → General →
+   VPN & Device Management → your Apple ID → Trust, then open **Invoices** from the Home Screen.
+
+With the free Personal Team the app stops opening after 7 days; run `make ios` again
+with the phone connected. Her data is kept.
+
+### Once the paid account is approved: TestFlight (recommended)
+
+TestFlight lets her install and update the app herself, with no cable, and each build
+lasts 90 days. Steps will be added to this README when the paid team exists (SPEC.md,
+"Platform").
+
+## Before the first install for her
+
+- Home → Business details: check the address ("123 Example St, Suit 100" is copied from the template
+  and may be a typo for "Suite"), bill-to, and the routing and account numbers.
+- Home → My buttons: 29 of the 37 starting photos are the small copies from the workbook. Retake
+  any that look blurry (tap the button → Retake Photo), or run `make seed` with the
+  original edited PNGs first.
+- Data lives on the device and is included in its iCloud Backup. Deleting the app deletes
+  the invoices and buttons.
+
+## How she uses it
+
+1. **Start a new invoice** on the home screen. The number and date are filled in.
+2. **Step 1, Buttons.** Add the first button: tap its shape, then its color (and size).
+   Or type the line from her notes ("125 burgundy mushrooms @ $8") and tap the photo.
+   Check the quantity and price, add a discount if any ($ or %), tap **Add**. Repeat, then
+   **Next**.
+3. A button that isn't saved yet: "Add it as a new button" (or **Add a new button** under
+   the shapes). Take its photo on a plain background, check the cutout (**Touch Up** if
+   needed), say whether it's one already saved, check the name and price, **Save and Add
+   to Invoice**.
+4. **Step 2, Shipping.** **Add shipping** for each box: type the amount, or photograph the
+   receipt and tap the amount for this order. Then **Next**.
+5. **Step 3, Review.** Check the lines and total (optionally type her own total to
+   compare), then **Finish** → **Finish and Share the PDF** → Messages or Mail.
+
+**Save & Exit** (top left) keeps the draft; it is listed on the home screen to continue.
