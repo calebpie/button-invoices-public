@@ -185,7 +185,8 @@ Found while checking:
   Skip Photo is plain text under Next, and Remove from Invoice has its own card, for the
   same reason.
 - Change Button: Delete This Button has a trash icon; "Before your changes" is now
-  "Earlier versions".
+  "Earlier versions". The trash icon first took the accent color while the text was red
+  (a list colors row icons with the accent); it is red now, as is Remove from Invoice's.
 
 Checked in Device Hub: Bunny's Change Button screen (photo card, dots on all 16 colors,
 trash icon, Earlier versions), new-button step 1, and a line's Change Line screen in a

@@ -128,6 +128,7 @@ struct LineEditorView: View {
                         context.delete(line)
                         dismiss()
                     }
+                    .tint(.red) // the icon too, not just the text
                 }
             }
         }
