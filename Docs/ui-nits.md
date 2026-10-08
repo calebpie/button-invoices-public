@@ -11,6 +11,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 2 | "Hello, Daphné." fades in place instead of sliding with the page | Invoices, opening an invoice | Open |
 | 3 | The receipt photo can't be opened full size to check the amount | Invoice step 2, Shipping | Open |
 | 4 | Swipe-delete: the row vanishes before she confirms; after she confirms, it vanishes with no animation | Invoices list | Open |
+| 5 | One letter in search finds nothing and says "No Results" | Buttons search; Add a Button in an invoice | Open |
 
 ## 1. Grey strip under the tab bar as the keyboard goes away
 
@@ -161,3 +162,39 @@ with Duplicate from Invoice 0261008, deleted in the recording):
   slide back in, not pop.
 - Match the button to the question: **Delete Draft** for a draft, **Delete Invoice** for
   the others.
+
+## 5. One letter in search finds nothing and says "No Results"
+
+**Reported** (Caleb, Oct 8, 2026, iPhone, after Docs/m3-test.md, Part 1, step 7): on the
+Buttons tab, typing "H" in search shows no results and says it found none. If search needs
+more than one letter, it should say so when only one is typed.
+
+**Reproduced** (iOS 27.0 Simulator, iPhone 17, on-screen keys):
+
+- "H": "No Results for "H"" and "Check the spelling or try a new search." Nothing listed.
+- "He" (one more letter): Heart, Burgundy, Medium; Heart, Navy, Medium; Heart, Red,
+  Medium.
+- The same search runs in an invoice's Add a Button sheet (`Catalog.search`, called from
+  AddLineSheet.swift), where one letter would show "No saved button matches "h"."; seen in
+  the code, not checked on screen.
+
+**Cause:** `Matcher.score` (Packages/InvoiceKit/Sources/InvoiceKit/Matcher.swift) counts a
+word she is still typing as a match only from 2 letters up (`w.count >= 2`, the "still
+typing" prefix rule). A single letter matches no whole word either, so every button scores
+0 and the list is empty. The 2-letter floor keeps stray letters in longer searches ("12 x
+red") from matching everything.
+
+**Her catalog** (App/Resources/Seed/catalog.json): 19 designs and 37 buttons. No letter
+starts more than 4 designs ("s": 4; "c": 3); by buttons, the biggest is "n" with 9
+(Nautilus). "h" starts only Heart: 3 buttons.
+
+**To try in the bug bash:**
+
+- Recommended: let a search of one letter match the start of design names only ("h" →
+  the 3 Hearts, "s" → 5 buttons), not colors, which would match most buttons ("b": black,
+  blue, burgundy…). Lists that small are useful from the first letter, which is how the
+  search in Apple's own apps behaves, and nothing needs explaining. Keep the 2-letter floor
+  for words in longer searches. Add a case to MatcherTests.
+- Caleb's suggestion, if one letter should still match nothing: in place of "No Results",
+  show a hint such as "Keep typing to search buttons." while only one letter is typed, in
+  both the Buttons tab and Add a Button.

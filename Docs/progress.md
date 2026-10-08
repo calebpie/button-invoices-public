@@ -6,8 +6,8 @@
 |---|---|
 | M1 Core logic and PDF | Done: Caleb ran Docs/m2-test.md, Part 1, steps 1–5, all pass (Oct 8, 2026) |
 | M2 App in the Simulator | Done: Caleb ran Docs/m2-test.md, Parts 2–4, all pass (Oct 8, 2026; results below) |
-| Bug bash | Pending: the nits in Docs/ui-nits.md (4 open), fixed together before the build goes to her iPhone |
-| M3 App on her iPhone | Started: Docs/m3-test.md, Part 1, on Caleb's iPhone (Personal Team, `make ios`): steps 1–6 and 8–10 pass; step 7 (shake to undo) failed, fixed, to rerun |
+| Bug bash | Pending: the nits in Docs/ui-nits.md (5 open), fixed together before the build goes to her iPhone |
+| M3 App on her iPhone | Started: Docs/m3-test.md, Part 1, all pass on Caleb's iPhone (Personal Team, `make ios`; step 7 after the shake-to-undo fix); Part 2 waits for the bug bash and the paid team |
 
 ## Automated results (Claude, Oct 8, 2026, M4 Max, Xcode 27.0, iOS 27.0 Simulator)
 
@@ -399,7 +399,7 @@ Use the Part N, step M labels from Docs/m3-test.md. Part 1 is on Caleb's iPhone 
 | Part 1, step 4 | Pass. |
 | Part 1, step 5 | Pass. |
 | Part 1, step 6 | Pass. |
-| Part 1, step 7 | Fail: the button removes on swipe, but shaking the device produces no prompt to undo. Fixed ("Shake to undo", above); rerun after `make ios`. |
+| Part 1, step 7 | Fail: the button removes on swipe, but shaking the device produces no prompt to undo. Fixed ("Shake to undo", above). Rerun (Oct 8): Pass. Searching "H" afterwards showed "No Results": logged as Docs/ui-nits.md, nit 5. |
 | Part 1, step 8 | Pass. |
 | Part 1, step 9 | Pass.|
 | Part 1, step 10 | Pass.|
