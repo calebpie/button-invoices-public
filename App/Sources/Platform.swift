@@ -757,6 +757,91 @@ private struct LeavesTapsToItsControls: ViewModifier {
     }
 }
 
+// MARK: - Shake to undo
+
+extension View {
+    /// Shaking the device offers to undo the last change (Undo and redo). Installed once, on
+    /// the app's window.
+    func shakeToUndo() -> some View {
+        background(ShakeToUndo())
+    }
+}
+
+/// iOS offers Undo on a shake only through the first responder's undo manager, and while no
+/// text field is active nothing is first responder: a shake after removing a line did
+/// nothing (Docs/m3-test.md, Part 1, step 7). A probe showed no first responder while the
+/// window's undo manager, the one the saved data records into, could undo "Remove Button".
+/// This invisible view takes that role whenever nothing else has it; its undo manager is the
+/// window's, through the responder chain.
+private struct ShakeToUndo: UIViewRepresentable {
+    func makeUIView(context: Context) -> Anchor {
+        let anchor = Anchor()
+        anchor.isUserInteractionEnabled = false
+        return anchor
+    }
+    func updateUIView(_ view: Anchor, context: Context) {}
+
+    final class Anchor: UIView {
+        override var canBecomeFirstResponder: Bool { true }
+
+        /// Keyboard shortcuts and the undo manager are looked up from the first responder
+        /// outward. Going on from the screen in front, not from here at the root, keeps that
+        /// screen's shortcuts reachable (⌘[ to go back is on its navigation stack), the same
+        /// chain a text field on that screen would have.
+        override var next: UIResponder? {
+            guard let root = window?.rootViewController else { return super.next }
+            return Self.frontmost(root)
+        }
+
+        private static func frontmost(_ controller: UIViewController) -> UIViewController {
+            if let presented = controller.presentedViewController, !presented.isBeingDismissed {
+                return frontmost(presented)
+            }
+            if let tabs = controller as? UITabBarController, let selected = tabs.selectedViewController {
+                return frontmost(selected)
+            }
+            if let stack = controller as? UINavigationController, let top = stack.topViewController {
+                return frontmost(top)
+            }
+            if controller.children.count == 1, let only = controller.children.first { return frontmost(only) }
+            return controller
+        }
+
+        override func didMoveToWindow() {
+            super.didMoveToWindow()
+            let center = NotificationCenter.default
+            center.removeObserver(self)
+            guard window != nil else { return }
+            // Whenever a text field lets go, or she comes back to the app.
+            for name in [UITextField.textDidEndEditingNotification, UITextView.textDidEndEditingNotification,
+                         UIApplication.didBecomeActiveNotification] {
+                center.addObserver(self, selector: #selector(claim), name: name, object: nil)
+            }
+            claim()
+        }
+
+        /// A moment later, so a field she has just moved into keeps the keyboard.
+        @objc private func claim() {
+            Task {
+                guard window != nil, UIResponder.current == nil else { return }
+                becomeFirstResponder()
+            }
+        }
+    }
+}
+
+extension UIResponder {
+    private static weak var found: UIResponder?
+    @objc private func invoicesReportFirstResponder(_ sender: Any?) { UIResponder.found = self }
+
+    /// The first responder, if there is one: an action sent to no one goes to it first.
+    static var current: UIResponder? {
+        found = nil
+        UIApplication.shared.sendAction(#selector(invoicesReportFirstResponder(_:)), to: nil, from: nil, for: nil)
+        return found
+    }
+}
+
 // MARK: - Large text
 
 /// Rows that put their parts side by side at normal text sizes and stack them at the

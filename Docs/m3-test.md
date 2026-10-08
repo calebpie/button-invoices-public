@@ -30,7 +30,10 @@ app is on your iPhone from `make ios`; with the free team it stops opening after
    Button**, quantity 2, **Add to Invoice**. Expected: the number pad, with no Done bar;
    tapping the heart photo closes it.
 7. Swipe the heart line left → **Delete**, then shake the iPhone. Expected: "Undo Remove
-   Button" with **Undo**. Tap **Undo**. Expected: the line is back.
+   Button" with **Undo**. Tap **Undo**. Expected: the line is back. Then Buttons tab → the
+   search circle → type **heart**. Expected: each letter appears as you type and the Heart
+   buttons are listed (typing is unaffected by the shake fix). Tap **✕**, then go back to
+   the Invoices tab.
 8. Tap step **2 Shipping** in the step bar → **Add Shipping** → **Choose from Photos** →
    the receipt. Expected: $36.48 filled in, $36.48 / $19.58 / $16.90 to tap, note "Shipped
    8/31/2026". Tap **Add Shipping**.

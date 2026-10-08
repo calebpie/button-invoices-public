@@ -139,6 +139,7 @@ struct ButtonInvoicesApp: App {
                 .environment(settings)
                 .environment(AppRouter.shared)
                 .keyboardHandling()
+                .shakeToUndo()
         }
         .modelContainer(container)
         .onChange(of: scenePhase) { _, phase in
@@ -185,6 +186,47 @@ struct RootView: View {
             }
             #endif
         }
+        #if DEBUG
+        // Probe: `-UndoProbe YES` logs, every 2 s, which undo manager a shake would find.
+        .task {
+            guard UserDefaults.standard.bool(forKey: "UndoProbe") else { return }
+            let log = Logger(subsystem: "InvoiceKit", category: "Probe")
+            @MainActor func describe(_ u: UndoManager?) -> String {
+                guard let u else { return "nil" }
+                return "\(Unmanaged.passUnretained(u).toOpaque()) canUndo=\(u.canUndo) name='\(u.undoActionName)'"
+            }
+            while !Task.isCancelled {
+                let first = UIResponder.current
+                let window = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+                    .flatMap(\.windows).first { $0.isKeyWindow }
+                log.notice("probe: undo first=\(first.map { String(describing: type(of: $0)) } ?? "none", privacy: .public) firstUM=\(describe(first?.undoManager), privacy: .public) windowUM=\(describe(window?.undoManager), privacy: .public) envUM=\(describe(undoManager), privacy: .public) contextUM=\(describe(context.undoManager), privacy: .public) shakeToEdit=\(UIApplication.shared.applicationSupportsShakeToEdit)")
+                try? await Task.sleep(for: .seconds(2))
+            }
+        }
+        // Probe: `-KeyProbe YES` logs the responder chain from the first responder, with the
+        // keyboard shortcuts each link offers, and every view controller's shortcuts.
+        .task {
+            guard UserDefaults.standard.bool(forKey: "KeyProbe") else { return }
+            let log = Logger(subsystem: "InvoiceKit", category: "Probe")
+            try? await Task.sleep(for: .seconds(3))
+            @MainActor func keys(_ r: UIResponder) -> String {
+                (r.keyCommands ?? []).map { "\($0.modifierFlags.contains(.command) ? "⌘" : "")\($0.input ?? "?")" }.joined(separator: ",")
+            }
+            var link = UIResponder.current
+            while let r = link {
+                log.notice("probe: key chain \(String(describing: type(of: r)), privacy: .public) [\(keys(r), privacy: .public)]")
+                link = r.next
+            }
+            @MainActor func walk(_ vc: UIViewController, _ depth: Int) {
+                log.notice("probe: key vc \(depth) \(String(describing: type(of: vc)), privacy: .public) [\(keys(vc), privacy: .public)] view [\(keys(vc.view), privacy: .public)]")
+                vc.children.forEach { walk($0, depth + 1) }
+                if let p = vc.presentedViewController, p.presentingViewController === vc { walk(p, depth + 1) }
+            }
+            let window = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+                .flatMap(\.windows).first { $0.isKeyWindow }
+            if let root = window?.rootViewController { walk(root, 0) }
+        }
+        #endif
         .onChange(of: router.tab) { _, tab in savedTab = tab.rawValue }
         .onChange(of: router.invoicePath) { _, path in
             savedInvoice = path.last.map { $0.status == .draft ? $0.number : "" } ?? ""

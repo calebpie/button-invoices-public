@@ -6,8 +6,8 @@
 |---|---|
 | M1 Core logic and PDF | Done: Caleb ran Docs/m2-test.md, Part 1, steps 1–5, all pass (Oct 8, 2026) |
 | M2 App in the Simulator | Done: Caleb ran Docs/m2-test.md, Parts 2–4, all pass (Oct 8, 2026; results below) |
-| Bug bash | Pending: the nits in Docs/ui-nits.md (3 open), fixed together before the build goes to her iPhone |
-| M3 App on her iPhone | Started: on Caleb's iPhone with the Personal Team (`make ios`, Oct 8, 2026); Docs/m3-test.md, Part 1, pending |
+| Bug bash | Pending: the nits in Docs/ui-nits.md (4 open), fixed together before the build goes to her iPhone |
+| M3 App on her iPhone | Started: Docs/m3-test.md, Part 1, on Caleb's iPhone (Personal Team, `make ios`): steps 1–6 and 8–10 pass; step 7 (shake to undo) failed, fixed, to rerun |
 
 ## Automated results (Claude, Oct 8, 2026, M4 Max, Xcode 27.0, iOS 27.0 Simulator)
 
@@ -313,6 +313,45 @@ tap-outside handling the cause; tighten the gap under "Hello, Daphné.".
   sharing); Part 2 is TestFlight to her iPhone once the paid team exists; Part 3 is
   SPEC.md's test, her next real invoice.
 
+## Shake to undo (Oct 8, 2026)
+
+Docs/m3-test.md, Part 1, step 7 failed on Caleb's iPhone: no "Undo Remove Button" after
+shaking. M2 had only checked ⌘Z in Device Hub, which has no Shake (Docs/m2-test.md, Part 2,
+step 9).
+
+- Reproduced in the iOS 27.0 Simulator (iPhone 17) with `xcrun simctl notify_post <device>
+  com.apple.UIKit.SimulatorShake`, the same event a shake sends. Control: with the Buttons
+  search field active, the shake showed iOS's "Undo Typing", so the simulated shake works.
+  After removing a line (no field active), the shake showed nothing.
+- Probe (`-UndoProbe YES`, App/Sources/ButtonInvoicesApp.swift, logs every 2 s): after the
+  removal, `first=none firstUM=nil`, while the window's undo manager (the same one the
+  saved data records into) had `canUndo=true name='Remove Button'`.
+- Cause: iOS asks the first responder (normally the active text field) for the undo
+  manager when the phone is shaken. With no field active there is no first responder, so
+  there was nothing to ask, and no prompt.
+- Fix (`shakeToUndo()`, App/Sources/Platform.swift): an invisible view in the window
+  becomes first responder whenever nothing else is (at launch, after a field lets go, on
+  return to the app). Its undo manager is the window's. It passes on to the screen in
+  front, so that screen's keyboard shortcuts still work: a second probe (`-KeyProbe YES`)
+  showed ⌘[ (Back) is on the tab's navigation stack, which the first version of the fix
+  didn't reach; it now does, along with ⌘N.
+- Checked in the Simulator after the fix:
+  - Remove a line, shake: "Undo Remove Button"; Undo puts it back ($3,600.00 →
+    $3,624.00). Twice in a row, and again after the change for ⌘[.
+  - Delete a draft from the list, shake: "Undo Delete Invoice"; Undo brings it back whole
+    (3 kinds, $3,723.00).
+  - Text fields keep the keyboard: the quantity number pad and the Buttons search field.
+    Shaking while typing in search still shows "Undo Typing".
+  - Typing into the search field just after opening it, through the Simulator's typing
+    tool: in the first session after the fix, of 4 attempts 2 never arrived, 1 appeared
+    only after the next key tap and 1 worked. After a relaunch with a first-responder
+    trace, 7 of 7 worked (one showed its text about a second late), and the trace showed
+    the field taking over from the invisible view each time with nothing in between. Typing on the on-screen keys
+    worked every time. Not explained; worth watching on the iPhone (below).
+- `make test`: 37 tests in 10 suites passed.
+- To rerun on the iPhone after `make ios`: Docs/m3-test.md, Part 1, step 7, then open the
+  Buttons search and type a few letters, to confirm typing is unaffected.
+
 ## M2 results (Caleb)
 
 Use the Part N, step M labels from Docs/m2-test.md.
@@ -346,12 +385,22 @@ Use the Part N, step M labels from Docs/m2-test.md.
 | Part 3, step 1 | Pass. |
 | Part 3, step 2 | Pass. |
 | Part 4, steps 1–11 | Pass. |
-| Part 5, step 1 | Pass. |
-| Part 5, step 2 |  Pass.|
-| Part 5, step 3 |  Pass, photo looks clean. |
-| Part 5, step 4 |  Pass.|
-| Part 5, step 5 | Pass. |
-|  |  |
 
+## M3 results (Caleb)
 
+Use the Part N, step M labels from Docs/m3-test.md. Part 1 is on Caleb's iPhone (Oct 8,
+2026).
+
+| Step | Result |
+|---|---|
+| Part 1, step 1 | Pass. |
+| Part 1, step 2 | Pass. |
+| Part 1, step 3 | Pass, photo looks clean. |
+| Part 1, step 4 | Pass. |
+| Part 1, step 5 | Pass. |
+| Part 1, step 6 | Pass. |
+| Part 1, step 7 | Fail: the button removes on swipe, but shaking the device produces no prompt to undo. Fixed ("Shake to undo", above); rerun after `make ios`. |
+| Part 1, step 8 | Pass. |
+| Part 1, step 9 | Pass.|
+| Part 1, step 10 | Pass.|
 
