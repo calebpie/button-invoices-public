@@ -151,7 +151,7 @@ struct InvoiceFlowView: View {
                                 .font(.headline)
                                 .frame(minHeight: 36)
                         }
-                        .buttonStyle(.borderedProminent)
+                        .prominentButton()
                         .disabled(!isDone(step))
                         .accessibilityLabel("Next: \(next.title)")
                         .accessibilityShowsLargeContentViewer {
@@ -161,7 +161,7 @@ struct InvoiceFlowView: View {
                         Button(action: finish) {
                             Label("Finish", systemImage: "checkmark").font(.headline).frame(minHeight: 36)
                         }
-                        .buttonStyle(.borderedProminent)
+                        .prominentButton()
                         .disabled(!ReviewStep.canFinish(invoice, others: otherNumbers))
                         .accessibilityShowsLargeContentViewer()
                     }
@@ -448,9 +448,9 @@ extension View {
     /// it; after that, Next is (Buttons, "Keep the number of prominent buttons to one or two").
     @ViewBuilder func addButtonStyle(prominent: Bool) -> some View {
         if prominent {
-            buttonStyle(.borderedProminent)
+            prominentButton()
         } else {
-            buttonStyle(.bordered)
+            buttonStyle(.bordered).labelStyle(.titleAndIcon)
         }
     }
 }

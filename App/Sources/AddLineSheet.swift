@@ -289,7 +289,7 @@ struct VariantPickerView: View {
                 Button { pick(match) } label: {
                     Text("Use This Button").font(.headline).frame(maxWidth: .infinity, minHeight: 40)
                 }
-                .buttonStyle(.borderedProminent)
+                .prominentButton()
             }
             .card()
         } else if color != nil, !hasSizes || size != nil {
@@ -299,7 +299,7 @@ struct VariantPickerView: View {
                 Button { newVariant(chosenColors, chosenSize) } label: {
                     Text("Add as a New Button").font(.headline).frame(maxWidth: .infinity, minHeight: 40)
                 }
-                .buttonStyle(.borderedProminent)
+                .prominentButton()
             }
             .card()
         }

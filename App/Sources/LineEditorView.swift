@@ -113,7 +113,7 @@ struct LineEditorView: View {
                     Text(isNew ? "Add to Invoice" : "Save")
                         .font(.headline).frame(maxWidth: .infinity, minHeight: 36)
                 }
-                .buttonStyle(.borderedProminent)
+                .prominentButton()
                 .disabled(!isValid)
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)

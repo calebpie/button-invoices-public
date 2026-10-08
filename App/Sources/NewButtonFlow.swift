@@ -247,7 +247,7 @@ struct NewButtonPhotoStep: View {
                 Button { advance(.matches) } label: {
                     Text("Next").font(.headline).frame(maxWidth: .infinity, minHeight: 40)
                 }
-                .buttonStyle(.borderedProminent)
+                .prominentButton()
                 .disabled(draft.photo == nil)
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
@@ -329,7 +329,7 @@ struct NewButtonMatchStep: View {
                 Button { advance(.details) } label: {
                     Text("It's a New Button").font(.headline).frame(maxWidth: .infinity, minHeight: 40)
                 }
-                .buttonStyle(.borderedProminent)
+                .prominentButton()
                 .disabled(checking)
             }
             .padding()
@@ -435,7 +435,7 @@ struct NewButtonDetailsStep: View {
                 Button { advance(.review) } label: {
                     Text("Next").font(.headline).frame(maxWidth: .infinity, minHeight: 40)
                 }
-                .buttonStyle(.borderedProminent)
+                .prominentButton()
                 .disabled(problem != nil)
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
@@ -501,7 +501,7 @@ struct NewButtonReviewStep: View {
                     Text(purpose == .invoice ? "Save and Add to Invoice" : "Save Button")
                         .font(.headline).frame(maxWidth: .infinity, minHeight: 44)
                 }
-                .buttonStyle(.borderedProminent)
+                .prominentButton()
                 .disabled(draft.problem(designs, variants, editing: nil) != nil)
                 Text("To change anything, go back a step.").font(.footnote).foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)

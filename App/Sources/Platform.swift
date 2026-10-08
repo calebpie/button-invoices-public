@@ -50,12 +50,20 @@ extension View {
         }
     }
 
-    /// Liquid Glass on iOS 26 and later; a filled capsule before that.
+    /// The filled accent button. Inside a list row SwiftUI colors a Label's icon with the
+    /// accent color, the same color as this button's fill, so the icon vanished; the label
+    /// style puts the icon back in the button's own white, like its title.
+    func prominentButton() -> some View {
+        buttonStyle(.borderedProminent).labelStyle(.titleAndIcon)
+    }
+
+    /// Liquid Glass on iOS 26 and later; a filled capsule before that. Its icon is kept in
+    /// the title's color for the same reason as `prominentButton()`.
     @ViewBuilder func glassProminentButton() -> some View {
         if #available(iOS 26.0, *) {
-            buttonStyle(.glassProminent)
+            buttonStyle(.glassProminent).labelStyle(.titleAndIcon)
         } else {
-            buttonStyle(.borderedProminent).buttonBorderShape(.capsule)
+            prominentButton().buttonBorderShape(.capsule)
         }
     }
 

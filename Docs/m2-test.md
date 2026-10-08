@@ -72,7 +72,7 @@ labels below. Commands run in Terminal from the project folder
     Invoice - AOB 0yyMMdd.pdf" with today's date (0261008 on Oct 8, 2026). Tap **Save to
     Files** → **On My iPhone** → **Save**, then close.
 16. Back on the Invoices tab it's listed under "Finished, waiting for payment". Open it.
-    Expected: total, **Share PDF**, a Share button and **⋯** at the top right, the switch
+    Expected: total, **Share PDF** with a white share icon, a Share button and **⋯** at the top right, the switch
     **Alix of Bohemia has paid**, and the PDF. Tap **⋯**. Expected: **Duplicate**, **Make
     Changes…** and **Delete…** right away; tap outside to close it. Turn the switch on, go back. Expected: it's
     under "Paid".

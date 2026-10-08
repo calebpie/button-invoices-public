@@ -107,7 +107,7 @@ struct EditButtonView: View {
                 Button(action: save) {
                     Text("Save Changes").font(.headline).frame(maxWidth: .infinity, minHeight: 36)
                 }
-                .buttonStyle(.borderedProminent)
+                .prominentButton()
                 .disabled(problem != nil)
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)

@@ -151,7 +151,7 @@ struct PhotoCutoutView: View {
                     }
                     .font(.headline).frame(maxWidth: .infinity, minHeight: 36)
                 }
-                .buttonStyle(.borderedProminent)
+                .prominentButton()
                 .disabled(saving)
                 Button {
                     touchingUp = true

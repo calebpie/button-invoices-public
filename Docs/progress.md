@@ -127,6 +127,13 @@ checked later the same day), Siri phrases, drag and drop, ⌘N with a keyboard.
   near the top of the screen instead of the invoice. Attached to the row it pointed at the
   row from touch and hold, but never appeared from a swipe until it waited 0.4 s for the
   row to slide closed. Now both point at the row; from ⋯ it points at ⋯.
+- Icons invisible on filled buttons (Caleb, Oct 8): inside a list row SwiftUI colors a
+  Label's icon with the accent color, the same as the button's fill. Share PDF, Add a
+  Button and Add Shipping in a draft showed no icon; New Invoice was fine only because it
+  set its label style. All filled buttons now use one style, `prominentButton()` (and
+  `glassProminentButton()`), that keeps the icon white like the title. Rechecked in Device
+  Hub: New Invoice, Share PDF, Add a Button, Add Shipping, Next, Finish, the sheet's ✓ and
+  the Buttons tab's Add a Button all show their icons.
 
 ## M2 results (Caleb)
 

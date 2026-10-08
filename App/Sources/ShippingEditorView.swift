@@ -64,7 +64,7 @@ struct ShippingEditorView: View {
                     Text(charge == nil ? "Add Shipping" : "Save")
                         .font(.headline).frame(maxWidth: .infinity, minHeight: 36)
                 }
-                .buttonStyle(.borderedProminent)
+                .prominentButton()
                 .disabled(amount == nil)
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)

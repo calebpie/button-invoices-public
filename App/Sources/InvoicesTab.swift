@@ -30,11 +30,10 @@ struct InvoicesTab: View {
                     .listRowInsets(EdgeInsets(top: 4, leading: 4, bottom: 8, trailing: 4))
                     Button(action: newInvoice) {
                         Label("New Invoice", systemImage: "plus.circle.fill")
-                            .labelStyle(.titleAndIcon)
                             .font(.title3.weight(.semibold))
                             .frame(maxWidth: .infinity, minHeight: 48)
                     }
-                    .buttonStyle(.borderedProminent)
+                    .prominentButton()
                     .keyboardShortcut("n", modifiers: .command)
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)

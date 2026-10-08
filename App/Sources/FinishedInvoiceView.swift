@@ -45,7 +45,7 @@ struct FinishedInvoiceView: View {
                         .font(.title3.weight(.semibold))
                         .frame(maxWidth: .infinity, minHeight: 44)
                 }
-                .buttonStyle(.borderedProminent)
+                .prominentButton()
                 .disabled(pdfURL == nil)
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
