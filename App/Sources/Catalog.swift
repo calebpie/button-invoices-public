@@ -27,14 +27,11 @@ enum Catalog {
 
     static var currentYear: Int { Calendar.current.component(.year, from: Date()) }
 
-    /// Buttons ranked against what she typed; hidden ones only when nothing else matches.
-    static func search(_ query: String, in variants: [ButtonVariant]) -> [ButtonVariant] {
-        let visible = variants.filter { !$0.isHidden }
-        let byID = Dictionary(variants.map { ($0.matchCandidate.id, $0) }, uniquingKeysWith: { a, _ in a })
-        var ranked = Matcher.rank(query, among: visible.map(\.matchCandidate)).compactMap { byID[$0.candidate.id] }
-        if ranked.isEmpty && !query.isEmpty {
-            ranked = Matcher.rank(query, among: variants.filter(\.isHidden).map(\.matchCandidate)).compactMap { byID[$0.candidate.id] }
-        }
+    /// Buttons ranked against what she typed. Archived ones only in the Buttons tab.
+    static func search(_ query: String, in variants: [ButtonVariant], includeArchived: Bool = false) -> [ButtonVariant] {
+        let pool = includeArchived ? variants : variants.filter { !$0.isHidden }
+        let byID = Dictionary(pool.map { ($0.matchCandidate.id, $0) }, uniquingKeysWith: { a, _ in a })
+        var ranked = Matcher.rank(query, among: pool.map(\.matchCandidate)).compactMap { byID[$0.candidate.id] }
         if query.trimmingCharacters(in: .whitespaces).isEmpty {
             // Recently invoiced first, then by name.
             ranked.sort { a, b in

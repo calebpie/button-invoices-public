@@ -44,7 +44,7 @@ import SwiftData
     var aliasesText: String = ""
     /// Square PNG with a transparent background.
     @Attribute(.externalStorage) var photo: Data?
-    /// Hidden buttons stay on old invoices but leave the pick lists.
+    /// Archived: kept, and still on invoices that have it, but not offered for new lines.
     var isHidden: Bool = false
     var createdAt: Date = Date()
     var lastUsedAt: Date?
@@ -136,6 +136,11 @@ enum InvoiceStatus: String, CaseIterable, Identifiable {
     var finalizedAt: Date?
     /// She said this order had no shipping (step 2 can't be left empty by accident).
     var noShipping: Bool = false
+    /// The business details as they were when she first tapped Finish. Later edits in
+    /// Settings don't change this invoice (SPEC.md, "Settings").
+    var businessSnapshot: Data?
+    /// The PDF made when she tapped Finish. Share sends exactly this file.
+    @Attribute(.externalStorage) var finishedPDF: Data?
     @Relationship(deleteRule: .cascade, inverse: \InvoiceLine.invoice) var lines: [InvoiceLine]? = []
     @Relationship(deleteRule: .cascade, inverse: \ShippingCharge.invoice) var shipping: [ShippingCharge]? = []
 
@@ -158,6 +163,11 @@ enum InvoiceStatus: String, CaseIterable, Identifiable {
     var buttonCount: Int { (lines ?? []).reduce(0) { $0 + $1.quantity } }
 
     var isEmpty: Bool { (lines ?? []).isEmpty && (shipping ?? []).isEmpty }
+
+    /// The details to print: the ones it was finished with, or today's for a new draft.
+    func businessProfile(current: BusinessProfile) -> BusinessProfile {
+        businessSnapshot.flatMap { try? JSONDecoder().decode(BusinessProfile.self, from: $0) } ?? current
+    }
 }
 
 /// One row of the invoice. The SKU, name and photo are copied from the button when it's
@@ -183,6 +193,27 @@ enum InvoiceStatus: String, CaseIterable, Identifiable {
         self.quantity = quantity
         self.unitPriceCents = unitPrice.cents
         copyDetails(from: variant)
+    }
+
+    /// For "Copy" on an invoice: the same button and quantity with the button's current name,
+    /// photo and price (or the old line's, if the button has since been deleted).
+    init(copying other: InvoiceLine) {
+        position = other.position
+        quantity = other.quantity
+        discountCents = other.discountCents
+        discountIsPercent = other.discountIsPercent
+        discountPercent = other.discountPercent
+        if let variant = other.variant {
+            self.variant = variant
+            unitPriceCents = variant.price > .zero ? variant.priceCents : other.unitPriceCents
+            copyDetails(from: variant)
+            if discountIsPercent { discountCents = Money(cents: unitPriceCents).percent(discountPercent).cents }
+        } else {
+            unitPriceCents = other.unitPriceCents
+            sku = other.sku
+            itemDescription = other.itemDescription
+            photo = other.photo
+        }
     }
 
     func copyDetails(from variant: ButtonVariant) {

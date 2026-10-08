@@ -12,14 +12,12 @@ struct EditButtonView: View {
     @Query(sort: [SortDescriptor(\ButtonDesign.name, comparator: .localizedStandard)]) private var designs: [ButtonDesign]
     @Query private var variants: [ButtonVariant]
     @State private var draft: ButtonDraft
-    @State private var isHidden: Bool
     @State private var cutoutSource: NewButtonPhotoStep.CutoutSource?
     @State private var confirmDelete = false
 
     init(variant: ButtonVariant) {
         self.variant = variant
         _draft = State(initialValue: ButtonDraft(editing: variant))
-        _isHidden = State(initialValue: variant.isHidden)
     }
 
     var body: some View {
@@ -52,10 +50,19 @@ struct EditButtonView: View {
             ButtonDetailsSections(draft: draft, editing: variant)
 
             Section {
-                Toggle("Hide from the button lists", isOn: $isHidden)
-                Button("Delete This Button", role: .destructive) { confirmDelete = true }
+                Button(variant.isHidden ? "Unarchive This Button" : "Archive This Button",
+                       systemImage: variant.isHidden ? "tray.and.arrow.up" : "archivebox") {
+                    variant.isHidden.toggle()
+                    try? context.save()
+                    dismiss()
+                }
+                if neverInvoiced {
+                    Button("Delete This Button", role: .destructive) { confirmDelete = true }
+                }
             } footer: {
-                Text("Hidden or deleted buttons stay on invoices you already made.")
+                Text(neverInvoiced
+                     ? "Archived buttons aren't offered for new invoices. You can unarchive them any time. A button that's never been invoiced can also be deleted."
+                     : "Archived buttons aren't offered for new invoices. Invoices that already have this button keep it exactly as it was.")
             }
 
             if !variant.sortedVersions.isEmpty {
@@ -103,15 +110,17 @@ struct EditButtonView: View {
         .confirmationDialog("Delete \(variant.title)?", isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete Button", role: .destructive, action: delete)
         } message: {
-            Text("Invoices that have it keep it. To keep it but stop seeing it, use Hide instead.")
+            Text("It has never been on an invoice, so nothing else changes.")
         }
     }
 
     private var problem: String? { draft.problem(designs, variants, editing: variant) }
 
+    private var neverInvoiced: Bool { (variant.invoiceLines ?? []).isEmpty }
+
     private func save() {
         guard problem == nil else { return }
-        draft.apply(to: variant, isHidden: isHidden, context, designs)
+        draft.apply(to: variant, isHidden: variant.isHidden, context, designs)
         dismiss()
     }
 

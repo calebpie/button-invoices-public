@@ -43,6 +43,18 @@ an empty new invoice was discarded.
 Fixed during the walkthrough: typed quantity and price weren't carried to the quantity
 screen; number pads had no way to close; "Next: Review" wrapped onto two lines.
 
+## Revision 3 (Oct 8, 2026)
+
+Three-tab layout (Invoices, Buttons, Settings) restored per Caleb; Archive; finished
+invoices store their business details and PDF. FreezeProbe in the Simulator: after
+finishing, changing Settings and renaming, repricing and archiving the button left the
+finished PDF byte-identical (pdfUnchanged=true, profileKept=true, line "Heart, Navy,
+Medium $4.00", button now "Heart, Red, Medium $4.50", 1 version kept).
+
+Template typos corrected in the seed and in both template files (SPEC.md, "Data"); both
+files pass zip and XML checks and macOS QuickLook renders them. Opening them in Excel is
+Docs/m2-test.md, Part 3. `make test`: 34 tests passed.
+
 ## M2 results (Caleb)
 
 Pending. Use the Part N, step M labels from Docs/m2-test.md.

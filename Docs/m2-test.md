@@ -21,11 +21,14 @@ labels below. Commands run in Terminal from the project folder
 
 1. Start fresh: `xcrun simctl uninstall booted com.calebpietrafesa.ButtonInvoices`
    (an error that nothing is installed is fine), then `make sim`. The Simulator opens
-   the app. Expected: "Hello, Daphné. What would you like to do today?" and "My buttons:
-   37 saved".
+   the app. Expected: tab bar Invoices · Buttons · Settings; Invoices shows "Hello,
+   Daphné. What would you like to do today?" and New Invoice. Buttons lists 37 buttons by
+   shape (Bunny first) with **Add a Button** floating bottom right; Pineapple, Celadon,
+   Ellipse, "Ladybug, Red / White", Crab 26CBL and Shell 26SY are spelled that way.
+   Settings shows "123 Example St, Suite 100".
 2. Add test photos to the Simulator:
    `xcrun simctl addmedia booted Examples/Images/Raw/IMG_8516.heic "Examples/Images/Shipping Receipts/IMG_9049.heic"`
-3. Tap **Start a new invoice**. Expected: step bar 1 Buttons · 2 Shipping · 3 Review with
+3. Invoices tab → **New Invoice**. Expected: step bar 1 Buttons · 2 Shipping · 3 Review with
    2 and 3 grayed out; "Total so far $0.00"; Next disabled with "Add at least one button
    to go on."
 4. Tap **Add the first button** → **Heart** → **Navy**. Expected: "Heart, Navy, Medium,
@@ -46,8 +49,7 @@ labels below. Commands run in Terminal from the project folder
    this one" and "Same shape, new color or size". Tap **No, it's a new button**.
 9. Expected: shape Daisy, colors Red / White, size Large, price $7.50, SKU 26DRWL. Tap
    **Next: Check it** → **Save and Add to Invoice**, quantity 10, **Add**.
-10. Tap **Save & Exit**. Expected: home screen lists "Continue a draft" with this
-    invoice. Quit the app (in the Simulator: swipe up from the bottom edge and hold, swipe
+10. Tap **Save & Exit**. Expected: the Invoices tab lists this invoice under Drafts. Quit the app (in the Simulator: swipe up from the bottom edge and hold, swipe
     the app away), reopen it from the Home Screen ("Invoices"). Expected: the draft is
     still there with 3 lines; tapping it reopens at step 2, Shipping.
 11. **Add shipping** → **Choose from Photos** → the receipt. Expected: $36.48 filled in,
@@ -61,14 +63,27 @@ labels below. Commands run in Terminal from the project folder
 15. Tap **Finish** → **Finish and Share the PDF**. Expected: share sheet with
     "Daphné Verley Invoice - AOB 0yyMMdd.pdf" with today's date (0261008 on Oct 8, 2026). Tap **Save to Files** →
     **On My iPhone** → **Save**, then close.
-16. Back on the home screen: **See or share a finished invoice** lists it under "Waiting
-    for payment". Open it, turn on **Alix of Bohemia has paid**. Expected: it moves to
-    "Paid".
-17. **My buttons** → tap Heart, Navy, Medium → change the price to 4.50 → **Save**. Tap it
-    again. Expected: "Before your changes" shows the $4.00 version. Open the finished
-    invoice. Expected: the heart line is still $4.00 each.
-18. Repeat Part 2, steps 1–4 with `SIMULATOR="iPad Air 11-inch (M4)" make sim`. Expected:
+16. Back on the Invoices tab it's listed under "Finished, waiting for payment". Open it,
+    turn on **Alix of Bohemia has paid**, go back. Expected: it's under "Paid".
+17. Buttons tab → Heart section → tap **Navy, Medium** → change the price to 4.50 →
+    **Save**. Tap it again. Expected: "Before your changes" shows the $4.00 version. Tap
+    **Archive This Button**. Expected: it moves to "Archived" at the bottom of the list.
+18. Settings tab → change Street to "1 Test Street". Invoices tab → open the finished
+    invoice. Expected: the PDF still shows Suite 100 and the heart at $4.00. Then
+    **New Invoice** → **Add the first button** → **Heart**. Expected: Navy isn't offered
+    (archived). Tap **Cancel**, **Save & Exit**. Put Settings back to "123 Example St, Suite 100"
+    and unarchive the heart (Buttons → Archived → tap it → **Unarchive This Button**).
+19. Repeat Part 2, steps 1–4 with `SIMULATOR="iPad Air 11-inch (M4)" make sim`. Expected:
     the same screens, centered at a readable width.
+
+## Part 3: Template typo fixes
+
+1. Open Examples/Invoice Excel and Output PDFs/BUTTON INVOICE TEMPLATE.xltx in Excel.
+   Expected: it opens without a repair prompt; Reference sheet shows Celadon, Ellipse,
+   Pineapple, "Ladybug, Red / White", Crab 26CBL, Shell 26SY; Invoice sheet shows
+   "123 Example St, Suite 100"; the photos are still in column C.
+2. Repeat Part 3, step 1 for BUTTON INVOICE TEMPLATE.xlsx. The originals are in
+   "Originals before typo fixes" in the same folder.
 
 ## Notes for the results
 

@@ -324,11 +324,14 @@ struct NewButtonMatchStep: View {
                 ButtonPhoto(data: v.photo, side: 64)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(v.title).font(.headline)
-                    Text("\(v.price.formatted) · \(v.sku)").foregroundStyle(.secondary)
+                    Text("\(v.price.formatted) · \(v.sku)" + (v.isHidden ? " · archived" : "")).foregroundStyle(.secondary)
                 }
             }
             HStack {
-                Button(purpose == .invoice ? "It's this one" : "Already saved") { chose(v) }
+                Button(purpose == .invoice ? "It's this one" : "Already saved") {
+                    v.isHidden = false // using it again brings it back from the archive
+                    chose(v)
+                }
                     .buttonStyle(.bordered)
                 Button("Same shape, new color or size") {
                     draft.designID = v.design?.persistentModelID
@@ -353,7 +356,7 @@ struct NewButtonMatchStep: View {
         }
         if draft.lookAlikes.isEmpty {
             do {
-                draft.lookAlikes = try await LookAlikeCache.shared.rank(photo, among: variants.filter { !$0.isHidden })
+                draft.lookAlikes = try await LookAlikeCache.shared.rank(photo, among: variants)
             } catch {
                 failed = true
             }

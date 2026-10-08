@@ -24,6 +24,7 @@ struct InvoiceFlowView: View {
 
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
+    @Environment(BusinessSettings.self) private var settings
     @State private var step: FlowStep = .buttons
     @State private var started = false
     @State private var confirmFinish = false
@@ -43,6 +44,8 @@ struct InvoiceFlowView: View {
         .navigationTitle("Invoice \(invoice.number)")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        // The running total takes the tab bar's place while she works through the steps.
+        .toolbarVisibility(.hidden, for: .tabBar)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button("Save & Exit") {
@@ -61,7 +64,7 @@ struct InvoiceFlowView: View {
         .confirmationDialog("Finish invoice \(invoice.number)?", isPresented: $confirmFinish, titleVisibility: .visible) {
             Button("Finish and Share the PDF", action: finish)
         } message: {
-            Text("It's then saved as it is and can be sent. You can still choose Make Changes later.")
+            Text("The invoice and its PDF are then kept exactly as they are, even if you later change a button or Settings.")
         }
     }
 
@@ -148,7 +151,12 @@ struct InvoiceFlowView: View {
         allInvoices.filter { $0.persistentModelID != invoice.persistentModelID }.map(\.number)
     }
 
+    /// Freezes the invoice: its business details (kept from the first Finish if she reopened
+    /// it) and the PDF that Share will send.
     private func finish() {
+        let profile = invoice.businessProfile(current: settings.profile)
+        invoice.businessSnapshot = try? JSONEncoder().encode(profile)
+        invoice.finishedPDF = InvoiceExport.render(invoice, profile: profile)
         invoice.status = .finalized
         invoice.finalizedAt = Date()
         for line in invoice.lines ?? [] { line.variant?.lastUsedAt = Date() }

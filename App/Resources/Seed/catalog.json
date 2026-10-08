@@ -38,7 +38,7 @@
         "Blue"
       ],
       "size": "",
-      "sku": "26CBLW",
+      "sku": "26CBL",
       "priceCents": 1200,
       "photo": "crab-blue.png"
     },
@@ -78,12 +78,12 @@
     {
       "design": "Dogwood",
       "colors": [
-        "Celedon"
+        "Celadon"
       ],
       "size": "",
       "sku": "26DC",
       "priceCents": 800,
-      "photo": "dogwood-celedon.png"
+      "photo": "dogwood-celadon.png"
     },
     {
       "design": "Dogwood",
@@ -96,14 +96,14 @@
       "photo": "dogwood-ivory.png"
     },
     {
-      "design": "Elipse",
+      "design": "Ellipse",
       "colors": [
         "Lavender"
       ],
       "size": "Mini",
       "sku": "26ELM",
       "priceCents": 350,
-      "photo": "elipse-lavender-mini.png"
+      "photo": "ellipse-lavender-mini.png"
     },
     {
       "design": "Flower Burst",
@@ -307,7 +307,7 @@
         "Yellow"
       ],
       "size": "",
-      "sku": "26SW",
+      "sku": "26SY",
       "priceCents": 800,
       "photo": "shell-yellow.png"
     },
@@ -334,15 +334,16 @@
     {
       "design": "Ladybug",
       "colors": [
-        "Red"
+        "Red",
+        "White"
       ],
       "size": "",
       "sku": "26LRW",
       "priceCents": 800,
-      "photo": "ladybug-red.png"
+      "photo": "ladybug-red-white.png"
     },
     {
-      "design": "Pineaple",
+      "design": "Pineapple",
       "colors": [
         "Yellow",
         "Brown"
@@ -350,7 +351,7 @@
       "size": "",
       "sku": "26PYB",
       "priceCents": 900,
-      "photo": "pineaple-yellow-brown.png"
+      "photo": "pineapple-yellow-brown.png"
     },
     {
       "design": "Rose",

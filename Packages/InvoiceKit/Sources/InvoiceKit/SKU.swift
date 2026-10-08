@@ -25,7 +25,8 @@ public struct SKURules: Sendable {
     /// Lowercased size → code.
     public var sizeCodes: [String: String]
 
-    /// The codes in the Excel template as of September 2026.
+    /// The codes in the Excel template as of September 2026 ("celedon" is the template's
+    /// spelling, kept so older text still maps).
     public static let standard = SKURules(
         colorCodes: [
             "black": "B", "white": "W", "brown": "BR", "blue": "BL", "burgundy": "B", "navy": "N",

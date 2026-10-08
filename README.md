@@ -94,9 +94,9 @@ lasts 90 days. Steps will be added to this README when the paid team exists (SPE
 
 ## Before the first install for her
 
-- Home → Business details: check the address ("123 Example St, Suit 100" is copied from the template
-  and may be a typo for "Suite"), bill-to, and the routing and account numbers.
-- Home → My buttons: 29 of the 37 starting photos are the small copies from the workbook. Retake
+- Settings tab: check the address, bill-to, and the routing and account numbers (copied
+  from the template, with "Suit 100" corrected to "Suite 100").
+- Buttons tab: 29 of the 37 starting photos are the small copies from the workbook. Retake
   any that look blurry (tap the button → Retake Photo), or run `make seed` with the
   original edited PNGs first.
 - Data lives on the device and is included in its iCloud Backup. Deleting the app deletes
@@ -104,7 +104,9 @@ lasts 90 days. Steps will be added to this README when the paid team exists (SPE
 
 ## How she uses it
 
-1. **Start a new invoice** on the home screen. The number and date are filled in.
+Three tabs at the bottom: **Invoices**, **Buttons**, **Settings**.
+
+1. **Invoices → New Invoice.** The number and date are filled in.
 2. **Step 1, Buttons.** Add the first button: tap its shape, then its color (and size).
    Or type the line from her notes ("125 burgundy mushrooms @ $8") and tap the photo.
    Check the quantity and price, add a discount if any ($ or %), tap **Add**. Repeat, then
@@ -118,4 +120,12 @@ lasts 90 days. Steps will be added to this README when the paid team exists (SPE
 5. **Step 3, Review.** Check the lines and total (optionally type her own total to
    compare), then **Finish** → **Finish and Share the PDF** → Messages or Mail.
 
-**Save & Exit** (top left) keeps the draft; it is listed on the home screen to continue.
+**Save & Exit** (top left) keeps the draft under Drafts on the Invoices tab. Finished
+invoices are listed there too; tap one to share its PDF again or mark it paid.
+
+**Buttons tab**: every button by shape. **Add a Button** (bottom right) adds a new one;
+tap a button to change its photo, name or price; swipe left to **Archive** it. Neither
+changes invoices that are already finished.
+
+**Settings tab**: the details printed on every invoice. Changes go on new invoices and
+drafts only.

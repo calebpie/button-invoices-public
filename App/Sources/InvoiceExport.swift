@@ -20,12 +20,22 @@ enum InvoiceExport {
                                logo: logo)
     }
 
-    /// Writes the PDF to a temporary file named like the ones she has sent before.
-    static func writePDF(_ invoice: Invoice, profile: BusinessProfile) throws -> URL {
+    static func render(_ invoice: Invoice, profile: BusinessProfile) -> Data {
+        InvoicePDF.render(document(invoice, profile: profile))
+    }
+
+    /// Writes PDF data to a temporary file named like the ones she has sent before, for
+    /// the preview and the share sheet.
+    static func write(_ pdf: Data, number: String, profile: BusinessProfile) throws -> URL {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent("Invoices", isDirectory: true)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-        let url = folder.appendingPathComponent(InvoicePDF.fileName(prefix: profile.fileNamePrefix, number: invoice.number))
-        try InvoicePDF.render(document(invoice, profile: profile)).write(to: url, options: .atomic)
+        let url = folder.appendingPathComponent(InvoicePDF.fileName(prefix: profile.fileNamePrefix, number: number))
+        try pdf.write(to: url, options: .atomic)
         return url
+    }
+
+    /// The PDF of a draft, with the details it would be finished with.
+    static func writePDF(_ invoice: Invoice, profile: BusinessProfile) throws -> URL {
+        try write(render(invoice, profile: profile), number: invoice.number, profile: profile)
     }
 }

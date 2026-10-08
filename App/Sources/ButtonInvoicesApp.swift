@@ -20,10 +20,47 @@ struct ButtonInvoicesApp: App {
         Seeder.seedCatalogIfNeeded(container.mainContext)
         #if DEBUG
         Self.runCutoutProbeIfAsked()
+        if UserDefaults.standard.bool(forKey: "FreezeProbe") { Self.runFreezeProbe(container.mainContext) }
         #endif
     }
 
     #if DEBUG
+    /// Probe for SPEC.md, "Settings" and "Button history": finishes an invoice, then changes
+    /// Settings and the button's name, price and photo, and logs whether the finished PDF and
+    /// lines changed. Uses a temporary in-memory store, so her data isn't touched.
+    static func runFreezeProbe(_ unused: ModelContext) {
+        let log = Logger(subsystem: "InvoiceKit", category: "Probe")
+        guard let memory = try? ModelContainer(for: Schema(AppSchema.models),
+                                               configurations: ModelConfiguration(isStoredInMemoryOnly: true)) else { return }
+        let ctx = memory.mainContext
+        let design = ButtonDesign(name: "Heart", code: "H")
+        ctx.insert(design)
+        let heart = ButtonVariant(design: design, colors: ["Navy"], size: "Medium", sku: "26HNM", price: Money(cents: 400), photo: nil)
+        ctx.insert(heart)
+        let invoice = Invoice(number: "0261008", date: Date())
+        ctx.insert(invoice)
+        let line = InvoiceLine(position: 0, variant: heart, quantity: 12, unitPrice: heart.price)
+        ctx.insert(line)
+        line.invoice = invoice
+        var profile = BusinessProfile()
+        profile.sellerLines = ["123 Example St, Suite 100"]
+        // Finish, as InvoiceFlowView.finish does.
+        invoice.businessSnapshot = try? JSONEncoder().encode(profile)
+        invoice.finishedPDF = InvoiceExport.render(invoice, profile: profile)
+        invoice.status = .finalized
+        let before = invoice.finishedPDF
+        // Later edits: Settings and the button.
+        var later = profile
+        later.sellerLines = ["1 New Street"]
+        later.routing = "999"
+        let draft = ButtonDraft(editing: heart)
+        draft.colorsText = "Red"
+        draft.priceText = "4.50"
+        draft.apply(to: heart, isHidden: true, ctx, [design])
+        let reread = invoice.businessProfile(current: later)
+        log.notice("probe: freeze pdfUnchanged=\(invoice.finishedPDF == before) profileKept=\(reread.sellerLines == profile.sellerLines) line=\(line.itemDescription, privacy: .public) \(line.unitPrice.formatted, privacy: .public) button=\(heart.title, privacy: .public) \(heart.price.formatted, privacy: .public) archived=\(heart.isHidden) versions=\(heart.versions?.count ?? 0)")
+    }
+
     /// Probes: `xcrun simctl launch <device> <bundle id> -CutoutProbe <photo> -ReceiptProbe <photo>`
     /// log whether Vision lifted the subject and read the receipt on this device
     /// (subsystem InvoiceKit, category Probe).
@@ -76,7 +113,7 @@ struct ButtonInvoicesApp: App {
 
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            RootView()
                 .environment(settings)
                 .keyboardDoneButton()
         }
@@ -84,6 +121,23 @@ struct ButtonInvoicesApp: App {
         .onChange(of: scenePhase) { _, phase in
             // Drafts save as she goes; this catches the last change when she leaves the app.
             if phase != .active { try? container.mainContext.save() }
+        }
+    }
+}
+
+/// Three tabs in the floating Liquid Glass tab bar (SPEC.md, "Layout").
+struct RootView: View {
+    var body: some View {
+        TabView {
+            Tab("Invoices", systemImage: "doc.text") {
+                InvoicesTab()
+            }
+            Tab("Buttons", systemImage: "circle.grid.2x2") {
+                NavigationStack { CatalogView() }
+            }
+            Tab("Settings", systemImage: "gearshape") {
+                NavigationStack { SettingsView() }
+            }
         }
     }
 }

@@ -79,6 +79,40 @@ class Workbook:
         return out
 
 
+# Typos in the workbook, corrected on the way into the app (SPEC.md, "Data"). Keys are
+# the workbook's text.
+NAME_FIXES = {
+    "Pineaple": "Pineapple",
+    "Celedon": "Celadon",
+    "Elipse": "Ellipse",
+}
+# Whole descriptions: the ladybug is red and white (edited photo "Ladybug, Red : White",
+# SKU 26LRW).
+DESCRIPTION_FIXES = {
+    "Ladybug, Red": "Ladybug, Red / White",
+}
+# SKUs that contradict the SKU rules and aren't on any example invoice: the crab had the
+# clover's SKU (two buttons can't share one), and the yellow shell had W for yellow.
+SKU_FIXES = {
+    ("Crab, Blue", "26CBLW"): "26CBL",
+    ("Shell, Yellow", "26SW"): "26SY",
+}
+ADDRESS_FIXES = {"Suit 100": "Suite 100"}
+
+
+def fix_name(text):
+    text = DESCRIPTION_FIXES.get(text, text)
+    for wrong, right in NAME_FIXES.items():
+        text = re.sub(rf"\b{wrong}\b", right, text)
+    return text
+
+
+def fix_address(text):
+    for wrong, right in ADDRESS_FIXES.items():
+        text = text.replace(wrong, right)
+    return text
+
+
 def split_description(text):
     parts = [p.strip() for p in text.split(",")]
     design, rest, size = parts[0], parts[1:], ""
@@ -116,8 +150,12 @@ def main():
     variants = []
     row = 1
     while f"A{row}" in ref and ref[f"A{row}"][0]:
-        name = ref[f"A{row}"][0].strip()
+        original = ref[f"A{row}"][0].strip()
+        name = fix_name(original)
         sku = (ref.get(f"B{row}", (None, None))[0] or "").strip()
+        sku = SKU_FIXES.get((original, sku), sku)
+        if name != original or sku != (ref.get(f"B{row}", (None, None))[0] or "").strip():
+            print(f"  corrected: {original} {ref[f'B{row}'][0]} → {name} {sku}")
         price = ref.get(f"D{row}", (None, None))[0]
         image = ref.get(f"C{row}", (None, None))[1]
         design, colors, size = split_description(name)
@@ -162,7 +200,7 @@ def main():
         return ""
     business = {
         "sellerName": text("A4"),
-        "sellerLines": [text(f"A{r}") for r in (5, 6, 7) if text(f"A{r}")],
+        "sellerLines": [fix_address(text(f"A{r}")) for r in (5, 6, 7) if text(f"A{r}")],
         "billToName": text("A10"),
         "billToLines": [text(f"A{r}") for r in (11, 12, 13) if text(f"A{r}")],
         "routing": beside("Routing:"),

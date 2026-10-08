@@ -65,8 +65,11 @@ struct FinishedInvoiceView: View {
         .navigationTitle("Invoice \(invoice.number)")
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            // Finished invoices print exactly what was saved when she tapped Finish.
-            if let url = try? InvoiceExport.writePDF(invoice, profile: settings.profile) {
+            // Exactly the PDF made when she tapped Finish; later edits to buttons or
+            // Settings don't reach it.
+            let profile = invoice.businessProfile(current: settings.profile)
+            let pdf = invoice.finishedPDF ?? InvoiceExport.render(invoice, profile: profile)
+            if let url = try? InvoiceExport.write(pdf, number: invoice.number, profile: profile) {
                 pdfURL = url
                 pages = PDFPages.render(url, width: 900)
                 if shareWhenOpened {
@@ -85,6 +88,7 @@ struct FinishedInvoiceView: View {
             Button("Make Changes") {
                 invoice.status = .draft
                 invoice.finalizedAt = nil
+                invoice.finishedPDF = nil
             }
         } message: {
             Text("It goes back to being a draft. If you already sent it, send the new PDF when you finish.")

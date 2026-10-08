@@ -180,7 +180,7 @@ public enum Matcher {
     ]
     static let wordSynonyms: [String: String] = [
         "blush": "pale pink", "olive": "green", "offwhite": "ivory", "celedon": "celadon",
-        "gray": "grey", "maroon": "burgundy", "ellipse": "elipse", "pineaple": "pineapple",
+        "gray": "grey", "maroon": "burgundy", "elipse": "ellipse", "pineaple": "pineapple",
     ]
     static let stopWords: Set<String> = ["the", "and", "with", "button", "buttons", "each", "for"]
 }

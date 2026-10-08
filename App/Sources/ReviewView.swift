@@ -20,7 +20,7 @@ struct ReviewStep: View {
             VStack(alignment: .leading, spacing: 16) {
                 StepGuide(number: 3, text: "Check everything. Tap Change to fix a part, or Finish when it's right.")
 
-                let checks = Self.checks(invoice, others: otherNumbers, profile: settings.profile)
+                let checks = Self.checks(invoice, others: otherNumbers, profile: profile)
                 if !checks.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         ForEach(checks) { check in
@@ -38,6 +38,13 @@ struct ReviewStep: View {
                             .font(.body.monospacedDigit())
                     }
                     DatePicker("Date", selection: $invoice.date, displayedComponents: .date)
+                    if invoice.businessSnapshot != nil && profile != settings.profile {
+                        Divider()
+                        Text("This invoice keeps the business details it was first finished with, not the ones in Settings now.")
+                            .font(.subheadline).foregroundStyle(.secondary)
+                        Button("Use the details in Settings instead") { invoice.businessSnapshot = nil }
+                            .font(.subheadline)
+                    }
                 }
                 .card()
                 .onChange(of: invoice.date) { _, date in
@@ -99,7 +106,7 @@ struct ReviewStep: View {
             .frame(maxWidth: .infinity)
         }
         .task(id: fingerprint) {
-            if let url = try? InvoiceExport.writePDF(invoice, profile: settings.profile) {
+            if let url = try? InvoiceExport.writePDF(invoice, profile: profile) {
                 pdfURL = url
                 pages = PDFPages.render(url, width: 900)
             }
@@ -128,6 +135,9 @@ struct ReviewStep: View {
         .fontWeight(bold ? .semibold : .regular)
     }
 
+    /// The details this invoice will print with.
+    private var profile: BusinessProfile { invoice.businessProfile(current: settings.profile) }
+
     private var otherNumbers: [String] {
         allInvoices.filter { $0.persistentModelID != invoice.persistentModelID }.map(\.number)
     }
@@ -145,7 +155,7 @@ struct ReviewStep: View {
         var parts = [invoice.number, invoice.date.description, String(invoice.total.cents)]
         parts += invoice.sortedLines.map { "\($0.sku)\($0.itemDescription)\($0.quantity)\($0.unitPriceCents)\($0.discountCents)\($0.photo?.count ?? 0)" }
         parts += invoice.sortedShipping.map { String($0.amountCents) }
-        parts.append(String(describing: settings.profile))
+        parts.append(String(describing: profile))
         return parts.joined(separator: "|")
     }
 

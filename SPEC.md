@@ -1,6 +1,6 @@
 # Button Invoices — specification
 
-Revision 2, October 8, 2026 (Caleb's flow notes: home screen, guided steps, duplicate check, % discounts, button history). Source of truth for the project; propose changes to Caleb
+Revision 3, October 8, 2026 (three tabs instead of a home screen; archive; Settings frozen into finished invoices; template typos corrected). Source of truth for the project; propose changes to Caleb
 rather than diverging. Status and test results: Docs/progress.md.
 
 ## Goal
@@ -36,19 +36,36 @@ and iPad can be switched on later without a migration (see Open questions).
 - **Button** (one design in one color and size): colors, size, SKU, price, photo
   (square transparent PNG, ≤ 800 px), words she has used for it (aliases), hidden flag.
 - **Invoice**: number, date, status (Draft / Finished / Paid), lines, shipping charges,
-  "no shipping" flag.
+  "no shipping" flag; once finished, the business details it was finished with and its PDF.
 - **Line**: copies of the SKU, name and photo (≤ 400 px) at the time it was added,
   quantity, price each, discount each in dollars (and the percentage, if she entered
   one). Later catalog edits update lines on Draft invoices only.
 - **Button history**: a copy of a button's name, SKU, price and photo, saved before each
   change to it (shown under "Before your changes" when she edits the button).
 - **Shipping charge**: amount, a note for her, optional receipt photo.
-- **Business details** (Home → Business details): seller name and address, bill-to, routing and
+- **Business details** (Settings tab): seller name and address, bill-to, routing and
   account numbers, the "BUTTON" and "daphné verley ceramics" lines, the PDF name prefix.
+  Copied into an invoice when it is finished, with the PDF itself.
 
 First launch loads the catalog from App/Resources/Seed, which `make seed` builds from
-the newest invoice workbook's Reference sheet (37 buttons as of 0260903). Business
-details come from the same workbook into Seed/business.json.
+the 0260903 workbook's Reference sheet (37 buttons). Business details come from the same
+workbook into Seed/business.json. Typos in the workbook are corrected on the way in
+(Tools/seed/extract_seed.py), and were corrected in the two template files too (originals
+in Examples/…/Originals before typo fixes):
+
+| Was | Now |
+|---|---|
+| Pineaple, Yellow / Brown | Pineapple, Yellow / Brown |
+| Dogwood, Celedon | Dogwood, Celadon |
+| Elipse, Lavender, Mini | Ellipse, Lavender, Mini |
+| Ladybug, Red (SKU 26LRW, photo "Red : White") | Ladybug, Red / White |
+| 123 Example St, Suit 100 | 123 Example St, Suite 100 |
+| Crab, Blue 26CBLW (the clover's SKU) | Crab, Blue 26CBL |
+| Shell, Yellow 26SW | Shell, Yellow 26SY |
+
+Kept: Pineapple's 26PYB (on sent invoice 0260812, though Brown is BR elsewhere), and
+"Rose, White / Green" (the edited photo is named "White : Blue", but its leaves are the
+same teal she calls Green on the strawberry). The sent invoices themselves are unchanged.
 
 ### Privacy
 
@@ -85,19 +102,37 @@ a code per color, a size letter (Mini M, Small S, Medium M, Large L, Extra Large
 Hypothesis (unconfirmed): the year in an SKU is the year the button was first saved and
 never changes. If Caleb re-years all SKUs each January, this needs a change.
 
-## Home
+## Layout
 
-"Hello, Daphné. What would you like to do today?" (the name is editable in Business
-details). Actions: Start a new invoice; Continue a draft (one row per draft); See or
-share a finished invoice; My buttons; Business details. Drafts are saved as she goes,
-including when she leaves the app; a new invoice she leaves without adding anything is
-discarded. A half-finished new button is not saved.
+Three tabs in the floating Liquid Glass tab bar (Caleb, Oct 8, 2026):
+
+- **Invoices**: "Hello, Daphné. What would you like to do today?", New Invoice, then
+  Drafts (tap to carry on), Finished, waiting for payment, and Paid. Swipe left to delete,
+  right to copy an invoice into a new draft. Drafts are saved as she goes, including when
+  she leaves the app; a new invoice left with nothing on it is discarded.
+- **Buttons**: every saved button, a section per shape (with a count) and a row per color
+  and size. A floating Add a Button (Liquid Glass) starts the new-button steps; each
+  shape's ⋯ menu adds a color or size or renames the shape. Swipe left (or open a button)
+  to Archive; archived buttons are listed at the bottom, aren't offered for new lines,
+  and can be unarchived. A button can be deleted only if it has never been invoiced.
+- **Settings**: each field printed on the invoice, in page order (your business, bill to,
+  the lines above and below each button, routing and account, the PDF name), plus a
+  sample invoice preview and the greeting name.
+
+## Settings
+
+Edits apply to drafts and new invoices. Finishing an invoice stores its business details
+and its PDF; a finished invoice always shows and shares that PDF. Make Changes reopens it
+as a draft that keeps the stored details (the Review step offers "Use the details in
+Settings instead"). Probe, Oct 8, 2026 (FreezeProbe): after finishing, changing the
+address and routing in Settings and renaming, repricing and archiving the button left the
+finished PDF byte-identical and the line "Heart, Navy, Medium $4.00".
 
 ## Making an invoice
 
 Three steps with a step bar at the top, a one-line instruction on each, and a bar at the
 bottom with the running total, Back and Next (Finish on the last step). Save & Exit is at
-the top left throughout. She can go back to any step, and forward to any step whose
+the top left throughout. The tab bar is hidden while she works through an invoice. She can go back to any step, and forward to any step whose
 earlier steps are complete; Next is disabled with the reason shown until the current step
 is complete.
 
@@ -108,8 +143,8 @@ is complete.
    jump to step 1 or 2. Finish asks to confirm, marks the invoice Finished, makes the PDF
    and opens the share sheet (Messages, Mail, AirDrop, Save to Files, Print).
 
-A finished invoice shows its PDF, Share, a "has paid" switch, and Make Changes, which
-returns it to Draft (she then finishes and sends it again).
+A finished invoice shows its stored PDF, Share, a "has paid" switch, and Make Changes,
+which returns it to Draft (she then finishes and sends it again).
 
 ## Adding a line
 
@@ -135,7 +170,7 @@ words it doesn't answer to, those words are saved as its aliases. All 17 lines f
 
 ## Adding a new button
 
-Four steps, from an invoice or from My buttons:
+Four steps, from an invoice or from the Buttons tab:
 
 1. **Photo**: take or choose one; the background is removed (Button photos), with Touch
    Up. "No photo right now" skips to step 3.
@@ -148,6 +183,9 @@ Four steps, from an invoice or from My buttons:
    the SKU suggested (SKUs). A button with the same name or SKU can't be saved twice.
 4. **Review**: photo, name, SKU, price, and whether it's a new shape; "Save and Add to
    Invoice" goes straight to the quantity screen.
+
+Archived buttons are included in the photo check; choosing one ("It's this one")
+unarchives it.
 
 Photo-match thresholds (probe, October 8, 2026: her 8 raw photos against the 37 saved
 ones; LookAlikeTests): the same button 0.040–0.098, the same shape in another color (red
@@ -240,12 +278,8 @@ example invoices for side-by-side comparison.
 
 ## Open questions (for Caleb)
 
-1. Template data to confirm or fix in the app: Crab, Blue has Clover, Blue / White's SKU
-   (26CBLW); Shell, Yellow is 26SW; Ladybug, Red is 26LRW; Pineaple, Yellow / Brown is
-   26PYB though Brown is BR elsewhere; "Pineaple", "Celedon" and "Elipse" are misspelled;
-   the address says "Suit 100"; Nautilus, Unglazed shares Matte White's photo and
-   Nautilus, Brown, Large shares Brown's. The edited photo "Rose, White : Blue" is
-   invoiced as "Rose, White / Green".
+1. Template data, corrected Oct 8, 2026 (Data). Still open: Nautilus, Unglazed shares
+   Matte White's photo and Nautilus, Brown, Large shares Brown's; Pineapple keeps 26PYB.
 2. SKU year: fixed at first save (assumed), or re-yeared every January?
 3. Same-day numbering: the April batch was -1…-5 from the first; the app gives the first
    one no suffix and the second "-2". Fine?

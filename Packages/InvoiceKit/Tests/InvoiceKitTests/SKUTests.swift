@@ -2,12 +2,10 @@ import Testing
 @testable import InvoiceKit
 
 @Suite struct SKUTests {
-    /// SKUs in the template that don't follow its own pattern (reported to Caleb, kept as is).
+    /// SKUs that don't follow the rules. Crab, Shell and Ladybug were corrected in the seed
+    /// (Tools/seed/extract_seed.py); this one is on a sent invoice (0260812), so it stays.
     static let irregular: Set<String> = [
-        "Crab, Blue",               // 26CBLW, a copy of Clover, Blue / White's SKU (26CBL expected)
-        "Shell, Yellow",            // 26SW (26SY expected)
-        "Ladybug, Red",             // 26LRW: the SKU has White, the name doesn't
-        "Pineaple, Yellow / Brown", // 26PYB: Brown is BR everywhere else (26PYBR expected)
+        "Pineapple, Yellow / Brown", // 26PYB: Brown is BR everywhere else (26PYBR expected)
     ]
 
     @Test func reproducesTheTemplate() throws {
