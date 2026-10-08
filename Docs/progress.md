@@ -4,8 +4,8 @@
 
 | Milestone | State |
 |---|---|
-| M1 Core logic and PDF | Built; automated tests pass; Caleb ran Docs/m2-test.md, Part 1, steps 1–2 (pass); his comparison, Part 1, steps 3–5, not reported yet |
-| M2 App in the Simulator | Built and walked through by Claude; Caleb's first run stopped at Part 2, step 1 (`make sim`, Xcode 27 has no Simulator app), fixed; Parts 2 and 4 pending |
+| M1 Core logic and PDF | Done: Caleb ran Docs/m2-test.md, Part 1, steps 1–5, all pass (Oct 8, 2026) |
+| M2 App in the Simulator | Done: Caleb ran Docs/m2-test.md, Parts 2–4, all pass (Oct 8, 2026; results below) |
 | M3 App on her iPhone | Not started (needs signing, README "Installing on her iPhone or iPad") |
 
 ## Automated results (Claude, Oct 8, 2026, M4 Max, Xcode 27.0, iOS 27.0 Simulator)
@@ -295,5 +295,31 @@ Use the Part N, step M labels from Docs/m2-test.md.
 |---|---|
 | Part 1, step 1 | Pass: "Test run with 35 tests in 9 suites passed after 6.765 seconds" |
 | Part 1, step 2 | Pass: "Wrote build/sample-pdfs (cutouts of the raw photos are in build/sample-pdfs/cutouts)" |
-| Part 1, steps 3–5 | Not reported |
-| Part 2, step 1 | Fail (Oct 8): `make sim` built the app, then stopped with "Unable to find application named 'Simulator'" and "make: *** [sim] Error 1". Fixed (above); rerun |
+| Part 1, step 3 | Pass: same layout, numbers and totals |
+| Part 1, step 4 | Pass: same layout, numbers and totals |
+| Part 1, step 5 | Pass: 8 buttons with transparent backgrounds, comparable to Examples/Images/Edited |
+| Part 2, step 1 | Fail (Oct 8): `make sim` built the app, then stopped with "Unable to find application named 'Simulator'" and "make: *** [sim] Error 1". Fixed (above); rerun. Pass (Oct 8). |
+| Part 2, step 2 | Pass. |
+| Part 2, step 3 | Pass. |
+| Part 2, step 4 | Pass. |
+| Part 2, step 5 | Pass. |
+| Part 2, step 6 | Pass. |
+| Part 2, step 7 | Pass. |
+| Part 2, step 8 | Pass. |
+| Part 2, step 9 | Pass. |
+| Part 2, step 10 | Pass. |
+| Part 2, step 11 | Pass. |
+| Part 2, step 12 | Pass. |
+| Part 2, step 13 | Pass. |
+| Part 2, step 14 | Pass. |
+| Part 2, step 15 | Pass. |
+| Part 2, step 16 | Pass. |
+| Part 2, step 17 | Pass. |
+| Part 2, step 18 | Pass. |
+| Part 2, step 19 | Pass. |
+| Part 3, step 1 | Pass. |
+| Part 3, step 2 | Pass. |
+| Part 4, steps 1–11 | Pass. |
+
+
+
