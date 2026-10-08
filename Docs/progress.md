@@ -241,6 +241,52 @@ Built and checked in Device Hub:
 - The keyboard handler no longer acts on taps in the navigation, tab or search bars,
   which run their own controls.
 
+## Search that grows out of its circle; the greeting's second line (Oct 8, 2026)
+
+Caleb: the fix above lost iOS's animation of the circle growing into the field; is the
+tap-outside handling the cause; tighten the gap under "Hello, Daphné.".
+
+- Probe: a 60-line app with none of ours (a tab view, a list, `.searchable`,
+  `searchToolbarBehavior(.minimize)`, a + button), iOS 27.0 Simulator, iPhone 17. Each row
+  is: open search, type, ✕, open again.
+
+  | Variant | First ✕ | Second open |
+  |---|---|---|
+  | Tabs, iOS places the circle (after +) | folds, but "red" stays and the list stays filtered | stuck as a wide capsule, no ✕, no keyboard |
+  | Same, clearing the text when `isPresented` turns false | `isPresented` never turns false; "red" stays | (same) |
+  | No tab view (iOS puts search at the bottom) | closes, text cleared | opens normally |
+  | Tabs, ending the search ourselves when the keyboard hides | closes, text cleared | opens normally |
+  | Same, after the keyboard's search key, then ✕ | no keyboard event, "b" stays | (would stick) |
+
+  So the stuck search is iOS's, in the top bar of a tab app, not the keyboard handling;
+  the reorder doesn't help (iOS's own placement after + sticks too). The keyboard
+  workaround misses the search-key case, and covering it would mean watching iOS's own
+  field, which an update could break and leave her stuck.
+- Probe: our own circle inside the navigation bar, growing into a field: the bar didn't
+  resize the item; the field drew off to the right. Our own bar instead (`safeAreaBar`
+  with the title, search and +, the navigation bar hidden): the circle morphs into the
+  field with Liquid Glass (`GlassEffectContainer`, `glassEffectID`). Kept. Before iOS 26
+  the system search field under the title stays.
+- In the app (screen recording at 30 fps): the circle stretches left into the field in
+  about 0.25 s while the title fades; + turns into ✕; ✕ reverses it. Typed "red" (six red
+  buttons), the clear button (field empty, keyboard stayed), "heart" and the search key
+  (keyboard down, three hearts stayed), ✕, open again: empty and focused. Three cycles,
+  "qq" showed "No Results for 'qq'", once from a scrolled list ("daisy", three daisies).
+  + opened New Button.
+- Position, in points from the top of the screen (3x screenshots): title lettering
+  Buttons 72.0–96.3 from x 18.0 (our bar); Settings 71.0–102.3 from x 17.0 and Invoices
+  70.3–102.0 from x 18.0 (navigation bar; the "g", "p" and "é" reach further). Scrolled,
+  Buttons now has Settings' frosted edge; `scrollEdgeEffectStyle(.soft)` left a row's text
+  showing under the small title, so it isn't used.
+- The keyboard handling leaves taps in the search bar alone: tapping its clear button had
+  put the keyboard away.
+- Invoices: "What would you like to do today?" was centered in a 44-point row and started
+  at the bar's bottom edge. Now its row is as tall as its text and tucked 10 points into
+  the bar's space (not at larger text sizes). Gap from the title's lettering to the
+  question: 17.7 points with the row alone, 7.7 with the tuck; question to New Invoice:
+  17 points.
+- `make test`: 37 tests in 10 suites passed.
+
 ## M2 results (Caleb)
 
 Use the Part N, step M labels from Docs/m2-test.md.

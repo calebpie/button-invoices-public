@@ -24,15 +24,19 @@ labels below. Commands run in Terminal from the project folder
    Simulator) opens with the app on the iPhone 17; if it shows another device, click
    **iPhone 17** in its sidebar. Expected: tab bar Invoices · Buttons · Settings; Invoices has
    the large title "Hello, Daphné." (no "Invoices" title) with "What would you like to do
-   today?" under it, New Invoice, and under Paid the nine sent
+   today?" just under it, reading as its second line, then a gap, then New Invoice, and under Paid the nine sent
    invoices, newest first (0260903 $4,178.69 … 0260426-1 $947.21). Open 0260812: two pages,
    $976.90, same lines as Examples/…/0260812.pdf with "Ladybug, Red / White" and
    "Pineapple" spelled that way. Buttons lists 37 buttons by shape (Bunny first), with
    the large title "Buttons" level with a search circle and an orange **+** circle. Scroll
    down slowly: the title shrinks as you drag, the circles stay, and the list fades under
-   the bar. Tap the search circle, type `heart`: three hearts; type `qq`: "No Results for
-   'qq'"; tap **✕**: the field goes away and stays away. Open and close search twice
-   more. Settings has the same large title style. Pineapple, Celadon, Ellipse, "Ladybug, Red / White", Crab 26CBL and Shell 26SY are spelled that way.
+   the bar. Tap the search circle: it stretches into the search field across the bar as
+   the title fades, the + turns into **✕**, and the keyboard comes up. Type `heart`: three
+   hearts. Tap the small ⊗ at the end of the field: the field empties and the keyboard
+   stays. Type `qq`: "No Results for 'qq'". Type over it with `heart` and tap the
+   keyboard's blue search key: the keyboard goes down, the hearts stay. Tap **✕**: the
+   field folds back into the circle and stays away. Open and close search twice more,
+   once while scrolled down. Settings has the same large title style. Pineapple, Celadon, Ellipse, "Ladybug, Red / White", Crab 26CBL and Shell 26SY are spelled that way.
    Settings shows "123 Example St, Suite 100".
 2. Add test photos to the Simulator:
    `xcrun simctl addmedia booted Examples/Images/Raw/IMG_8516.heic "Examples/Images/Shipping Receipts/IMG_9049.heic"`

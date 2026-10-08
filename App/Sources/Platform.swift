@@ -86,13 +86,165 @@ extension View {
 
 // MARK: - Search
 
+/// The prominent action beside search in `searchTitleBar`.
+struct TitleBarAction {
+    let title: String
+    let systemImage: String
+    let perform: () -> Void
+}
+
 extension View {
-    /// The system search field, shown only while she searches: a search circle in the bar
-    /// opens it focused, and its Cancel takes it away again (Search fields, "Search in a
-    /// toolbar"). iOS 26's own minimized search does the same, but in this tab layout it
-    /// stuck half open the second time it was used, with or without the custom title and
-    /// keyboard handling (iOS 27.0 Simulator, Oct 8, 2026).
-    func searchOnRequest(text: Binding<String>, isSearching: Binding<Bool>, prompt: String) -> some View {
+    /// The screen's title, a search circle and one prominent action on one row, the title
+    /// shrinking as she scrolls (Caleb's design, Oct 8, 2026). Tapping the circle grows it
+    /// into the search field, focused; ✕ folds it back (Search fields, "Search in a toolbar").
+    ///
+    /// On iOS 26 the row is our own bar (`safeAreaBar`, with the system's scroll edge
+    /// effect), so the circle can morph into the field the way iOS's own minimized search
+    /// does. iOS's own (`searchToolbarBehavior(.minimize)`) is not used: in a tab app it
+    /// sits in the top bar, where ✕ folds the field away without ending the search, and the
+    /// next tap leaves it stuck open with no ✕. A 60-line app with only a tab view, a list
+    /// and `.searchable` does the same, so it is iOS's (iOS 27.0 Simulator, Oct 8, 2026).
+    /// Before iOS 26: the bar's title and buttons, and the system search field under the title.
+    @ViewBuilder
+    func searchTitleBar(_ title: String, text: Binding<String>, prompt: String, searchLabel: String,
+                        action: TitleBarAction) -> some View {
+        if #available(iOS 26.0, *) {
+            modifier(SearchTitleBar(title: title, text: text, prompt: prompt, searchLabel: searchLabel, action: action))
+        } else {
+            modifier(ToolbarSearchTitle(title: title, text: text, prompt: prompt, searchLabel: searchLabel, action: action))
+        }
+    }
+}
+
+@available(iOS 26.0, *)
+private struct SearchTitleBar: ViewModifier {
+    let title: String
+    @Binding var text: String
+    let prompt: String
+    let searchLabel: String
+    let action: TitleBarAction
+    @State private var progress: CGFloat = 0
+    @State private var searching = false
+    @FocusState private var focused: Bool
+    @Namespace private var glass
+
+    func body(content: Content) -> some View {
+        content
+            .titleProgress($progress)
+            // Kept for VoiceOver and the app switcher; the bar below draws it.
+            .navigationTitle(title)
+            .toolbar(.hidden, for: .navigationBar)
+            // The same frosted edge as the navigation bar on the other tabs.
+            .safeAreaBar(edge: .top) { bar }
+    }
+
+    private var bar: some View {
+        GlassEffectContainer(spacing: 10) {
+            HStack(spacing: 10) {
+                if searching {
+                    field
+                    circle("Close Search", systemImage: "xmark", id: "trailing", action: close)
+                } else {
+                    TitleText(title: title, progress: progress)
+                        .transition(.opacity.animation(.easeOut(duration: 0.15)))
+                    Spacer(minLength: 8)
+                    circle(searchLabel, systemImage: "magnifyingglass", id: "search", action: open)
+                        .keyboardShortcut("f", modifiers: .command)
+                    circle(action.title, systemImage: action.systemImage, id: "trailing", prominent: true,
+                           action: action.perform)
+                }
+            }
+            // Level with the navigation bar's title on the other tabs.
+            .frame(height: 44)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 10)
+        }
+        .leavesTapsToItsControls()
+    }
+
+    private var field: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+                .accessibilityHidden(true)
+            TextField(prompt, text: $text)
+                .focused($focused)
+                .submitLabel(.search)
+                .autocorrectionDisabled()
+                .accessibilityAddTraits(.isSearchField)
+                .onKeyPress(.escape) {
+                    close()
+                    return .handled
+                }
+            if !text.isEmpty {
+                Button("Clear Text", systemImage: "xmark.circle.fill") { text = "" }
+                    .labelStyle(.iconOnly)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.horizontal, 14)
+        .frame(maxWidth: .infinity, minHeight: 44)
+        .glassEffect(.regular.interactive(), in: .capsule)
+        .glassEffectID("search", in: glass)
+    }
+
+    private func circle(_ title: String, systemImage: String, id: String, prominent: Bool = false,
+                        action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.title3.weight(.medium))
+                .foregroundStyle(prominent ? Color.white : Color.primary)
+                .frame(width: 44, height: 44)
+                .contentShape(.circle)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .glassEffect(prominent ? .regular.tint(.accentColor).interactive() : .regular.interactive(), in: .circle)
+        .glassEffectID(id, in: glass)
+    }
+
+    private func open() {
+        withAnimation(.smooth) { searching = true }
+        focused = true
+    }
+
+    private func close() {
+        focused = false
+        withAnimation(.smooth) { searching = false }
+        text = ""
+    }
+}
+
+/// Before iOS 26: the bar's title and buttons, and the system search field under the title
+/// while she searches.
+private struct ToolbarSearchTitle: ViewModifier {
+    let title: String
+    @Binding var text: String
+    let prompt: String
+    let searchLabel: String
+    let action: TitleBarAction
+    @State private var searching = false
+
+    func body(content: Content) -> some View {
+        content
+            .shrinkingTitle(title)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(searchLabel, systemImage: "magnifyingglass") { searching = true }
+                        .keyboardShortcut("f", modifiers: .command)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action.title, systemImage: action.systemImage, action: action.perform)
+                        .glassProminentButton()
+                }
+            }
+            .searchOnRequest(text: $text, isSearching: $searching, prompt: prompt)
+    }
+}
+
+extension View {
+    /// The system search field, shown only while she searches, focused; its Cancel takes it
+    /// away again.
+    fileprivate func searchOnRequest(text: Binding<String>, isSearching: Binding<Bool>, prompt: String) -> some View {
         modifier(SearchOnRequest(text: text, isSearching: isSearching, prompt: prompt))
     }
 }
@@ -162,32 +314,49 @@ extension View {
 private struct ShrinkingTitle: ViewModifier {
     let title: String
     @State private var progress: CGFloat = 0
-    @ScaledMetric(relativeTo: .largeTitle) private var large: CGFloat = 34
-    @ScaledMetric(relativeTo: .headline) private var small: CGFloat = 17
 
     func body(content: Content) -> some View {
         content
-            .onScrollGeometryChange(for: CGFloat.self) { geometry in
-                geometry.contentOffset.y + geometry.contentInsets.top
-            } action: { _, offset in
-                progress = min(max(offset / 52, 0), 1)
-            }
+            .titleProgress($progress)
             // Kept for VoiceOver and the app switcher; drawn by the item below instead.
             .navigationTitle(title)
             .toolbarTitleDisplayMode(.inline)
             .toolbar(removing: .title)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    // Capped so the largest text sizes still fit the bar.
-                    let size = min(large, 44) + (min(small, 24) - min(large, 44)) * progress
-                    Text(title)
-                        .font(.system(size: size, weight: .bold))
-                        .lineLimit(1)
-                        .fixedSize()
-                        .accessibilityAddTraits(.isHeader)
+                    TitleText(title: title, progress: progress)
                 }
                 .hidingSharedBackground()
             }
+    }
+}
+
+/// A screen's title: large at the top of the list, the standard size once she has scrolled
+/// 52 points. Capped so the largest text sizes still fit the bar.
+private struct TitleText: View {
+    let title: String
+    let progress: CGFloat
+    @ScaledMetric(relativeTo: .largeTitle) private var large: CGFloat = 34
+    @ScaledMetric(relativeTo: .headline) private var small: CGFloat = 17
+
+    var body: some View {
+        let size = min(large, 44) + (min(small, 24) - min(large, 44)) * progress
+        Text(title)
+            .font(.system(size: size, weight: .bold))
+            .lineLimit(1)
+            .fixedSize()
+            .accessibilityAddTraits(.isHeader)
+    }
+}
+
+extension View {
+    /// How far the title has shrunk: 0 at the top of the list, 1 from 52 points down.
+    fileprivate func titleProgress(_ progress: Binding<CGFloat>) -> some View {
+        onScrollGeometryChange(for: CGFloat.self) { geometry in
+            geometry.contentOffset.y + geometry.contentInsets.top
+        } action: { _, offset in
+            progress.wrappedValue = min(max(offset / 52, 0), 1)
+        }
     }
 }
 
@@ -368,16 +537,49 @@ extension View {
     func keyboardHandling() -> some View {
         background(KeyboardAssistant.Installer())
     }
+
+    /// Taps in this view are left to its own controls: the keyboard stays up (the search
+    /// bar's clear button, for one).
+    func leavesTapsToItsControls() -> some View {
+        modifier(LeavesTapsToItsControls())
+    }
+}
+
+private struct LeavesTapsToItsControls: ViewModifier {
+    @State private var id = UUID()
+    @State private var frame: CGRect = .zero
+    @State private var showing = false
+
+    func body(content: Content) -> some View {
+        content
+            .onGeometryChange(for: CGRect.self) { $0.frame(in: .global) } action: { frame in
+                self.frame = frame
+                if showing { KeyboardAssistant.shared.ownControls[id] = frame }
+            }
+            // A tab that isn't showing keeps its views; only the one on screen counts.
+            .onAppear {
+                showing = true
+                KeyboardAssistant.shared.ownControls[id] = frame
+            }
+            .onDisappear {
+                showing = false
+                KeyboardAssistant.shared.ownControls[id] = nil
+            }
+    }
 }
 
 /// The number pads have no Return or Done key; she puts the keyboard away by tapping
-/// anywhere else, as in Apple's own apps. When a field gets the keyboard, its whole row (not
-/// just the text) is scrolled above it with a little room to spare.
+/// anywhere else, or by dragging the list down (`scrollDismissesKeyboard`). iOS doesn't put
+/// the keyboard away on a tap by itself; this is the usual way apps add it, done once for the
+/// window so it never takes the tap from a row's own buttons. When a field gets the keyboard,
+/// its whole row (not just the text) is scrolled above it with a little room to spare.
 @MainActor final class KeyboardAssistant: NSObject, UIGestureRecognizerDelegate {
     static let shared = KeyboardAssistant()
 
     private weak var window: UIWindow?
     private weak var field: UIView?
+    /// In window coordinates: views whose own controls take their taps (`leavesTapsToItsControls()`).
+    var ownControls: [UUID: CGRect] = [:]
     /// In screen coordinates, while the keyboard is showing.
     private var keyboardFrame: CGRect?
     /// Space left between the row and the top of the keyboard.
@@ -450,6 +652,7 @@ extension View {
             if v is UINavigationBar || v is UIToolbar || v is UITabBar || v is UISearchBar { return false }
             bar = v.superview
         }
+        if let window, ownControls.values.contains(where: { $0.contains(touch.location(in: window)) }) { return false }
         if let target = missedField(touch) {
             pending = .focus(target)
             return true

@@ -1,6 +1,6 @@
 # Button Invoices — specification
 
-Revision 11, October 8, 2026 (one title style on all three tabs; search that closes reliably; see Design guidelines). Source of truth for the project; propose changes to Caleb
+Revision 12, October 8, 2026 (Buttons search grows out of its circle; the Invoices question sits just under the greeting; see Design guidelines). Source of truth for the project; propose changes to Caleb
 rather than diverging. Status and test results: Docs/progress.md.
 
 ## Goal
@@ -139,7 +139,7 @@ sits on the bar's row, level with any bar buttons: large at the top, shrinking w
 scroll to the standard size, with the scroll edge effect under the bar.
 
 - **Invoices**: the title is the greeting, "Hello, Daphné." (no "Invoices" title), with
-  "What would you like to do today?" under it, New Invoice, then
+  "What would you like to do today?" just under it, as its second line, New Invoice, then
   Drafts (tap to carry on), Finished, waiting for payment, and Paid. Swipe left to delete,
   right to copy an invoice into a new draft; touching and holding an invoice offers the
   same (Duplicate, Share PDF…, Delete…). Drafts are saved as she goes, including when she
@@ -147,8 +147,8 @@ scroll to the standard size, with the scroll edge effect under the bar.
   the tab, and the draft, she left.
 - **Buttons**: every saved button, a section per shape (with a count) and a row per color
   and size. The title is level with a search circle and an orange + circle. + starts
-  the new-button steps; search shows the search field under the title, focused, and ✕
-  takes it away ("No Results" when nothing matches); each shape's ⋯ menu adds a color or size or renames the shape. Swipe left (or open a button)
+  the new-button steps; the search circle grows into the search field across the bar,
+  focused, and ✕ folds it back ("No Results" when nothing matches); each shape's ⋯ menu adds a color or size or renames the shape. Swipe left (or open a button)
   to Archive; archived buttons are listed at the bottom, aren't offered for new lines,
   and can be unarchived. A button can be deleted only if it has never been invoiced.
 - **Settings**: each field printed on the invoice, in page order (your business, bill to,
@@ -343,12 +343,20 @@ Applied (HIG page in parentheses):
 - No confirmation for Finish; a success haptic marks it (Alerts, Playing haptics).
   Confirmations stay for deleting and for reopening a sent invoice.
 - Every swipe action is also in the touch-and-hold menu (Context menus, Gestures).
-- Buttons tab: search and add are symbols in the bar, add the prominent one; search
-  opens the system search field, focused (Toolbars, Search fields, "Search in a
-  toolbar"). iOS 26's minimized search was tried and dropped: in this tab layout it
-  reopened after ✕ when placed before +, and stuck half open on its second use when iOS
-  placed it (iOS 27.0 Simulator). Titles are custom so they can sit level with bar
-  buttons; each keeps the system title for VoiceOver and the app switcher.
+- Buttons tab: search and add are symbols in the bar, add the prominent one; the search
+  circle grows into the search field, focused, the way iOS 26's own minimized search does
+  (Toolbars, Search fields, "Search in a toolbar"). iOS's own was tried and dropped: in a
+  tab app it sits in the top bar, where ✕ folds the field away without ending the search,
+  and the next tap leaves it stuck open with no ✕, also in a bare 60-line app (iOS 27.0
+  Simulator). So on iOS 26 the title, search and + are our own bar (`safeAreaBar`, the
+  same frosted edge as the navigation bar), and the circle morphs with Liquid Glass;
+  before iOS 26, the system search field appears under the title. Titles are custom so
+  they can sit level with bar buttons; each keeps the system title for VoiceOver and the
+  app switcher.
+- Tapping outside a text field puts the keyboard away, and dragging a list down does too
+  (`scrollDismissesKeyboard`). iOS does neither tap behavior by itself; the app adds it once
+  for the window so it never takes a tap from a row's own buttons. Bars, and the Buttons
+  search bar, keep their taps.
 - Grouped rows always form whole rounded cards: a button photo sits on its card with
   Take Photo and Choose from Photos; a bare prominent button never has a card row under
   it (Skip Photo is plain text; Remove from Invoice has its own card). Destructive rows

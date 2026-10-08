@@ -14,6 +14,7 @@ struct InvoicesTab: View {
     private var invoices: [Invoice]
     @State private var pendingDelete: Invoice?
     @State private var sharing: URL?
+    @Environment(\.dynamicTypeSize) private var textSize
     private let repeatTip = RepeatOrderTip()
 
     var body: some View {
@@ -26,7 +27,7 @@ struct InvoicesTab: View {
                         .foregroundStyle(.secondary)
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
-                        .listRowInsets(EdgeInsets(top: 0, leading: 4, bottom: 8, trailing: 4))
+                        .listRowInsets(EdgeInsets(top: 0, leading: 4, bottom: 16, trailing: 4))
                     Button(action: newInvoice) {
                         Label("New Invoice", systemImage: "plus.circle.fill")
                             .font(.title3.weight(.semibold))
@@ -96,8 +97,12 @@ struct InvoicesTab: View {
                     }
                 }
             }
-            // The question reads as the greeting's second line, not a section away.
-            .contentMargins(.top, 0, for: .scrollContent)
+            // The question reads as the greeting's second line, not a section away: its row
+            // only as tall as its text (rows are at least 44 points otherwise, which centered
+            // it lower), tucked 10 points into the bar's space under the title (Caleb, Oct 8,
+            // 2026). Not at larger text sizes, where the title's own letters fill that space.
+            .contentMargins(.top, textSize <= .large ? -10 : 0, for: .scrollContent)
+            .environment(\.defaultMinListRowHeight, 0)
             .shrinkingTitle(greeting)
             .overlay {
                 if invoices.isEmpty {

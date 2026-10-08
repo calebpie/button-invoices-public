@@ -12,7 +12,6 @@ struct CatalogView: View {
     @Query private var variants: [ButtonVariant]
 
     @State private var search = ""
-    @State private var searching = false
     @State private var showArchived = false
     @State private var editing: ButtonVariant?
     @State private var adding: NewButton?
@@ -73,11 +72,13 @@ struct CatalogView: View {
             }
         }
         .listStyle(.insetGrouped)
-        .shrinkingTitle("Buttons")
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) { searchButton }
-            ToolbarItem(placement: .topBarTrailing) { addButton }
-        }
+        // Search and add as circles level with the title, there at any scroll position:
+        // symbols, add the prominent one (Toolbars, "Prefer simple, recognizable symbols";
+        // "Use the .prominent style for key actions").
+        .searchTitleBar("Buttons", text: $search, prompt: "Search buttons", searchLabel: "Search Buttons",
+                        action: TitleBarAction(title: "Add a Button", systemImage: "plus") {
+                            adding = NewButton(design: nil)
+                        })
         .overlay {
             if variants.isEmpty {
                 ContentUnavailableView("No Buttons Yet", systemImage: "circle.grid.2x2",
@@ -86,7 +87,6 @@ struct CatalogView: View {
                 ContentUnavailableView.search(text: search)
             }
         }
-        .searchOnRequest(text: $search, isSearching: $searching, prompt: "Search buttons")
         .readableWidth()
         .sheet(item: $editing) { variant in
             NavigationStack { EditButtonView(variant: variant) }
@@ -114,19 +114,6 @@ struct CatalogView: View {
 
     private var archived: [ButtonVariant] {
         variants.filter(\.isHidden).sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
-    }
-
-    /// Search and add as circles in the bar, level with the title and there at any scroll
-    /// position: symbols, the add one prominent (Toolbars, "Prefer simple, recognizable
-    /// symbols"; "Use the .prominent style for key actions").
-    private var searchButton: some View {
-        Button("Search Buttons", systemImage: "magnifyingglass") { searching = true }
-            .keyboardShortcut("f", modifiers: .command)
-    }
-
-    private var addButton: some View {
-        Button("Add a Button", systemImage: "plus") { adding = NewButton(design: nil) }
-            .glassProminentButton()
     }
 
     private func row(_ variant: ButtonVariant) -> some View {
