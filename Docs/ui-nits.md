@@ -10,8 +10,8 @@ to try. App code isn't changed for a nit until the bug bash.
 | 1 | Grey strip under the tab bar as the keyboard goes away | Buttons, search | Open |
 | 2 | "Hello, Daphné." fades in place instead of sliding with the page | Invoices, opening an invoice | Open |
 | 3 | The receipt photo can't be opened full size to check the amount | Invoice step 2, Shipping | Open |
-| 4 | Swipe-delete: the row vanishes before she confirms; after she confirms, it vanishes with no animation | Invoices list | Open |
-| 5 | One letter in search finds nothing and says "No Results" | Buttons search; Add a Button in an invoice | Fixed; Caleb to check |
+| 4 | Swipe-delete: the row vanishes before she confirms; after she confirms, it vanishes with no animation | Invoices list | Fixed; Caleb to check |
+| 5 | One letter in search finds nothing and says "No Results" | Buttons search; Add a Button in an invoice | Fixed |
 
 ## 1. Grey strip under the tab bar as the keyboard goes away
 
@@ -163,6 +163,35 @@ with Duplicate from Invoice 0261008, deleted in the recording):
 - Match the button to the question: **Delete Draft** for a draft, **Delete Invoice** for
   the others.
 
+**Fixed** (bug bash, Oct 8, 2026; InvoicesTab.swift):
+
+- The swipe's Delete button no longer has the destructive role (red with `.tint(.red)`), so
+  the row only slides closed. The 0.4 s wait is gone; the question still appears.
+- The list's `@Query` is animated, so a deleted invoice collapses and one put back by undo
+  slides in.
+- With the animation, the fading row showed "$0.00 · 0 kinds of buttons" for about 0.15 s
+  (its lines are deleted with it). `InvoiceRow` now keeps what it last showed once its
+  invoice is deleted.
+- The button says **Delete Draft** for a draft, **Delete Invoice** otherwise, and so does the
+  shake prompt ("Undo Delete Draft").
+
+**Rechecked** (iOS 27.0 Simulator, iPhone 17, recordings at 30 fps; top of the first Paid
+row's check mark, in points from the top):
+
+- Delete tapped: the row slides closed (pencil icon back in place at 10.87 s); Paid stays at
+  470 throughout. Nothing vanishes. The question appears pointing at the row.
+- Delete Draft tapped: Paid slides 470 → 301 between 16.07 and 16.53 s (0.46 s, easing out);
+  the draft row fades with "$3,723.00 · 3 kinds" shown to the end.
+- Shake → Undo: Paid slides back 301 → 470 between 30.73 and 31.17 s, the draft row fading
+  in.
+- Not checked on screen: **Delete…** from touching and holding the row; it uses the same
+  question and delete.
+
+**Check** (Caleb, iPhone): Invoices → Duplicate any invoice (swipe right) → back → swipe the
+new draft left → **Delete**: the row only slides closed, then "Delete draft …?" with a
+**Delete Draft** button. Tap it: the row fades and the rest slides up. Shake → **Undo**: it
+slides back in. Repeat with touch and hold → **Delete…**.
+
 ## 5. One letter in search finds nothing and says "No Results"
 
 **Reported** (Caleb, Oct 8, 2026, iPhone, after Docs/m3-test.md, Part 1, step 7): on the
@@ -213,3 +242,5 @@ search, "H" → Heart, Burgundy / Navy / Red, Medium.
 **Check** (Caleb, iPhone): Buttons → search → type "H": the three Hearts. Then type "S":
 Sailboat, Shell, Star (2), Strawberry. Then in an invoice, Add a Button → type "h": the
 three Hearts.
+
+**Checked** (Caleb, Oct 8, 2026, iPhone): Pass.

@@ -10,7 +10,9 @@ struct InvoicesTab: View {
     @Environment(\.modelContext) private var context
     @Environment(BusinessSettings.self) private var settings
     @Environment(AppRouter.self) private var router
-    @Query(sort: [SortDescriptor(\Invoice.date, order: .reverse), SortDescriptor(\Invoice.number, order: .reverse)])
+    /// Animated, so a deleted invoice collapses and one put back by undo slides in.
+    @Query(sort: [SortDescriptor(\Invoice.date, order: .reverse), SortDescriptor(\Invoice.number, order: .reverse)],
+           animation: .default)
     private var invoices: [Invoice]
     @State private var pendingDelete: Invoice?
     @State private var sharing: URL?
@@ -52,14 +54,10 @@ struct InvoicesTab: View {
                             ForEach(group) { invoice in
                                 NavigationLink(value: invoice) { InvoiceRow(invoice: invoice) }
                                     .swipeActions(edge: .trailing) {
-                                        Button("Delete", systemImage: "trash", role: .destructive) {
-                                            // Asked once the row has slid closed; asked while
-                                            // it closes, the question never appears.
-                                            Task {
-                                                try? await Task.sleep(for: .milliseconds(400))
-                                                pendingDelete = invoice
-                                            }
-                                        }
+                                        // Not `.destructive`: the list would take that as the
+                                        // delete itself and remove the row before she answers.
+                                        Button("Delete", systemImage: "trash") { pendingDelete = invoice }
+                                            .tint(.red)
                                     }
                                     .swipeActions(edge: .leading) {
                                         Button("Duplicate", systemImage: "plus.square.on.square") { duplicate(invoice) }
@@ -79,7 +77,7 @@ struct InvoicesTab: View {
                                     // invoice being deleted (Action sheets).
                                     .confirmationDialog(deleteTitle(invoice), isPresented: isDeleting(invoice),
                                                         titleVisibility: .visible) {
-                                        Button("Delete Invoice", role: .destructive) {
+                                        Button(invoice.status == .draft ? "Delete Draft" : "Delete Invoice", role: .destructive) {
                                             InvoiceActions.delete(invoice, context)
                                             pendingDelete = nil
                                         }
@@ -193,15 +191,24 @@ struct InvoicesTab: View {
 
     /// Deleting can be undone with a shake (Undo and redo, "describe the operation").
     static func delete(_ invoice: Invoice, _ context: ModelContext) {
-        context.undoManager?.setActionName("Delete Invoice")
+        context.undoManager?.setActionName(invoice.status == .draft ? "Delete Draft" : "Delete Invoice")
         context.delete(invoice)
     }
 }
 
 struct InvoiceRow: View {
     let invoice: Invoice
+    /// What the row last showed. A deleted invoice has already lost its lines while its
+    /// row fades out, so the row keeps this instead of showing "$0.00 · 0 kinds".
+    @State private var shown: Summary?
+
+    private struct Summary: Equatable {
+        var total: String
+        var detail: String
+    }
 
     var body: some View {
+        let summary = invoice.isDeleted ? shown ?? current : current
         AdaptiveRow {
             IconTextStack {
                 Image(systemName: icon)
@@ -210,13 +217,16 @@ struct InvoiceRow: View {
                     .frame(minWidth: 32)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Invoice \(invoice.number)").font(.headline)
-                    Text(detail).font(.subheadline).foregroundStyle(.secondary)
+                    Text(summary.detail).font(.subheadline).foregroundStyle(.secondary)
                 }
             }
         } trailing: {
-            Text(invoice.total.formatted).font(.headline).monospacedDigit()
+            Text(summary.total).font(.headline).monospacedDigit()
         }
         .padding(.vertical, 4)
+        .onChange(of: invoice.isDeleted ? nil : current, initial: true) { _, now in
+            if let now { shown = now }
+        }
         .accessibilityElement(children: .combine)
         .accessibilityValue(invoice.status.label)
     }
@@ -227,6 +237,10 @@ struct InvoiceRow: View {
         case .finalized: "paperplane.circle.fill"
         case .paid: "checkmark.circle.fill"
         }
+    }
+
+    private var current: Summary {
+        Summary(total: invoice.total.formatted, detail: detail)
     }
 
     private var detail: String {

@@ -403,4 +403,4 @@ Use the Part N, step M labels from Docs/m3-test.md. Part 1 is on Caleb's iPhone 
 | Part 1, step 8 | Pass. |
 | Part 1, step 9 | Pass.|
 | Part 1, step 10 | Pass.|
-
+| Part 2, bug bash, nit 5 | Pass. |
