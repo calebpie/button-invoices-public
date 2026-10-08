@@ -6,7 +6,7 @@
 |---|---|
 | M1 Core logic and PDF | Done: Caleb ran Docs/m2-test.md, Part 1, steps 1–5, all pass (Oct 8, 2026) |
 | M2 App in the Simulator | Done: Caleb ran Docs/m2-test.md, Parts 2–4, all pass (Oct 8, 2026; results below) |
-| M3 App on her iPhone | Not started (needs signing, README "Installing on her iPhone or iPad") |
+| M3 App on her iPhone | Started: Personal Team signing set up; first `make ios` failed (below), fixed, rerun pending |
 
 ## Automated results (Claude, Oct 8, 2026, M4 Max, Xcode 27.0, iOS 27.0 Simulator)
 
@@ -286,6 +286,24 @@ tap-outside handling the cause; tighten the gap under "Hello, Daphné.".
   question: 17.7 points with the row alone, 7.7 with the tuck; question to New Invoice:
   17 points.
 - `make test`: 37 tests in 10 suites passed.
+
+## M3: first `make ios` (Oct 8, 2026)
+
+- Caleb: `ALLOW_PERSONAL_TEAM=1 make setup` wrote his Personal Team, name checked. Then
+  `make ios` stopped with "Communication with Apple failed: Your team has no devices from
+  which to generate a provisioning profile" and "No profiles for
+  'com.calebpietrafesa.ButtonInvoices' were found" (Error 65).
+- Cause: the build was for any iPhone (`generic/platform=iOS`), so no device was named
+  and none was registered with the team; a Personal Team gets no profile without one.
+- Also found: Xcode 27's `devicectl list devices` lists the simulators too, "paired", so
+  the install step would have picked the iPhone 17 simulator.
+- Fix: `make ios` (Tools/scripts/run-ios.sh) finds a real connected iPhone or iPad first,
+  builds for it by ID with `-allowProvisioningDeviceRegistration`, then installs and opens
+  it. Checked without a phone (stops with the README's connect step, and ignores the
+  simulator even when named) and with a stand-in device list (a real phone is picked; the
+  simulator isn't; Developer Mode off prints the steps). Not yet run with a phone.
+- README, "Installing on her iPhone or iPad": updated steps, and registering through
+  Xcode once if the build still finds no devices.
 
 ## M2 results (Caleb)
 

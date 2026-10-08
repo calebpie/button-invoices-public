@@ -38,10 +38,7 @@ sim: generate
 	Tools/scripts/run-sim.sh "$(SIM_APP)" "$(SIMULATOR)"
 
 ios: generate
-	xcodebuild -project $(PROJECT) -scheme ButtonInvoices -configuration Debug \
-		-derivedDataPath $(BUILD_DIR) -destination 'generic/platform=iOS' \
-		-allowProvisioningUpdates -quiet build
-	Tools/scripts/install-ios.sh "$(IOS_APP)"
+	Tools/scripts/run-ios.sh "$(PROJECT)" "$(BUILD_DIR)" "$(IOS_APP)"
 
 test:
 	swift test --package-path Packages/InvoiceKit

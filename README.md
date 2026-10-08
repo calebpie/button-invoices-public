@@ -82,12 +82,20 @@ Steps 1–5 are done on Caleb's M4 Max as of October 8, 2026 (Xcode 27.0 install
 ### Now: over a cable (free or paid team)
 
 1. Connect the iPhone to the Mac with a cable, unlock it, tap **Trust** and enter the passcode.
-2. On the iPhone: Settings → Privacy & Security → Developer Mode → on, then restart and
-   confirm. (The switch appears after the iPhone has been connected to Xcode once; if it
-   isn't there, run `make ios` once first.)
-3. `make ios` builds, installs and opens the app.
+2. `make ios` finds the connected iPhone (or iPad), builds for it, installs the app and
+   opens it. The first time, it also registers the iPhone with your signing team so Xcode
+   can make a provisioning profile for it (the Mac must be online and signed in to Xcode).
+3. If it says Developer Mode is off: on the iPhone, Settings → Privacy & Security →
+   Developer Mode → on, restart, confirm, and run `make ios` again. (The switch appears only
+   after the iPhone has been connected to Xcode, which `make ios` does.)
 4. First launch only: if the iPhone says "Untrusted Developer", go to Settings → General →
    VPN & Device Management → your Apple ID → Trust, then open **Invoices** from the Home Screen.
+
+If the build still says "Your team has no devices", register the iPhone through Xcode
+once: `make open`, choose the iPhone from the device menu at the top center of the Xcode
+window, then Product → Run (⌘R). After that, `make ios` works on its own. With several
+devices connected, pick one: `DEVICE="Daphné's iPhone" make ios` (its name as shown in
+Finder).
 
 With the free Personal Team the app stops opening after 7 days; run `make ios` again
 with the phone connected. Her data is kept.
