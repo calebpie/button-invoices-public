@@ -41,6 +41,7 @@ enum NewButtonPurpose {
         colorsText = colors.joined(separator: " / ")
         self.size = size
         priceText = price.map(\.editingText) ?? ""
+        if let design { fillFromShape(design) }
     }
 
     init(editing v: ButtonVariant) {
@@ -67,6 +68,20 @@ enum NewButtonPurpose {
             || !colorsText.trimmingCharacters(in: .whitespaces).isEmpty
     }
     func hash(into hasher: inout Hasher) { hasher.combine(ObjectIdentifier(self)) }
+
+    /// When she picks a saved shape, fill what she hasn't: the size if all its buttons share
+    /// one, and the price they use most (nit 20). Without this, Heart, Red saved beside
+    /// Heart, Red, Medium.
+    func fillFromShape(_ design: ButtonDesign) {
+        let saved = design.visibleVariants
+        let sizes = Set(saved.map(\.size))
+        if size.isEmpty, sizes.count == 1, let only = sizes.first, !only.isEmpty { size = only }
+        let priced = saved.filter { $0.price > .zero }.map(\.price.cents)
+        if price == nil, let common = Dictionary(grouping: priced, by: { $0 })
+            .max(by: { ($0.value.count, $0.key) < ($1.value.count, $1.key) })?.key {
+            priceText = Money(cents: common).editingText
+        }
+    }
 
     // MARK: Derived
 
@@ -97,6 +112,16 @@ enum NewButtonPurpose {
             year: Catalog.currentYear, designName: name,
             designCode: design?.code ?? SKURules.designCode(for: name),
             colors: colors, size: size, taken: Set(others.map(\.sku)))
+    }
+
+    /// A saved button of the same shape and colors that has a size, when this one has none:
+    /// likely the same button with the size left out. A warning, not a block (nit 20).
+    func sizeTwin(_ designs: [ButtonDesign], editing: ButtonVariant?) -> ButtonVariant? {
+        guard size.isEmpty, !colors.isEmpty, let design = chosenDesign(designs) else { return nil }
+        let mine = colors.map { $0.lowercased() }
+        return design.visibleVariants.first {
+            $0 !== editing && !$0.size.isEmpty && $0.colors.map { $0.lowercased() } == mine
+        }
     }
 
     func duplicate(_ designs: [ButtonDesign], _ variants: [ButtonVariant], editing: ButtonVariant?) -> ButtonVariant? {
@@ -497,12 +522,15 @@ struct NewButtonReviewStep: View {
                 if let best = draft.lookAlikes.first, best.distance < LookAlike.sameButton {
                     Notice("The photo looks a lot like \(best.variant.title). That's fine if this one is a different color or size.")
                 }
+                if let twin = draft.sizeTwin(designs, editing: nil) {
+                    Notice("\(twin.title) is already saved. Is this a different size?")
+                }
                 if draft.photo == nil {
                     Label("No photo yet. You can add one later from the Buttons tab.", systemImage: "camera")
                         .foregroundStyle(.secondary)
                 }
                 if let problem = draft.problem(designs, variants, editing: nil) {
-                    Label(problem, systemImage: "xmark.octagon.fill").foregroundStyle(.red)
+                    Notice(problem, tone: .problem)
                 }
                 Button {
                     saved(draft.saveNew(context, designs))
@@ -607,6 +635,9 @@ struct ButtonDetailsSections: View {
                     Text("One size").tag("")
                     ForEach(sizeChoices, id: \.self) { Text($0).tag($0) }
                 }
+                if let twin = draft.sizeTwin(designs, editing: editing) {
+                    Notice("\(twin.title) is already saved. Is this a different size?")
+                }
             }
             Section("Price each") {
                 MoneyField(title: "Price", text: $draft.priceText)
@@ -617,6 +648,10 @@ struct ButtonDetailsSections: View {
             if draft.skuText.isEmpty { draft.skuText = suggestedSKU }
         }
         .onChange(of: suggestedSKU) { _, sku in if !draft.skuEdited { draft.skuText = sku } }
+        .onChange(of: draft.designID) { _, _ in
+            // A new button only: a saved one already has its size and price.
+            if editing == nil, let design = draft.chosenDesign(designs) { draft.fillFromShape(design) }
+        }
     }
 
     private var designSection: some View {

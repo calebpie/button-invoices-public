@@ -26,7 +26,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 17 | The orange "why can't I go on" text is 2.1:1 in light mode | New Button step 3, Change Button | Fixed; Caleb to check |
 | 18 | The big camera picture on the photo step looks tappable but does nothing | New Button step 1 | Fixed; Caleb to check |
 | 19 | Step 3 picks the shape from a list of 20 names, no photos | New Button step 3, Change Button | Fixed; Caleb to check |
-| 20 | Picking a saved shape leaves size "One size" and price empty, so a near-duplicate is easy | New Button step 3 | Open (UX review; confuses her) |
+| 20 | Picking a saved shape leaves size "One size" and price empty, so a near-duplicate is easy | New Button step 3 | Fixed; Caleb to check |
 | 21 | "Change" buttons are 24 points tall | Invoice step 3, Review | Open (UX review; confuses her) |
 | 22 | "Already Saved" reads like a label, and the two card buttons differ in size | New Button step 2 | Open (UX review; confuses her) |
 | 23 | Side margins are 16 points on some screens and 20 on others | Draft bars, Review, Add a Button, new-button steps, photo | Open (UX review; polish) |
@@ -1023,6 +1023,26 @@ the most common price) if she hasn't chosen one; and warn "Heart, Red, Medium is
 saved. Is this a different size?" when the only difference is a missing size.
 
 **Severity:** confuses her (a second red heart on later invoices, under a new SKU).
+
+**Fix** (Caleb chose both): `ButtonDraft.fillFromShape` (NewButtonFlow.swift) fills, when a
+saved shape is picked for a new button and only where she hasn't: the size, if all the
+shape's buttons share one, and the price they use most (ties to the higher). It runs when a
+draft starts from a shape (Add Color or Size…, Add as a New Button) and when she picks one in
+step 3; Change Button is left alone. `sizeTwin` finds a saved button of the same shape and
+colors that has a size when this one has none; step 3 shows "Heart, Red, Medium is already
+saved. Is this a different size?" under Size, and step 4 shows it too, as a warning: Next
+and Save stay allowed. Also: step 4's problem line was red text; it's now the red ✕ with
+dark text (nit 17's style).
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light): New Button → Skip Photo → Heart
+→ Red: Size **Medium**, Price **4**, "Heart, Red, Medium" is already saved and Next is grey
+(shot 66-nit20-heart-filled-light). Size → One size: the warning under Size, "Heart, Red",
+26HR, Next allowed (67-nit20-size-twin-light). Next: step 4 shows the same warning, Save
+Button allowed (68-nit20-step4-twin-light). Discarded; nothing saved.
+
+**Check** (Caleb, iPhone): Buttons tab → **+** → **Skip Photo** → **Pick a saved shape** →
+**Heart**, color **Navy**. Expected: Size Medium, Price 4, and "Heart, Navy, Medium" is
+already saved. Swipe down → **Discard Changes**.
 
 ## 21. "Change" buttons are 24 points tall
 
