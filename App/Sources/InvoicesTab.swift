@@ -232,6 +232,7 @@ struct InvoiceRow: View {
             Text(summary.total).font(.headline).monospacedDigit()
         }
         .padding(.vertical, 4)
+        .modifier(WholePointHeight())
         .onChange(of: invoice.isDeleted ? nil : current, initial: true) { _, now in
             if let now { shown = now }
         }
@@ -252,6 +253,22 @@ struct InvoiceRow: View {
         let skus = invoice.sortedLines.count
         return Summary(total: invoice.total.formatted,
                        detail: "\(date) · \(skus == 1 ? "1 SKU" : "\(skus) SKUs")")
+    }
+}
+
+/// Pads a row's bottom up to a whole number of points. Rows 78.33 points tall put some row
+/// boundaries between pixels, and a 1-pixel seam of the background showed across the card
+/// (nit 27).
+private struct WholePointHeight: ViewModifier {
+    @State private var extra: CGFloat = 0
+
+    func body(content: Content) -> some View {
+        content
+            .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
+                let rounded = (height - 0.01).rounded(.up)
+                if abs(rounded - height - extra) > 0.01 { extra = rounded - height }
+            }
+            .padding(.bottom, extra)
     }
 }
 

@@ -33,7 +33,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 24 | Remove Shipping hangs under the bare Save button, with square corners and no icon | Shipping sheet (changing a charge) | Fixed; Caleb to check |
 | 25 | Unreached steps in the step bar are 1.6:1, too faint to read | Draft step bar | Fixed; Caleb to check |
 | 26 | Invoice rows wrap "of buttons" onto a third line | Invoices list | Fixed; Caleb to check |
-| 27 | A 1-pixel seam crosses the Paid card | Invoices list | Open (UX review; polish) |
+| 27 | A 1-pixel seam crosses the Paid card | Invoices list | Fixed; Caleb to check |
 | 28 | The draft's ⋯ menu holds one item | Draft invoice | Open (UX review; polish) |
 | 29 | Same thing, different words: Town / City, No price / No price yet / $0.00, alert capitals | Settings, Buttons, New Button | Open (UX review; polish) |
 | 30 | The line total, the number that matters, is in grey | Quantity screen | Open (UX review; polish) |
@@ -1260,6 +1260,23 @@ one row boundary falls between pixels.
 in a release build.
 
 **Severity:** polish.
+
+**Cause, confirmed** (Oct 9, after nit 26): rows were 78.33 points tall, separators 235,
+235, 234 and 236 pixels apart; the seam (#F2F2F7 at y 2427 px) sat right under the
+separator after the 236-pixel step, where the rounding left a pixel between two rows' white
+backgrounds.
+
+**Fix** (Caleb approved): `WholePointHeight` (InvoicesTab.swift) measures each invoice row
+and pads its bottom up to the next whole point (78.33 → 79), at any text size.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max): a detector (build/ux-review/seam.sh:
+background-colored pixel rows inside a card, in the icon column where separators don't
+reach) finds the review's seam (shot 01, y 1869) and today's (y 2427). After the fix, no
+seam in 10 distinct scroll positions, 5 light and 5 dark, from flings that stop at arbitrary
+offsets (shots 87-nit27-no-seam-light, 88-nit27-no-seam-dark); separators every 237 pixels
+(79 points), e.g. 1229, 1466, 1703, 1940, 2177, 2414.
+
+**Check** (Caleb, iPhone): scroll the Invoices list slowly; no hairline crosses the Paid card.
 
 ## 28. The draft's ⋯ menu holds one item
 
