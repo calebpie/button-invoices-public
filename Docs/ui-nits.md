@@ -1128,7 +1128,7 @@ ones); `SystemMargin.current` gives it from the first frame, so nothing shifts 4
 after appearing. Used instead of the 16-point `.padding()` / `.padding(.horizontal)` in the
 draft's bottom bar and step bar, Review, Add a Button's grid and colors-and-sizes screen,
 New Button steps 2 and 4, Which shape?, the photo cutout (7 places) and the receipt viewer's
-amount bar. The question under "Hello, Daphné." has leading inset 0. No 16-point horizontal
+amount bar. The question under "Hello, Daphné." moved 1 point left (see below). No 16-point horizontal
 padding is left (`grep '.padding()$\|.padding(.horizontal)$' App/Sources` finds none).
 
 **Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, 3x screenshots; left / right edge where
@@ -1141,9 +1141,13 @@ a card or control meets the background, points):
 | Add a Button grid (74-nit23-add-button-light), still 3 tiles a row | 16.3 / 413.7 | 20.0 / 410.0 |
 | Photo cutout, photo and buttons (75-nit23-cutout-light) | 16 | 20.0 / 410.0 |
 | New Button step 2 cards (76-nit23-step2-light) | 16.0 / 414.0 | 20.0 / 410.0 |
-| "What would you like to do today?" ink (72-nit23-invoices-light), title at 22.0 | 26.0 | 23.0 |
+| "What would you like to do today?" ink (72-nit23-invoices-light), title at 22.0 | 26.0, W's left stroke slightly cut | 25.0, W whole |
 
-The question's 1 point past the title is the letters' own side bearings (W vs H).
+The question can't sit level with the title: its row clips anything nearer the edge than about
+23 points, and the W's left stroke reaches past the text's frame. A first try (inset 0)
+measured 23.0 but was the clip, not the letter; enlarged, the W's left stroke was cut flat.
+Now padding before the secondary style gives the W room inside its own layer
+(InvoicesTab.swift); enlarged, its left stroke ends at a slant, like the w in "would".
 
 **Check** (Caleb, iPhone): go from the Invoices list into a draft and to Review; the cards
 shouldn't change width.
