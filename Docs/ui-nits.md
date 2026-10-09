@@ -20,7 +20,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 11 | "Archived (1)" can't be opened, so archived buttons can't be seen or unarchived from the list | Buttons tab | Fixed; Caleb to check |
 | 12 | A discount bigger than the price shows a negative line total, and Add is greyed out with no reason | Quantity screen | Fixed; Caleb to check |
 | 13 | "Add a Button" means two different things | Invoice step 1; Home Screen, Siri, Buttons + | Fixed (spec changed); Caleb to check |
-| 14 | The missing-bank-details warning sends her to "Home → Business details", which doesn't exist | Invoice step 3, Review | Open (UX review; confuses her) |
+| 14 | The missing-bank-details warning sends her to "Home → Business details", which doesn't exist | Invoice step 3, Review | Fixed; Caleb to check |
 | 15 | Two ‹ back buttons on a draft, each going somewhere different | Draft invoice | Open (UX review; confuses her) |
 | 16 | Questions show only the red button; "Keep Editing" and Cancel never appear | Discard and Delete questions | Open (UX review; confuses her) |
 | 17 | The orange "why can't I go on" text is 2.1:1 in light mode | New Button step 3, Change Button | Open (UX review; confuses her) |
@@ -805,6 +805,28 @@ button, rather than trying to describe its location."
 Payment." with a **Open Settings** button that switches to the Settings tab.
 
 **Severity:** confuses her.
+
+**Fix** (Caleb chose the sheet): the warning reads "The bank routing or account number is
+empty, so the invoice won't say where to pay." with an **Add Bank Details** button under it
+(large, bordered). It opens a Bank Details sheet (BankDetailsSheet.swift): Routing and Account
+(digits only), the note "Printed bottom left, beside the totals, so Alix of Bohemia knows where
+to pay. Also in Settings, under Payment.", Save (and ✓), greyed with "Enter both numbers."
+until both are filled; ✕ or a swipe asks before discarding. Save writes the same keychain
+values as Settings → Payment. A reopened invoice that keeps the details it was finished with
+gets the two numbers too, and nothing else from Settings.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light): the numbers are in the keychain,
+so the Simulator's keychain was reset to empty them. Review showed the warning and the button
+(shot 51-nit14-bank-warning-light); the sheet opened with both fields empty and Save grey
+(52-nit14-bank-sheet-light). Test numbers 000000000 and 1234 → Save: the warning went away and
+the PDF preview printed them (53-nit14-pdf-after-test-numbers-light). Her numbers were then
+restored by resetting the keychain again and reinstalling, which reads them from the seed
+file; Settings → Payment showed them.
+
+**Check** (Caleb, iPhone): can't be seen without emptying her numbers, so check it in the
+Simulator if at all: `xcrun simctl keychain booted reset`, open a draft's Review, tap **Add
+Bank Details**. Afterwards reset the keychain again and run `make sim` after deleting the app
+from the Simulator, to restore them.
 
 ## 15. Two ‹ back buttons on a draft, each going somewhere different
 

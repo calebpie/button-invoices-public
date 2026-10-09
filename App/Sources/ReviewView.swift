@@ -14,6 +14,7 @@ struct ReviewStep: View {
     @State private var pages: [UIImage] = []
     @State private var pdfURL: URL?
     @State private var fullScreen: URL?
+    @State private var addingBank = false
 
     var body: some View {
         ScrollView {
@@ -26,6 +27,11 @@ struct ReviewStep: View {
                         ForEach(checks) { check in
                             Label(check.text, systemImage: check.level == .problem ? "xmark.octagon.fill" : "exclamationmark.triangle.fill")
                                 .foregroundStyle(check.level == .problem ? .red : .orange)
+                            if check.fix == .bankDetails {
+                                Button("Add Bank Details", systemImage: "building.columns") { addingBank = true }
+                                    .buttonStyle(.bordered)
+                                    .controlSize(.large)
+                            }
                         }
                     }
                     .card()
@@ -112,6 +118,9 @@ struct ReviewStep: View {
             }
         }
         .quickLookPreview($fullScreen)
+        .sheet(isPresented: $addingBank) {
+            NavigationStack { BankDetailsSheet(invoice: invoice) }
+        }
     }
 
     private func section(_ title: String, step: FlowStep, @ViewBuilder content: () -> some View) -> some View {
@@ -164,9 +173,12 @@ struct ReviewStep: View {
 
     struct Check: Identifiable {
         enum Level { case problem, warning }
+        /// A check she can fix right here, with a button under it.
+        enum Fix { case bankDetails }
         let id = UUID()
         let level: Level
         let text: String
+        var fix: Fix? = nil
     }
 
     /// Problems stop Finish; warnings don't.
@@ -188,7 +200,8 @@ struct ReviewStep: View {
             out.append(.init(level: .warning, text: "\(sku) is on the invoice more than once."))
         }
         if profile.routing.isEmpty || profile.account.isEmpty {
-            out.append(.init(level: .warning, text: "The bank routing or account number is empty (Home → Business details)."))
+            out.append(.init(level: .warning, text: "The bank routing or account number is empty, so the invoice won't say where to pay.",
+                                fix: .bankDetails))
         }
         return out
     }

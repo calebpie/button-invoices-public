@@ -21,6 +21,7 @@ is a screen pushed in a navigation stack, "Sh" a sheet, "FS" full screen, "D" a 
    - Step 2 Shipping: guide, charges, Add Shipping / Add Another Box, "No shipping on this invoice" switch
    - Step 3 Review (ReviewView.swift): guide, checks card (problems red, warnings orange), Invoice # and Date, "Use Current Settings" (reopened invoice whose details differ), Buttons card + Change, Shipping card + Change, Total due, your-total check (match / more / less), The PDF
      - FS Quick Look of the PDF (tap the page)
+     - Sh Bank Details (BankDetailsSheet.swift): Routing, Account, Save; from the empty-bank-numbers warning's Add Bank Details
    - Finish → finished screen with the share sheet open
 3. S Finished invoice (FinishedInvoiceView.swift): total, number and date, Share PDF, paid switch, The PDF. Tap a finished or paid invoice.
    - toolbar Share (ShareLink) and M ⋯: Duplicate, Make Changes…, Delete…
