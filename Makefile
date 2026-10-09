@@ -5,7 +5,7 @@ BUILD_DIR := build
 XCODEGEN  := swift run --package-path Tools/BuildTools -c release xcodegen
 SIM_APP   := $(BUILD_DIR)/Build/Products/Debug-iphonesimulator/Button Invoices.app
 IOS_APP   := $(BUILD_DIR)/Build/Products/Debug-iphoneos/Button Invoices.app
-SIMULATOR ?= iPhone 17
+SIMULATOR ?= iPhone 15 Pro Max
 
 .PHONY: help setup generate open sim ios test sample-pdfs seed clean
 
@@ -13,7 +13,7 @@ help:
 	@echo "make setup        One time, after signing into Xcode: find your team ID, write Configs/Signing.xcconfig"
 	@echo "make generate     Regenerate ButtonInvoices.xcodeproj from project.yml"
 	@echo "make open         Regenerate, then open the project in Xcode"
-	@echo "make sim          Build and launch the app in the iPhone Simulator (SIMULATOR=\"iPad Air 11-inch (M4)\" for another)"
+	@echo "make sim          Build and launch the app in the Simulator, on her iPhone 15 Pro Max (SIMULATOR=\"iPad Air 11-inch (M4)\" for another)"
 	@echo "make ios          Build, install and launch the app on the iPhone connected by cable"
 	@echo "make test         Run the InvoiceKit tests (naming, SKUs, matching, totals, PDF, photo cutout)"
 	@echo "make sample-pdfs  Re-create the example invoices as PDFs in build/sample-pdfs, to compare with Examples/"

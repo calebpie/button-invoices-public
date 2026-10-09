@@ -405,6 +405,15 @@ Archive, Unarchive and Archive Shape. Probe cases 4 and 5 above are this approac
 heart line, shake, Undo), then swipe the app away in the app switcher and reopen it: the
 heart line is still there. Then the same with deleting a draft from the Invoices list.
 
+## Simulator on her iPhone's model (Oct 8, 2026)
+
+Her iPhone is an iPhone 15 Pro Max (SPEC.md, "Who uses it"), so Simulator checks use one
+from now on (Caleb). Xcode 27 lists the model but had no simulator made for it; `make sim`
+now makes one with the newest iOS on the Mac. Checked: `make sim` made it (iOS 27.0),
+installed and launched the app; screenshot 1290 × 2796 pixels (430 × 932 points), the
+Invoices tab as before. Earlier Simulator results in this file and Docs/ui-nits.md were on
+the 6.3-inch iPhone 17.
+
 ## M2 results (Caleb)
 
 Use the Part N, step M labels from Docs/m2-test.md.

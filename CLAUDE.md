@@ -23,7 +23,8 @@ than diverging. Status and test results: Docs/progress.md.
 
 - `make test`: InvoiceKit tests (swift-testing; needs Xcode's toolchain)
 - `make sample-pdfs`: the nine example invoices re-rendered into build/sample-pdfs
-- `make sim` / `make ios`: build and run in the Simulator / on the connected iPhone
+- `make sim` / `make ios`: build and run in the Simulator / on the connected iPhone. The
+  Simulator is an iPhone 15 Pro Max, her iPhone's model: use it for every Simulator check
 - `make seed`: rebuild App/Resources/Seed from the 0260903 workbook in Examples/
 - `make generate`, `make setup`: see README. The app icon is App/Resources/AppIcon.icon (Icon Composer format: icon.json and SVG layers)
 

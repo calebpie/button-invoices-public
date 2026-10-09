@@ -21,8 +21,8 @@ labels below. Commands run in Terminal from the project folder
 
 1. Start fresh: `xcrun simctl uninstall booted com.calebpietrafesa.ButtonInvoices`
    (an error that nothing is installed is fine), then `make sim`. Device Hub (Xcode 27's
-   Simulator) opens with the app on the iPhone 17; if it shows another device, click
-   **iPhone 17** in its sidebar. Expected: tab bar Invoices · Buttons · Settings; Invoices has
+   Simulator) opens with the app on the iPhone 15 Pro Max; if it shows another device, click
+   **iPhone 15 Pro Max** in its sidebar. Expected: tab bar Invoices · Buttons · Settings; Invoices has
    the large title "Hello, Daphné." (no "Invoices" title) with "What would you like to do
    today?" just under it, reading as its second line, then a gap, then New Invoice, and under Paid the nine sent
    invoices, newest first (0260903 $4,178.69 … 0260426-1 $947.21). Open 0260812: two pages,

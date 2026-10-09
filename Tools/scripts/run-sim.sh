@@ -4,17 +4,40 @@
 set -euo pipefail
 
 APP="$1"
-NAME="${2:-iPhone 17}"
+NAME="${2:-iPhone 15 Pro Max}"
 BUNDLE_ID=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Info.plist")
 
-UDID=$(xcrun simctl list devices available -j | python3 -c '
+find_udid() {
+    xcrun simctl list devices available -j | python3 -c '
 import json, sys
 name = sys.argv[1]
 for runtime, devices in json.load(sys.stdin)["devices"].items():
     for d in devices:
         if d["name"] == name and "iOS" in runtime:
             print(d["udid"]); sys.exit()
+' "$NAME"
+}
+
+UDID=$(find_udid)
+
+# Xcode lists some device models without a simulator made for them (her iPhone 15 Pro Max
+# in Xcode 27). Make one with the newest iOS the Mac has.
+if [ -z "$UDID" ]; then
+    TYPE=$(xcrun simctl list devicetypes -j | python3 -c '
+import json, sys
+for t in json.load(sys.stdin)["devicetypes"]:
+    if t["name"] == sys.argv[1]: print(t["identifier"])
 ' "$NAME")
+    RUNTIME=$(xcrun simctl list runtimes available -j | python3 -c '
+import json, sys
+ios = [r for r in json.load(sys.stdin)["runtimes"] if r["platform"] == "iOS"]
+if ios: print(max(ios, key=lambda r: [int(p) for p in r["version"].split(".")])["identifier"])
+')
+    if [ -n "$TYPE" ] && [ -n "$RUNTIME" ]; then
+        echo "Making a \"$NAME\" simulator ($RUNTIME)"
+        xcrun simctl create "$NAME" "$TYPE" "$RUNTIME" >/dev/null && UDID=$(find_udid)
+    fi
+fi
 
 if [ -z "$UDID" ]; then
     echo "No simulator named \"$NAME\". Available:"
