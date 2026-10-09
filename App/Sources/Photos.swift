@@ -118,13 +118,17 @@ struct CameraPicker: UIViewControllerRepresentable {
     }
 }
 
-/// "Take Photo" and "Choose from Photos" buttons that hand back an upright image.
+/// "Take Photo" and "Choose from Photos" buttons that hand back an upright image. Setting
+/// `start` to true does what Take Photo does (Choose from Photos without a camera), for a
+/// photo frame that's tappable too (nit 18).
 struct PhotoSourceButtons: View {
     let takeLabel: String
     let chooseLabel: String
+    var start: Binding<Bool> = .constant(false)
     let onImage: (CGImage) -> Void
 
     @State private var showCamera = false
+    @State private var showPicker = false
     @State private var pickerItem: PhotosPickerItem?
 
     var body: some View {
@@ -134,15 +138,23 @@ struct PhotoSourceButtons: View {
             } label: {
                 Label(takeLabel, systemImage: "camera")
             }
-            .fullScreenCover(isPresented: $showCamera) {
-                CameraPicker { image in
-                    if let cg = Photos.upright(image) { onImage(cg) }
-                }
-                .ignoresSafeArea()
-            }
         }
-        PhotosPicker(selection: $pickerItem, matching: .images) {
+        Button {
+            showPicker = true
+        } label: {
             Label(chooseLabel, systemImage: "photo.on.rectangle")
+        }
+        .photosPicker(isPresented: $showPicker, selection: $pickerItem, matching: .images)
+        .fullScreenCover(isPresented: $showCamera) {
+            CameraPicker { image in
+                if let cg = Photos.upright(image) { onImage(cg) }
+            }
+            .ignoresSafeArea()
+        }
+        .onChange(of: start.wrappedValue) { _, asked in
+            guard asked else { return }
+            start.wrappedValue = false
+            if CameraPicker.isAvailable { showCamera = true } else { showPicker = true }
         }
         .onChange(of: pickerItem) { _, item in
             guard let item else { return }

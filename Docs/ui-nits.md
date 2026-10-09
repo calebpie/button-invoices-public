@@ -24,7 +24,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 15 | Two ‹ back buttons on a draft, each going somewhere different | Draft invoice | Fixed (spec changed); Caleb to check |
 | 16 | Questions show only the red button; "Keep Editing" and Cancel never appear | Discard and Delete questions | Fixed; Caleb to check |
 | 17 | The orange "why can't I go on" text is 2.1:1 in light mode | New Button step 3, Change Button | Fixed; Caleb to check |
-| 18 | The big camera picture on the photo step looks tappable but does nothing | New Button step 1 | Open (UX review; confuses her) |
+| 18 | The big camera picture on the photo step looks tappable but does nothing | New Button step 1 | Fixed; Caleb to check |
 | 19 | Step 3 picks the shape from a list of 20 names, no photos | New Button step 3, Change Button | Open (UX review; confuses her; spec) |
 | 20 | Picking a saved shape leaves size "One size" and price empty, so a near-duplicate is easy | New Button step 3 | Open (UX review; confuses her) |
 | 21 | "Change" buttons are 24 points tall | Invoice step 3, Review | Open (UX review; confuses her) |
@@ -954,6 +954,23 @@ when a gesture isn't available."
 the Simulator), or show the empty checkerboard without the camera symbol.
 
 **Severity:** confuses her.
+
+**Fix** (Caleb chose to make it do Take Photo): before there's a photo, the frame is a button
+that does what Take Photo does (Choose from Photos on a device without a camera)
+(NewButtonFlow.swift). Once there's a photo, tapping it does nothing; Retake Photo, Choose
+from Photos and Touch Up the Edges are the rows below. To start it from outside,
+`PhotoSourceButtons` takes a `start` binding, and its Choose from Photos is now a plain
+button with `.photosPicker(isPresented:)` instead of a `PhotosPicker` view (same look; also
+used by Shipping and Change Button).
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light): the iOS 27 Simulator has a
+simulated camera, so tapping the frame opened the camera (shot
+61-nit18-frame-opens-photos-light), twice in a row; ✕ came back. Choose from Photos → the
+strawberry → Use This Photo: the photo fills the frame, undimmed, and tapping it did nothing
+(62-nit18-photo-tap-does-nothing-light).
+
+**Check** (Caleb, iPhone): Buttons tab → **+** → tap the big camera picture. Expected: the
+camera. Cancel, then **Choose from Photos** still opens Photos.
 
 ## 19. Step 3 picks the shape from a list of 20 names, no photos
 

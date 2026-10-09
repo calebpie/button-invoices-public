@@ -207,6 +207,7 @@ struct NewButtonPhotoStep: View {
     let draft: ButtonDraft
     let advance: (NewButtonStep) -> Void
     @State private var cutoutSource: CutoutSource?
+    @State private var startPhoto = false
 
     struct CutoutSource: Identifiable {
         let id = UUID()
@@ -222,16 +223,24 @@ struct NewButtonPhotoStep: View {
             Section {
                 HStack {
                     Spacer()
-                    ZStack {
-                        Checkerboard().clipShape(RoundedRectangle(cornerRadius: 12))
-                        ButtonPhoto(data: draft.photo, side: 180)
+                    // Before there's a photo, the frame with its camera symbol is a button
+                    // that does what Take Photo does: it's what she'll tap first (nit 18).
+                    Button { if draft.photo == nil { startPhoto = true } } label: {
+                        ZStack {
+                            Checkerboard().clipShape(RoundedRectangle(cornerRadius: 12))
+                            ButtonPhoto(data: draft.photo, side: 180)
+                        }
+                        .frame(width: 200, height: 200)
+                        .contentShape(RoundedRectangle(cornerRadius: 12))
                     }
-                    .frame(width: 200, height: 200)
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(CameraPicker.isAvailable ? "Take Photo" : "Choose from Photos")
+                    .accessibilityHidden(draft.photo != nil)
                     Spacer()
                 }
                 .padding(.vertical, 8)
                 PhotoSourceButtons(takeLabel: draft.photo == nil ? "Take Photo" : "Retake Photo",
-                                   chooseLabel: "Choose from Photos") { image in
+                                   chooseLabel: "Choose from Photos", start: $startPhoto) { image in
                     draft.source = image
                     cutoutSource = CutoutSource(image: image)
                 }
