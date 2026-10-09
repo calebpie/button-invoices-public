@@ -8,7 +8,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | # | Nit | Where | Status |
 |---|---|---|---|
 | 1 | Grey strip under the tab bar as the keyboard goes away | Buttons, search | Open |
-| 2 | "Hello, Daphné." fades in place instead of sliding with the page | Invoices, opening an invoice | Open |
+| 2 | "Hello, Daphné." fades in place instead of sliding with the page | Invoices, opening an invoice | Fixed; Caleb to check |
 | 3 | The receipt photo can't be opened full size to check the amount | Invoice step 2, Shipping | Fixed; Caleb to check |
 | 4 | Swipe-delete: the row vanishes before she confirms; after she confirms, it vanishes with no animation | Invoices list | Fixed; Caleb to check |
 | 5 | One letter in search finds nothing and says "No Results" | Buttons search; Add a Button in an invoice | Fixed |
@@ -16,7 +16,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 7 | Search circle: opens slowly; on close it collapses mid-bar, then slides over | Buttons tab, search | Open |
 | 8 | The PDF page's top corners are rounded off | Finished invoice, "The PDF" | Open |
 | 9 | More space below New Invoice than above it | Invoices | Open |
-| 10 | The Buttons title sits further left than the other tabs' titles | Buttons tab | Open |
+| 10 | The Buttons title sits further left than the other tabs' titles | Buttons tab | Fixed; Caleb to check |
 
 ## 1. Grey strip under the tab bar as the keyboard goes away
 
@@ -77,6 +77,26 @@ bar (`safeAreaBar`), part of the page.
 all three tabs stay identical), so the title moves with the page. Then watch the push and
 pop, including the back swipe: the Invoices page hides the navigation bar and the invoice
 screen shows its own, and that bar's appearance should look clean while sliding.
+
+**Fixed** (Oct 8, 2026): on iOS 26, `shrinkingTitle` (Invoices and Settings) now draws the
+title in our own bar like the Buttons tab, and hides the navigation bar. Both bars share one
+row (`BarRow` in Platform.swift), so all three tabs line up (nit 10). Before iOS 26 nothing
+changes. Settings' form lost the 35 points above its first card when the navigation bar went
+away; `contentMargins` puts them back.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, recording at 30 fps):
+
+- Opening Invoice 0260819 from the list (11.27–11.73 s): "Hello, Daphné." slides left with
+  the page. The invoice's bar (‹, "Invoice 0260819", ⋯, Share) fades in over the first
+  frames as it did before, overlapping the sliding greeting for about 0.1 s.
+- Back button on Invoice 0260903 (18.37–18.77 s): the greeting slides in from the left with
+  its page; the invoice's bar slides out with its page.
+- Back swipe (13.4–14.6 s): the greeting follows the finger with the page.
+- At rest, nothing moved: Invoices title at x 22.0, subtitle baseline y 117.3, New Invoice
+  y 139.3–201.3, "Paid" at y 233.3; Settings title x 21.3, first card's text at y 187.3. All
+  the same as before.
+- Scrolling still shrinks the title on Invoices, with the same frosted edge under the bar as
+  the Buttons tab.
 
 ## 3. The receipt photo can't be opened full size to check the amount
 
@@ -453,3 +473,13 @@ starts a little further left than H by its shape.
 - If nit 2 moves Invoices and Settings onto the Buttons tab's own bar, set the inset once
   there instead.
 - Check on iPad too, where the bar's insets differ.
+
+**Fixed** (Oct 8, 2026, with nit 2): all three tabs' titles are now in the same row of our
+own bar, in from the edges by the screen's system margin (UIKit's
+`systemMinimumLayoutMargins`, the one navigation bars and lists use: 20 points on this
+iPhone, 16 on most others) instead of a fixed 16. The search and + circles moved in by the
+same 4 points, level with the right edge of the list cards.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max): Buttons title now at x 22.0, the same
+as Invoices (22.0); Settings 21.3 as before. The + circle's right edge is at x 410.5, the
+cards' right edge at about 409.5. Not checked: iPad, and an iPhone with 16-point margins.

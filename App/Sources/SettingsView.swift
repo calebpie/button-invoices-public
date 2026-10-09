@@ -94,6 +94,9 @@ struct SettingsView: View {
                 Text("Everything is kept on this device and included in its iCloud Backup. The bank numbers are kept in the device's keychain.")
             }
         }
+        // With the title in our own bar (iOS 26) the form starts right under it; this puts
+        // back the 35 points it had under the navigation bar (Docs/ui-nits.md, nit 2).
+        .contentMargins(.top, ownTitleBar ? 35 : 0, for: .scrollContent)
         .shrinkingTitle("Settings")
         .readableWidth()
         .quickLookPreview($preview)

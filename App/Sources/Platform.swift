@@ -134,13 +134,13 @@ private struct SearchTitleBar: ViewModifier {
             // Kept for VoiceOver and the app switcher; the bar below draws it.
             .navigationTitle(title)
             .toolbar(.hidden, for: .navigationBar)
-            // The same frosted edge as the navigation bar on the other tabs.
+            // The system's frosted scroll edge, like a navigation bar's.
             .safeAreaBar(edge: .top) { bar }
     }
 
     private var bar: some View {
         GlassEffectContainer(spacing: 10) {
-            HStack(spacing: 10) {
+            BarRow {
                 if searching {
                     field
                     circle("Close Search", systemImage: "xmark", id: "trailing", action: close)
@@ -154,10 +154,6 @@ private struct SearchTitleBar: ViewModifier {
                            action: action.perform)
                 }
             }
-            // Level with the navigation bar's title on the other tabs.
-            .frame(height: 44)
-            .padding(.horizontal, 16)
-            .padding(.bottom, 10)
         }
         .leavesTapsToItsControls()
     }
@@ -311,23 +307,88 @@ extension View {
     }
 }
 
+/// Whether `shrinkingTitle` draws the title in our own bar rather than the navigation bar.
+var ownTitleBar: Bool {
+    if #available(iOS 26.0, *) { true } else { false }
+}
+
 private struct ShrinkingTitle: ViewModifier {
     let title: String
     @State private var progress: CGFloat = 0
 
     func body(content: Content) -> some View {
-        content
-            .titleProgress($progress)
-            // Kept for VoiceOver and the app switcher; drawn by the item below instead.
-            .navigationTitle(title)
-            .toolbarTitleDisplayMode(.inline)
-            .toolbar(removing: .title)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    TitleText(title: title, progress: progress)
+        if #available(iOS 26.0, *) {
+            // On iOS 26 in our own bar, like the Buttons tab's (`searchTitleBar`), so the
+            // title slides with the page when a screen opens over it. In the navigation bar
+            // iOS faded it out in place instead (Docs/ui-nits.md, nit 2).
+            content
+                .titleProgress($progress)
+                // Kept for VoiceOver and the app switcher; the bar below draws it.
+                .navigationTitle(title)
+                .toolbar(.hidden, for: .navigationBar)
+                .safeAreaBar(edge: .top) {
+                    BarRow {
+                        TitleText(title: title, progress: progress)
+                        Spacer(minLength: 0)
+                    }
                 }
-                .hidingSharedBackground()
-            }
+        } else {
+            content
+                .titleProgress($progress)
+                // Kept for VoiceOver and the app switcher; drawn by the item below instead.
+                .navigationTitle(title)
+                .toolbarTitleDisplayMode(.inline)
+                .toolbar(removing: .title)
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        TitleText(title: title, progress: progress)
+                    }
+                    .hidingSharedBackground()
+                }
+        }
+    }
+}
+
+/// A tab's own top bar row: 44 points tall and level with a navigation bar's title, in from
+/// the screen's edges by the same margins as a navigation bar's items and the list's rows
+/// (16 points on most iPhones, 20 on the largest), so every tab's title starts at the same
+/// place (Docs/ui-nits.md, nit 10).
+private struct BarRow<Content: View>: View {
+    @ViewBuilder let content: Content
+    @State private var margin: CGFloat = 16
+
+    var body: some View {
+        HStack(spacing: 10) { content }
+            .frame(height: 44)
+            .padding(.horizontal, margin)
+            .padding(.bottom, 10)
+            .background(SystemMargin(margin: $margin))
+    }
+}
+
+/// The screen's system minimum layout margin, the one UIKit's bars and lists use.
+private struct SystemMargin: UIViewRepresentable {
+    @Binding var margin: CGFloat
+
+    func makeUIView(context: Context) -> Reader {
+        let reader = Reader()
+        reader.isUserInteractionEnabled = false
+        return reader
+    }
+
+    func updateUIView(_ reader: Reader, context: Context) {
+        reader.report = { new in if margin != new { margin = new } }
+    }
+
+    final class Reader: UIView {
+        var report: ((CGFloat) -> Void)?
+
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            guard let leading = window?.rootViewController?.systemMinimumLayoutMargins.leading else { return }
+            // Not during the layout pass that asked for it.
+            DispatchQueue.main.async { [report] in report?(leading) }
+        }
     }
 }
 
