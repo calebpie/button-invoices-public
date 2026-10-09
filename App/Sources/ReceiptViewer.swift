@@ -37,7 +37,8 @@ struct ReceiptViewer: View {
                                 }
                             }
                         }
-                        .padding()
+                        .padding(.vertical)
+                        .systemHorizontalMargin()
                         .background(.bar)
                     }
                 }

@@ -105,7 +105,8 @@ struct ReviewStep: View {
                 Text("The PDF").font(.headline).heading()
                 PDFPages(pages: pages) { fullScreen = pdfURL }
             }
-            .padding()
+            .padding(.vertical)
+            .systemHorizontalMargin()
             .frame(maxWidth: 760)
             .frame(maxWidth: .infinity)
         }

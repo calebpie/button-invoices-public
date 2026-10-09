@@ -373,7 +373,8 @@ struct NewButtonMatchStep: View {
                 .prominentButton()
                 .disabled(checking)
             }
-            .padding()
+            .padding(.vertical)
+            .systemHorizontalMargin()
             .frame(maxWidth: 760)
             .frame(maxWidth: .infinity)
         }
@@ -564,7 +565,8 @@ struct NewButtonReviewStep: View {
                 Text("To change anything, go back a step.").font(.footnote).foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
             }
-            .padding()
+            .padding(.vertical)
+            .systemHorizontalMargin()
             .frame(maxWidth: 760)
             .frame(maxWidth: .infinity)
         }
@@ -604,7 +606,8 @@ struct ShapeChoiceView: View {
                 Button { pick(nil) } label: { newShapeTile }
                     .buttonStyle(.plain)
             }
-            .padding()
+            .padding(.vertical)
+            .systemHorizontalMargin()
         }
         // The plain background, as in Add a Button, so the tiles' cards show.
         .background(Color(.systemBackground))

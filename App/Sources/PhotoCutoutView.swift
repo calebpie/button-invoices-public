@@ -62,16 +62,16 @@ struct PhotoCutoutView: View {
         if let cutout, !touchingUp {
             if cutout.objectMasks.count > 1 {
                 Label("There are \(cutout.objectMasks.count) buttons in this photo. Tap the one to keep.", systemImage: "hand.tap")
-                    .padding(.horizontal)
+                    .systemHorizontalMargin()
             } else if cutout.usedColorFallback {
                 Label("The background was removed by color. Use Touch Up if anything is missing.", systemImage: "info.circle")
-                    .padding(.horizontal)
+                    .systemHorizontalMargin()
             } else {
-                Text("Background removed. Use Touch Up to fix any edges.").padding(.horizontal)
+                Text("Background removed. Use Touch Up to fix any edges.").systemHorizontalMargin()
             }
         } else if touchingUp {
             Text(restoring ? "Paint over parts of the button to bring them back." : "Paint over leftover background to erase it.")
-                .padding(.horizontal)
+                .systemHorizontalMargin()
         }
     }
 
@@ -102,7 +102,7 @@ struct PhotoCutoutView: View {
                                  including: !touchingUp && (cutout?.objectMasks.count ?? 0) > 1 ? .all : .subviews)
             .position(x: geo.size.width / 2, y: geo.size.height / 2)
         }
-        .padding(.horizontal)
+        .systemHorizontalMargin()
     }
 
     @ViewBuilder private var controls: some View {
@@ -134,7 +134,7 @@ struct PhotoCutoutView: View {
                     }
                 }
             }
-            .padding(.horizontal)
+            .systemHorizontalMargin()
         } else {
             VStack(spacing: 10) {
                 Button {
@@ -157,7 +157,7 @@ struct PhotoCutoutView: View {
                 }
                 .buttonStyle(.bordered)
             }
-            .padding(.horizontal)
+            .systemHorizontalMargin()
         }
     }
 

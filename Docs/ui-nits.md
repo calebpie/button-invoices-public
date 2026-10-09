@@ -29,7 +29,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 20 | Picking a saved shape leaves size "One size" and price empty, so a near-duplicate is easy | New Button step 3 | Fixed; Caleb to check |
 | 21 | "Change" buttons are 24 points tall | Invoice step 3, Review | Fixed; Caleb to check |
 | 22 | "Already Saved" reads like a label, and the two card buttons differ in size | New Button step 2 | Fixed; Caleb to check |
-| 23 | Side margins are 16 points on some screens and 20 on others | Draft bars, Review, Add a Button, new-button steps, photo | Open (UX review; polish) |
+| 23 | Side margins are 16 points on some screens and 20 on others | Draft bars, Review, Add a Button, new-button steps, photo | Fixed; Caleb to check |
 | 24 | Remove Shipping hangs under the bare Save button, with square corners and no icon | Shipping sheet (changing a charge) | Open (UX review; polish) |
 | 25 | Unreached steps in the step bar are 1.6:1, too faint to read | Draft step bar | Open (UX review; polish) |
 | 26 | Invoice rows wrap "of buttons" onto a third line | Invoices list | Open (UX review; polish) |
@@ -1121,6 +1121,32 @@ Shots 01, 06, 07, 18, 29, 30.
 question's leading inset 0.
 
 **Severity:** polish.
+
+**Fix** (Caleb approved): `.systemHorizontalMargin()` (Platform.swift) pads left and right
+by the screen's system margin, the one lists and bars use (20 on her iPhone, 16 on smaller
+ones); `SystemMargin.current` gives it from the first frame, so nothing shifts 4 points
+after appearing. Used instead of the 16-point `.padding()` / `.padding(.horizontal)` in the
+draft's bottom bar and step bar, Review, Add a Button's grid and colors-and-sizes screen,
+New Button steps 2 and 4, Which shape?, the photo cutout (7 places) and the receipt viewer's
+amount bar. The question under "Hello, Daphné." has leading inset 0. No 16-point horizontal
+padding is left (`grep '.padding()$\|.padding(.horizontal)$' App/Sources` finds none).
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, 3x screenshots; left / right edge where
+a card or control meets the background, points):
+
+| Screen | Before | After |
+|---|---|---|
+| Review cards (light, 73-nit23-draft-light; dark, 77-nit23-review-dark) | 16.0 / 414.0 | 20.0 / 410.0 |
+| Draft bottom bar, Finish's right end | 414.0 | 410.0 |
+| Add a Button grid (74-nit23-add-button-light), still 3 tiles a row | 16.3 / 413.7 | 20.0 / 410.0 |
+| Photo cutout, photo and buttons (75-nit23-cutout-light) | 16 | 20.0 / 410.0 |
+| New Button step 2 cards (76-nit23-step2-light) | 16.0 / 414.0 | 20.0 / 410.0 |
+| "What would you like to do today?" ink (72-nit23-invoices-light), title at 22.0 | 26.0 | 23.0 |
+
+The question's 1 point past the title is the letters' own side bearings (W vs H).
+
+**Check** (Caleb, iPhone): go from the Invoices list into a draft and to Review; the cards
+shouldn't change width.
 
 ## 24. Remove Shipping hangs under the bare Save button, with square corners and no icon
 

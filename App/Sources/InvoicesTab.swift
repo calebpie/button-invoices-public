@@ -30,7 +30,8 @@ struct InvoicesTab: View {
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
                         // As much room above New Invoice as the list leaves below it (nit 9).
-                        .listRowInsets(EdgeInsets(top: 0, leading: 4, bottom: 26, trailing: 4))
+                        // Leading 0: level with the title above it (nit 23).
+                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 26, trailing: 0))
                     Button(action: newInvoice) {
                         Label("New Invoice", systemImage: "plus.circle.fill")
                             .font(.title3.weight(.semibold))

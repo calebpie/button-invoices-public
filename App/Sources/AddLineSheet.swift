@@ -147,7 +147,8 @@ struct ShapePickerView: View {
                 }
                 .padding(.top, 8)
             }
-            .padding()
+            .padding(.vertical)
+            .systemHorizontalMargin()
             .padding(.bottom, ownKeyboardRoom ? keyboardHeight : 0)
             .frame(maxWidth: 760)
             .frame(maxWidth: .infinity)
@@ -286,7 +287,8 @@ struct VariantPickerView: View {
 
                 result
             }
-            .padding()
+            .padding(.vertical)
+            .systemHorizontalMargin()
             .frame(maxWidth: 760)
             .frame(maxWidth: .infinity)
         }

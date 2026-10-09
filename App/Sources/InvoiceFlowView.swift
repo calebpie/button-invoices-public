@@ -158,7 +158,7 @@ struct InvoiceFlowView: View {
                 }
             }
         }
-        .padding(.horizontal)
+        .systemHorizontalMargin()
         .padding(.vertical, 10)
         .frame(maxWidth: 760)
         .frame(maxWidth: .infinity)
@@ -233,7 +233,7 @@ struct StepIndicator: View {
                 }
             }
         }
-        .padding(.horizontal)
+        .systemHorizontalMargin()
         .padding(.vertical, 6)
         .frame(maxWidth: 760)
         .frame(maxWidth: .infinity)

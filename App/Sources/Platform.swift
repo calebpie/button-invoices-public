@@ -381,7 +381,7 @@ private struct ShrinkingTitle: ViewModifier {
 /// place (Docs/ui-nits.md, nit 10).
 private struct BarRow<Content: View>: View {
     @ViewBuilder let content: Content
-    @State private var margin: CGFloat = 16
+    @State private var margin = SystemMargin.current
 
     var body: some View {
         HStack(spacing: 10) { content }
@@ -392,9 +392,34 @@ private struct BarRow<Content: View>: View {
     }
 }
 
+extension View {
+    /// Left and right padding equal to the screen's system margin, the one lists and bars
+    /// use (20 points on her iPhone, 16 on smaller ones), so every screen's edges line up
+    /// (nit 23).
+    func systemHorizontalMargin() -> some View { modifier(SystemHorizontalMargin()) }
+}
+
+private struct SystemHorizontalMargin: ViewModifier {
+    @State private var margin = SystemMargin.current
+
+    func body(content: Content) -> some View {
+        content
+            .padding(.horizontal, margin)
+            .background(SystemMargin(margin: $margin))
+    }
+}
+
 /// The screen's system minimum layout margin, the one UIKit's bars and lists use.
 private struct SystemMargin: UIViewRepresentable {
     @Binding var margin: CGFloat
+
+    /// The margin now, so a view starts at the right place instead of moving 4 points once
+    /// the reader reports.
+    @MainActor static var current: CGFloat {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        return scenes.flatMap(\.windows).first { $0.isKeyWindow }?.rootViewController?
+            .systemMinimumLayoutMargins.leading ?? 16
+    }
 
     func makeUIView(context: Context) -> Reader {
         let reader = Reader()
