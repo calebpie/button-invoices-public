@@ -129,21 +129,9 @@ struct InvoiceFlowView: View {
                 }
                 .accessibilityElement(children: .combine)
             } trailing: {
+                // No step-back button here: a second ‹ beside the bar's ‹ went somewhere else
+                // (nit 15). The step bar above goes back a step.
                 HStack(spacing: 12) {
-                    if let previous = FlowStep(rawValue: step.rawValue - 1) {
-                        Button { step = previous } label: {
-                            Label("Back", systemImage: "chevron.backward")
-                                .labelStyle(.iconOnly)
-                                .font(.headline)
-                                .frame(minWidth: 36, minHeight: 36)
-                        }
-                        .buttonStyle(.bordered)
-                        .buttonBorderShape(.circle)
-                        .accessibilityLabel("Back to \(previous.title)")
-                        .accessibilityShowsLargeContentViewer {
-                            Label("Back to \(previous.title)", systemImage: "chevron.backward")
-                        }
-                    }
                     if let next = FlowStep(rawValue: step.rawValue + 1) {
                         Button { step = next } label: {
                             Label("Next", systemImage: "chevron.forward")

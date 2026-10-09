@@ -139,8 +139,8 @@ Three tabs at the bottom: **Invoices**, **Buttons**, **Settings**.
    Messages or Mail.
 
 Everything is saved as she goes. The back arrow at the top left (or a swipe from the left
-edge of the screen) returns to the Invoices tab, where the draft waits under Drafts; the
-round **‹** button at the bottom goes back one step. In a form that slides up from the
+edge of the screen) returns to the Invoices tab, where the draft waits under Drafts; tap a step in the step
+bar at the top (**1 Buttons**, **2 Shipping**) to go back one. In a form that slides up from the
 bottom, **✕** at the top left cancels (it asks first if she typed something) and **✓** at
 the top right saves. Finished invoices are listed on the Invoices tab too; tap one to share
 its PDF again or mark it paid. Touch and hold an invoice for **Duplicate** (a new draft

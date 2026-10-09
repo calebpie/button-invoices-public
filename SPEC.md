@@ -172,8 +172,8 @@ finished PDF byte-identical and the line "Heart, Navy, Medium $4.00".
 ## Making an invoice
 
 Three steps with a step bar at the top, a one-line instruction on each, and a bar at the
-bottom with the running total ("saved"), Back to the previous step and Next (Finish on
-the last step). The standard back button at the top left (or a swipe from the left edge)
+bottom with the running total ("saved") and Next (Finish on the last step); the step bar
+goes back a step, so there is no second ‹ beside Next. The standard back button at the top left (or a swipe from the left edge)
 returns to the Invoices list; everything is already saved, so there is no Save & Exit.
 The tab bar stays visible. The ⋯ menu at the top right has Delete Draft…. She can go back
 to any step, and forward to any step whose earlier steps are complete; Next is disabled

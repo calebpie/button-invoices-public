@@ -21,7 +21,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 12 | A discount bigger than the price shows a negative line total, and Add is greyed out with no reason | Quantity screen | Fixed; Caleb to check |
 | 13 | "Add a Button" means two different things | Invoice step 1; Home Screen, Siri, Buttons + | Fixed (spec changed); Caleb to check |
 | 14 | The missing-bank-details warning sends her to "Home → Business details", which doesn't exist | Invoice step 3, Review | Fixed; Caleb to check |
-| 15 | Two ‹ back buttons on a draft, each going somewhere different | Draft invoice | Open (UX review; confuses her) |
+| 15 | Two ‹ back buttons on a draft, each going somewhere different | Draft invoice | Fixed (spec changed); Caleb to check |
 | 16 | Questions show only the red button; "Keep Editing" and Cancel never appear | Discard and Delete questions | Open (UX review; confuses her) |
 | 17 | The orange "why can't I go on" text is 2.1:1 in light mode | New Button step 3, Change Button | Open (UX review; confuses her) |
 | 18 | The big camera picture on the photo step looks tappable but does nothing | New Button step 1 | Open (UX review; confuses her) |
@@ -844,6 +844,19 @@ consistent."
 or drop it and let the step bar be the way back, as it already is.
 
 **Severity:** confuses her.
+
+**Fix** (Caleb chose to remove it): the ‹ circle beside Next / Finish is gone
+(InvoiceFlowView.swift); the bottom bar is the total and Next or Finish. The top-left ‹ is
+the only back button, and the step bar goes back a step. SPEC.md ("Making an invoice") listed
+"Back to the previous step" in the bottom bar, so it and the README now say the step bar does
+it.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light): Duplicate of Invoice 0260903
+opens on step 2 with the total and Next only (shot 55-nit15-step2-one-back-light); tapping
+**1 Buttons** in the step bar went back to step 1.
+
+**Check** (Caleb, iPhone): on step 2 or 3 of a draft, one ‹ (top left); tap **1 Buttons** or
+**2 Shipping** at the top to go back a step.
 
 ## 16. Questions show only the red button; "Keep Editing" and Cancel never appear
 
