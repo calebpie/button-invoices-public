@@ -24,53 +24,17 @@ struct CatalogView: View {
     }
 
     var body: some View {
-        List {
-            if search.isEmpty {
-                ForEach(designs) { design in
-                    let active = design.visibleVariants
-                    if !active.isEmpty {
-                        Section {
-                            ForEach(active) { row($0) }
-                        } header: {
-                            HStack {
-                                Text(design.name)
-                                Text("\(active.count)").foregroundStyle(.secondary)
-                                Spacer()
-                                Menu {
-                                    Button("Add Color or Size…", systemImage: "plus") {
-                                        adding = NewButton(design: design)
-                                    }
-                                    Button("Rename…", systemImage: "pencil") {
-                                        newName = design.name
-                                        renaming = design
-                                    }
-                                    Button("Archive Shape", systemImage: "archivebox") {
-                                        Undo.perform("Archive \(design.name)", context, .setHidden(design.variants ?? [], true))
-                                    }
-                                } label: {
-                                    Image(systemName: "ellipsis.circle").font(.title3)
-                                        .frame(minWidth: 44, minHeight: 44)
-                                }
-                                .accessibilityLabel("\(design.name) options")
-                                .textCase(nil)
-                            }
-                        }
-                    }
-                }
-                if !archived.isEmpty {
-                    Section(isExpanded: $showArchived) {
-                        ForEach(archived) { row($0) }
-                    } header: {
-                        Text("Archived (\(archived.count))")
-                    }
-                }
-            } else {
-                Section {
-                    ForEach(Catalog.search(search, in: variants, includeArchived: true)) { row($0) }
-                }
+        // The results lie over the whole list instead of replacing it, as iOS's own search
+        // results do: the list stays drawn underneath, so ✕ uncovers it at once. Rebuilding
+        // it then held the search field still for 0.1 s, and rebuilding it after the field
+        // had closed left the results under the title for 0.25 s (Docs/ui-nits.md, nit 1).
+        ZStack {
+            catalog
+                .accessibilityHidden(!search.isEmpty)
+            if !search.isEmpty {
+                results
             }
         }
-        .listStyle(.insetGrouped)
         // Search and add as circles level with the title, there at any scroll position:
         // symbols, add the prominent one (Toolbars, "Prefer simple, recognizable symbols";
         // "Use the .prominent style for key actions").
@@ -82,8 +46,6 @@ struct CatalogView: View {
             if variants.isEmpty {
                 ContentUnavailableView("No Buttons Yet", systemImage: "circle.grid.2x2",
                                        description: Text("Tap + to save your first one."))
-            } else if !search.isEmpty, Catalog.search(search, in: variants, includeArchived: true).isEmpty {
-                ContentUnavailableView.search(text: search)
             }
         }
         .readableWidth()
@@ -104,6 +66,65 @@ struct CatalogView: View {
         }
     }
 
+    private var catalog: some View {
+        List {
+            ForEach(designs) { design in
+                let active = design.visibleVariants
+                if !active.isEmpty {
+                    Section {
+                        ForEach(active) { row($0) }
+                    } header: {
+                        HStack {
+                            Text(design.name)
+                            Text("\(active.count)").foregroundStyle(.secondary)
+                            Spacer()
+                            Menu {
+                                Button("Add Color or Size…", systemImage: "plus") {
+                                    adding = NewButton(design: design)
+                                }
+                                Button("Rename…", systemImage: "pencil") {
+                                    newName = design.name
+                                    renaming = design
+                                }
+                                Button("Archive Shape", systemImage: "archivebox") {
+                                    Undo.perform("Archive \(design.name)", context, .setHidden(design.variants ?? [], true))
+                                }
+                            } label: {
+                                Image(systemName: "ellipsis.circle").font(.title3)
+                                    .frame(minWidth: 44, minHeight: 44)
+                            }
+                            .accessibilityLabel("\(design.name) options")
+                            .textCase(nil)
+                        }
+                    }
+                }
+            }
+            if !archived.isEmpty {
+                Section(isExpanded: $showArchived) {
+                    ForEach(archived) { row($0) }
+                } header: {
+                    Text("Archived (\(archived.count))")
+                }
+            }
+        }
+        .listStyle(.insetGrouped)
+    }
+
+    private var results: some View {
+        let found = Catalog.search(search, in: variants, includeArchived: true)
+        return List {
+            Section {
+                ForEach(found) { row($0, inSearch: true) }
+            }
+        }
+        .listStyle(.insetGrouped)
+        .overlay {
+            if found.isEmpty {
+                ContentUnavailableView.search(text: search)
+            }
+        }
+    }
+
     /// The Add a Button quick action and App Shortcut open the new-button steps here.
     private func handleRequest() {
         guard router.request == .newButton else { return }
@@ -115,7 +136,8 @@ struct CatalogView: View {
         variants.filter(\.isHidden).sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
     }
 
-    private func row(_ variant: ButtonVariant) -> some View {
+    /// In the results a row shows its whole name, as there's no shape heading above it.
+    private func row(_ variant: ButtonVariant, inSearch: Bool = false) -> some View {
         Button {
             editing = variant
         } label: {
@@ -123,7 +145,7 @@ struct CatalogView: View {
                 IconTextStack {
                     ButtonPhoto(data: variant.photo, side: 52)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(search.isEmpty && !variant.isHidden ? variantName(variant) : variant.title)
+                        Text(!inSearch && !variant.isHidden ? variantName(variant) : variant.title)
                             .font(.body.weight(.medium))
                         Text(variant.sku).font(.subheadline.monospaced()).foregroundStyle(.secondary)
                     }

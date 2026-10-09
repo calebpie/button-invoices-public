@@ -228,10 +228,11 @@ private struct SearchTitleBar: ViewModifier {
 
     private func close() {
         focused = false
-        // The text clears once the field has closed: clearing it brings back the whole
-        // list, and drawing that at the start held the field still for 0.1 s (nit 7).
-        // Not if she has opened it again meanwhile.
-        withAnimation(motion) { searching = false } completion: { if !searching { text = "" } }
+        // The text clears at once. The Buttons tab lays its results over its list, so this
+        // uncovers the list rather than redrawing it, which held the field still for 0.1 s
+        // (nits 1 and 7).
+        text = ""
+        withAnimation(motion) { searching = false }
     }
 }
 

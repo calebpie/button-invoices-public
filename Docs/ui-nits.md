@@ -7,7 +7,7 @@ to try. App code isn't changed for a nit until the bug bash.
 
 | # | Nit | Where | Status |
 |---|---|---|---|
-| 1 | Grey strip under the tab bar as the keyboard goes away | Buttons, search | Open |
+| 1 | Grey strip under the tab bar as the keyboard goes away | Buttons, search | Fixed (the list); strip left as iOS's; Caleb to check |
 | 2 | "Hello, Daphné." fades in place instead of sliding with the page | Invoices, opening an invoice | Fixed; Caleb to check |
 | 3 | The receipt photo can't be opened full size to check the amount | Invoice step 2, Shipping | Fixed; Caleb to check |
 | 4 | Swipe-delete: the row vanishes before she confirms; after she confirms, it vanishes with no animation | Invoices list | Fixed; Caleb to check |
@@ -50,6 +50,58 @@ until it has gone.
   gone, so nothing sits over the keyboard's slide.
 - For the empty stretch: switch back to the full list only after the keyboard is down, or
   without animation.
+
+**Rechecked after nit 7** (Oct 8, 2026; iOS 27.0 Simulator, iPhone 15 Pro Max, on-screen
+keyboard, 30 fps; the tab bar spans y 851–910, so 22 points of screen show below it):
+
+| Time (s) | Keyboard's top edge, x 20 (y) | Grey below the tab bar |
+|---|---|---|
+| 11.27 | full keyboard | — |
+| 11.40 | 864 | none (the keyboard covers the tab bar) |
+| 11.43 | 897 | 22 pt, the whole gap |
+| 11.47 | 915 | 17 pt |
+| 11.50 | 925 | 7 pt |
+| 11.53 | gone | — |
+
+The empty stretch had changed with nit 7's fix, which cleared the text only once the field
+had closed: the title "Buttons" was back by 11.57 s with the three "He" results still
+under it, and the full list snapped in at 11.83 s.
+
+**Apple's own app** (Files, Recents tab, same Simulator; it has the same floating tab bar,
+and its search field and ✕ move to the top like ours): the keyboard's top edge at x 20 is
+at y 872 at 18.47 s, 901 at 18.50 (about 22 pt below its tab bar, which ends at y 909),
+917 at 18.53, 926 at 18.57, gone at 18.60. The same grey slab, the same height, gone after
+the same 3 frames. So the strip is iOS 26's look, and it stays. The keyboard is its own
+window above the app; nothing the app draws can cover its slide.
+
+**Fixed** (Oct 8, 2026; CatalogView.swift, Platform.swift `SearchTitleBar.close`), the
+list part:
+
+- The search results now lie over the whole list instead of replacing it, as iOS's own
+  search results do. The list stays drawn underneath, hidden from VoiceOver while she
+  searches, so ✕ uncovers it rather than rebuilding it.
+- ✕ clears the text at once again. Rebuilding the list was what held the field still for
+  0.1 s (nit 7); uncovering it doesn't.
+
+**Checked** (same Simulator; 🔍, "he", ✕):
+
+| | Before | After |
+|---|---|---|
+| ✕ to the full list | 0.55 s (results under the title from 11.57, list at 11.83) | one frame (results at 14.57, list at 14.60) |
+| Rows that were under the keyboard | there, as the list was drawn late | there, as the keyboard slides away |
+| ✕ to the field moving | one frame | one frame (moving from 14.63, at rest by 15.00) |
+
+Also checked:
+
+- Scrolling the list still shrinks the title, with the frosted edge under the bar.
+- "Q" still shows "No Results for "Q"". Its near-white background (f8f8f8, against the list's
+  f0f0f0) is the same as before the change.
+- Scrolled down to Crab, then 🔍, "q", ✕: the list is still at Crab, title small.
+
+**Check** (Caleb, iPhone): Buttons → 🔍, type "he", ✕: the whole list is back at once as
+the field closes, with no results left under the title and no empty space where the
+keyboard was. The grey strip under the tab bar as the keyboard leaves is still there: the
+Files app does the same.
 
 ## 2. "Hello, Daphné." fades in place instead of sliding with the page
 
@@ -425,7 +477,8 @@ Third-party guides (not Apple) suggest 0.3–0.5 s for transitions like this.
   moving inside it. The field's text fades in and out with it.
 - Both use `.smooth(duration: 0.3)` instead of `.smooth`'s 0.5 s.
 - ✕ clears the text once the field has closed, not at once: clearing it brings back the
-  whole list, and drawing that held the field still for about 0.1 s before it moved.
+  whole list, and drawing that held the field still for about 0.1 s before it moved. (Replaced in
+  nit 1: the results now lie over the list, so ✕ clears the text at once.)
 
 **Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, recordings at 30 fps):
 
