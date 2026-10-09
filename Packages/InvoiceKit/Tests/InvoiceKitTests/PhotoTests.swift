@@ -4,10 +4,13 @@ import Testing
 @testable import InvoiceKit
 
 @Suite struct PhotoTests {
+    /// Her raw photos of one button each, the ones labeled in LookAlikeTests.rawLabels. The
+    /// folder's other photos (batches of many buttons, screenshots; added Oct 8, 2026) aren't
+    /// labeled and don't fit these checks, which expect one known button filling the cutout.
     static let rawPhotos: [URL] = {
         let dir = Repo.examples.appendingPathComponent("Images/Raw")
-        return ((try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)) ?? [])
-            .filter { $0.pathExtension.lowercased() == "heic" }.sorted { $0.path < $1.path }
+        return LookAlikeTests.rawLabels.keys.sorted().map { dir.appendingPathComponent("\($0).heic") }
+            .filter { FileManager.default.fileExists(atPath: $0.path) }
     }()
 
     /// Her raw photos (Examples/Images/Raw) come out as square transparent PNGs. Writes the
