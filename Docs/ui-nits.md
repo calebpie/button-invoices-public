@@ -32,7 +32,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 23 | Side margins are 16 points on some screens and 20 on others | Draft bars, Review, Add a Button, new-button steps, photo | Fixed; Caleb to check |
 | 24 | Remove Shipping hangs under the bare Save button, with square corners and no icon | Shipping sheet (changing a charge) | Fixed; Caleb to check |
 | 25 | Unreached steps in the step bar are 1.6:1, too faint to read | Draft step bar | Fixed; Caleb to check |
-| 26 | Invoice rows wrap "of buttons" onto a third line | Invoices list | Open (UX review; polish) |
+| 26 | Invoice rows wrap "of buttons" onto a third line | Invoices list | Fixed; Caleb to check |
 | 27 | A 1-pixel seam crosses the Paid card | Invoices list | Open (UX review; polish) |
 | 28 | The draft's ⋯ menu holds one item | Draft invoice | Open (UX review; polish) |
 | 29 | Same thing, different words: Town / City, No price / No price yet / $0.00, alert capitals | Settings, Buttons, New Button | Open (UX review; polish) |
@@ -1235,6 +1235,15 @@ read."
 own line.
 
 **Severity:** polish.
+
+**Fix** (Caleb chose two lines): the row's detail is two lines, "Sep 3, 2026" and "2 kinds
+of buttons" ("1 kind of button" for one) (InvoicesTab.swift). Rows are as tall as before.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light): every row reads number, date,
+count, with nothing wrapped, including "10 kinds of buttons" beside $976.90 (shot
+85-nit26-rows-light). Both lines #7F7F7F on white, 4.00:1, as before.
+
+**Check** (Caleb, iPhone): the Invoices list; no row has a line with only "of buttons".
 
 ## 27. A 1-pixel seam crosses the Paid card
 

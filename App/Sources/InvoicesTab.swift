@@ -210,7 +210,8 @@ struct InvoiceRow: View {
 
     private struct Summary: Equatable {
         var total: String
-        var detail: String
+        var date: String
+        var kinds: String
     }
 
     var body: some View {
@@ -223,7 +224,10 @@ struct InvoiceRow: View {
                     .frame(minWidth: 32)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Invoice \(invoice.number)").font(.headline)
-                    Text(summary.detail).font(.subheadline).foregroundStyle(.secondary)
+                    // Date and count on their own lines: as one line beside the total it
+                    // wrapped "of buttons" onto a line by itself (nit 26).
+                    Text(summary.date).font(.subheadline).foregroundStyle(.secondary)
+                    Text(summary.kinds).font(.subheadline).foregroundStyle(.secondary)
                 }
             }
         } trailing: {
@@ -246,13 +250,10 @@ struct InvoiceRow: View {
     }
 
     private var current: Summary {
-        Summary(total: invoice.total.formatted, detail: detail)
-    }
-
-    private var detail: String {
-        let date = invoice.date.formatted(.dateTime.day().month(.abbreviated).year())
         let kinds = invoice.sortedLines.count
-        return "\(date) · \(kinds == 1 ? "1 kind" : "\(kinds) kinds") of buttons"
+        return Summary(total: invoice.total.formatted,
+                       date: invoice.date.formatted(.dateTime.day().month(.abbreviated).year()),
+                       kinds: kinds == 1 ? "1 kind of button" : "\(kinds) kinds of buttons")
     }
 }
 
