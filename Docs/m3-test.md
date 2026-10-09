@@ -57,3 +57,28 @@ on her iPhone with her saved data seeded, as in Part 1, step 1.
 1. She makes her next invoice for Alix of Bohemia in the app, with her own photos.
 2. Before it goes to AOB, she sends you the PDF; check it against her messages and the
    buttons she shipped. Record what she found confusing, even where it worked.
+
+## Part 4: UX review checks on your iPhone (Oct 9, 2026)
+
+What the UX review (Docs/ui-nits.md, nits 11–35) couldn't see in the Simulator: Vision's
+cutout and photo matching, loading a photo from iCloud, and the on-screen keyboard. Use the
+strawberry photo from Part 1, step 2. Record what you see, and screenshots where something
+looks off.
+
+1. Buttons tab → **Crab** heading's **⋯** → **Add Color or Size…** → **Choose from Photos** →
+   the strawberry → **Use This Photo** → **Next**. Expected: a list of look-alike buttons with
+   **Strawberry, Red / Green** first, then "Your saved Crab buttons:". Note: whether each
+   card's two buttons fit side by side or wrap (nit 22), and how the heading reads.
+   Swipe the sheet down → **Discard Changes**.
+2. **+** → **Choose from Photos** → a photo that is only in iCloud (an old one, or one taken on
+   another device). Expected: something on screen while it downloads. Note how many seconds
+   pass between tapping the photo and the cutout screen, and whether anything shows meanwhile.
+   **✕** at the top left.
+3. Invoices tab → **New Invoice** → **Add a Button** → **Heart** → **Red** → **Use This Button**.
+   Tap the quantity, then **Add Discount** and the discount field. Expected: the number pad,
+   with each field's whole row above it; tapping the heart photo puts it away. Note anything
+   hidden under the keyboard.
+4. Tap **Add to Invoice**, then tap the heart line to change it, change the quantity and swipe
+   the sheet down. Note the question's buttons: is there a **Keep Editing** (nit 16)? Tap
+   outside the question; the sheet should stay. Tap **✕** → **Discard Changes**.
+5. **⋯ → Delete Draft…**: note the question's buttons again, then tap **Delete Draft**.

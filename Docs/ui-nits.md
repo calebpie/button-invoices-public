@@ -17,6 +17,31 @@ to try. App code isn't changed for a nit until the bug bash.
 | 8 | The PDF page's top corners are rounded off | Finished invoice, "The PDF" | Fixed; Caleb to check |
 | 9 | More space below New Invoice than above it | Invoices | Fixed; Caleb to check |
 | 10 | The Buttons title sits further left than the other tabs' titles | Buttons tab | Fixed; Caleb to check |
+| 11 | "Archived (1)" can't be opened, so archived buttons can't be seen or unarchived from the list | Buttons tab | Open (UX review; blocks her) |
+| 12 | A discount bigger than the price shows a negative line total, and Add is greyed out with no reason | Quantity screen | Open (UX review; confuses her) |
+| 13 | "Add a Button" means two different things | Invoice step 1; Home Screen, Siri, Buttons + | Open (UX review; confuses her) |
+| 14 | The missing-bank-details warning sends her to "Home → Business details", which doesn't exist | Invoice step 3, Review | Open (UX review; confuses her) |
+| 15 | Two ‹ back buttons on a draft, each going somewhere different | Draft invoice | Open (UX review; confuses her) |
+| 16 | Questions show only the red button; "Keep Editing" and Cancel never appear | Discard and Delete questions | Open (UX review; confuses her) |
+| 17 | The orange "why can't I go on" text is 2.1:1 in light mode | New Button step 3, Change Button | Open (UX review; confuses her) |
+| 18 | The big camera picture on the photo step looks tappable but does nothing | New Button step 1 | Open (UX review; confuses her) |
+| 19 | Step 3 picks the shape from a list of 20 names, no photos | New Button step 3, Change Button | Open (UX review; confuses her; spec) |
+| 20 | Picking a saved shape leaves size "One size" and price empty, so a near-duplicate is easy | New Button step 3 | Open (UX review; confuses her) |
+| 21 | "Change" buttons are 24 points tall | Invoice step 3, Review | Open (UX review; confuses her) |
+| 22 | "Already Saved" reads like a label, and the two card buttons differ in size | New Button step 2 | Open (UX review; confuses her) |
+| 23 | Side margins are 16 points on some screens and 20 on others | Draft bars, Review, Add a Button, new-button steps, photo | Open (UX review; polish) |
+| 24 | Remove Shipping hangs under the bare Save button, with square corners and no icon | Shipping sheet (changing a charge) | Open (UX review; polish) |
+| 25 | Unreached steps in the step bar are 1.6:1, too faint to read | Draft step bar | Open (UX review; polish) |
+| 26 | Invoice rows wrap "of buttons" onto a third line | Invoices list | Open (UX review; polish) |
+| 27 | A 1-pixel seam crosses the Paid card | Invoices list | Open (UX review; polish) |
+| 28 | The draft's ⋯ menu holds one item | Draft invoice | Open (UX review; polish) |
+| 29 | Same thing, different words: Town / City, No price / No price yet / $0.00, alert capitals | Settings, Buttons, New Button | Open (UX review; polish) |
+| 30 | The line total, the number that matters, is in grey | Quantity screen | Open (UX review; polish) |
+| 31 | Red, burgundy and brown dots vanish on picked (orange) color chips | New Button step 3, Change Button | Open (UX review; polish) |
+| 32 | Two prominent confirm buttons on one sheet | Add to Invoice, Change Line, Change Button, Shipping, photo | Open (UX review; polish; spec) |
+| 33 | The receipt viewer closes with ✓, though nothing is confirmed | Receipt viewer | Open (UX review; polish) |
+| 34 | The PDF page is a picture with a tap, not a button: no press feedback | Review, finished invoice | Open (UX review; polish) |
+| 35 | Saved-color captions under the shape are cut off ("Burgundy,…") | New Button step 3, Change Button | Open (UX review; polish) |
 
 ## 1. Grey strip under the tab bar as the keyboard goes away
 
@@ -635,3 +660,433 @@ same 4 points, level with the right edge of the list cards.
 **Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max): Buttons title now at x 22.0, the same
 as Invoices (22.0); Settings 21.3 as before. The + circle's right edge is at x 410.5, the
 cards' right edge at about 409.5. Not checked: iPad, and an iPhone with 16-point margins.
+
+## The UX review (Oct 9, 2026): nits 11–35
+
+Found by Claude reviewing the app against Apple's Human Interface Guidelines as published
+on Oct 9, 2026 (Docs/ux-review/hig-checklist.md; every screen in Docs/ux-review/screens.md),
+not reported by Caleb. Checked in the iOS 27.0 Simulator, iPhone 15 Pro Max, fresh install
+with the seed data, light and dark, default text size, Bold Text off. Measurements are from
+3x screenshots, in points. Screenshots are in build/ux-review/shots (gitignored: some show
+her bank numbers); each nit names its file.
+
+- **Severity:** *blocks her* (she can't do the task), *confuses her* (she can, but is likely
+  to stall, misread or mis-tap), *polish* (looks or feels off; she'd manage).
+- **Not HIG** marks a judgment of Claude's own, with the evidence beside it.
+- **Spec** marks a nit that conflicts with SPEC.md; those are proposals for Caleb.
+- Not covered: the on-screen keyboard (the Simulator's typing tool counts as a hardware
+  keyboard and hides it; nits 1 and 6 covered keyboard motion), the empty catalog, and what
+  needs a real phone (Docs/m3-test.md, Part 4).
+
+## 11. "Archived (1)" can't be opened, so archived buttons can't be seen or unarchived from the list
+
+**Found:** Buttons tab, swipe Bunny left (Archive), scroll to the end. The list ends with
+the heading "Archived (1)" and nothing under it, with no chevron. Tapping the heading (twice,
+at x 85 and 100) does nothing. Shots 04-buttons-archived-dark, 05-buttons-archived-header-dark.
+
+**Cause:** `Section(isExpanded: $showArchived)` (CatalogView.swift:103) starts collapsed. In
+an inset-grouped list iOS draws no disclosure control on the header (it does in the sidebar
+style), so nothing can set it to true. Search does find archived buttons, and Undo brings one
+back, but SPEC.md, "Layout", says archived buttons "are listed at the bottom … and can be
+unarchived".
+
+**Guideline:** none needed: a bug against the spec. (Search finds archived buttons and offers
+Unarchive, but nothing tells her so.)
+
+**To try:** a plain section (always open), its rows dimmed as now; or a row "Show Archived
+Buttons (1)" with a chevron that opens them on their own screen.
+
+**Severity:** blocks her from browsing archived buttons; search is a hidden way round.
+
+## 12. A discount bigger than the price shows a negative line total, and Add is greyed out with no reason
+
+**Found:** quantity screen for Heart, Red, Medium ($4.00), Add Discount, Dollars, type 5.
+Line total "-$12.00", "12 × -$1.00"; ✓ and Add to Invoice go grey. Nothing says why. The
+shot (10-quantity-discount-over-price-dark) shows the field at 55: "-$612.00", "12 ×
+-$51.00".
+
+**Cause:** `isValid` refuses a discount above the price (LineEditorView.swift:214–217), but
+the line total and the warning icon don't: the orange icon shows only when the text isn't a
+number (:82). A price of 0 and an empty quantity are also refused silently.
+
+**Guideline:** Writing: display an error message "as close to the problem as possible …
+and be clear about what someone can do to fix it." (Entering data endorses greying out the
+button; the gap is the missing reason.) The invoice steps already show theirs beside Next.
+
+**To try:** under the discount, "The discount can't be more than the price ($4.00)." and
+"—" for the line total; the same one-line reason under Add to Invoice for a missing quantity
+or price.
+
+**Severity:** confuses her.
+
+## 13. "Add a Button" means two different things
+
+**Found:**
+- In a draft, **Add a Button** (InvoiceFlowView.swift:304) opens the sheet titled "Add a
+  Button" that puts a saved button on the invoice.
+- The Home Screen quick action **Add a Button** (project.yml:86), the Siri/Shortcuts action
+  of the same name (AppShortcuts.swift:18, "Adds a new button design") and the Buttons tab's +
+  (its label, CatalogView.swift:42) start the new-button steps, titled "New Button".
+- Inside the Add a Button sheet, making a new one is **Add a New Button**.
+
+**Guideline:** Writing: "Create a list of common terms, and reference that list to keep your
+language consistent."
+
+**To try:** keep **Add a Button** for putting one on an invoice (her most frequent action);
+call making one **New Button** everywhere: the quick action, the App Shortcut ("New button in
+Invoices"), the + label, and the sheet's "Add a New Button".
+
+**Severity:** confuses her (from the Home Screen, "Add a Button" lands her in a camera step,
+not on an invoice).
+
+## 14. The missing-bank-details warning sends her to "Home → Business details", which doesn't exist
+
+**Found:** ReviewView.swift:191: "The bank routing or account number is empty (Home →
+Business details)." The app's tabs are Invoices, Buttons and Settings; the fields are under
+Settings → **Payment** (SettingsView.swift:60). Read from the code: the seed has bank numbers,
+so the warning didn't show on screen.
+
+**Guideline:** Writing: "If you need to direct someone to a setting, provide a direct link or
+button, rather than trying to describe its location."
+
+**To try:** "The bank routing or account number is empty. Add them in Settings, under
+Payment." with a **Open Settings** button that switches to the Settings tab.
+
+**Severity:** confuses her.
+
+## 15. Two ‹ back buttons on a draft, each going somewhere different
+
+**Found:** on step 2 or 3 of a draft, the top-left ‹ (x 20–64, y 59–103) goes back to the
+Invoices list, and the bottom ‹ circle beside Next (about x 254–304, y 789–838 on step 3) goes to
+the previous step. Same symbol, same glass circle, different destinations. Shots
+14-step2-dark, 18-review-dark.
+
+**Guideline:** Toolbars: people know the standard Back button "lets them retrace their steps
+through a hierarchy"; Design principles, Familiarity: "Keep visuals and interactions
+consistent."
+
+**To try:** give the bottom one words, not the chevron alone: "‹ Buttons" / "‹ Shipping"
+(the earlier "Back" was cut to "Ba…", Docs/progress.md, so use the step name, which is short),
+or drop it and let the step bar be the way back, as it already is.
+
+**Severity:** confuses her.
+
+## 16. Questions show only the red button; "Keep Editing" and Cancel never appear
+
+**Found:** "Discard your changes?" (swipe down a New Button sheet, or ✕ on Change Button)
+shows a single **Discard Changes**; "Delete draft 0261009-2?" shows a single **Delete
+Draft**. The code also offers **Keep Editing** (Platform.swift:511), and Docs/progress.md
+describes it, but it isn't drawn. Tapping outside the bubble does keep editing, but nothing
+says so. Shots 05-buttons-bottom-dark,
+36-newbutton-swipe-discard-light, 39-delete-draft-question-light.
+
+**Cause:** these are confirmation dialogs anchored to a control; on iOS 26 and later they
+show as a small bubble and leave out the button with the cancel role ("Keep Editing",
+Platform.swift:511; SwiftUI's own Cancel in InvoicesTab.swift:79, InvoiceFlowView.swift:63,
+FinishedInvoiceView.swift:119 and :128, EditButtonView.swift:133).
+
+**Guideline:** Not HIG. Action sheets: "If necessary, provide a Cancel button that lets
+people reject an action that might destroy data", but it's SwiftUI's own Cancel that iOS hides
+here, and a bubble that closes on a tap outside is iOS 26's standard. The judgment: for her,
+a question whose only visible answer is the destructive one invites the wrong tap.
+
+**To try:** give Keep Editing (and a "Keep Draft" / "Keep Invoice") a normal role instead of
+`.cancel`, so it's drawn; check it appears in the bubble, below the red one. If the bubble
+still drops it, use an alert for these.
+
+**Severity:** confuses her (on the discard and delete questions the only visible choice is
+the destructive one; Make Changes isn't red but has the same gap).
+
+## 17. The orange "why can't I go on" text is 2.1:1 in light mode
+
+**Found:** New Button step 3 with no price: under the grey Next, "Enter the price for one
+button." in #FF8D28 on #F2F2F7: **2.07:1**, at 13 points. Shot 34-step3-lower-light. The same
+footer style is on Change Button (EditButtonView.swift:115) and step 3 (NewButtonFlow.swift:446).
+Dark mode is fine (orange on black).
+
+**Guideline:** Accessibility: 4.5:1 for text up to 17 points (WCAG AA).
+
+**To try:** the footer in the standard secondary color with an orange ⚠︎ symbol in front, or
+`.red` text, which is darker; recheck at 4.5:1. Review's orange warnings are on white cards:
+check those too once a warning can be shown (nit 14's warning, a line with no photo).
+
+**Severity:** confuses her (it's the only explanation of the grey button).
+
+## 18. The big camera picture on the photo step looks tappable but does nothing
+
+**Found:** New Button step 1: a 200-point checkerboard with a large camera symbol in a
+circle (NewButtonFlow.swift:225–228, Photos.swift:55–59). Tapping it (215, 405) does nothing;
+Take Photo is the row below. Shots 27-newbutton-step1-light, tmp2.
+
+**Guideline:** Not HIG: a judgment that a large camera symbol where the photo goes reads as
+"tap here" (the same symbol is on the Take Photo row below it). Loosely, Gestures: "Indicate
+when a gesture isn't available."
+
+**To try:** make the picture a button that does what Take Photo does (Choose from Photos in
+the Simulator), or show the empty checkerboard without the camera symbol.
+
+**Severity:** confuses her.
+
+## 19. Step 3 picks the shape from a list of 20 names, no photos
+
+**Found:** New Button step 3 and Change Button: **Shape** is a menu of names ("New shape…",
+Bunny … Strawberry), 20 lines, scrolling (NewButtonFlow.swift:560). Shot 32-shape-menu-light.
+
+**Guideline:** SPEC.md, "Who uses it": "Pick from photos, not names." (HIG Menus allows long
+menus of user-defined items, so this is a spec point.) The Add a Button sheet already has a
+grid of shape photos (AddLineSheet.swift:114).
+
+**To try:** open the same shape grid (DesignTile) as a pushed screen, with "A new shape" as
+its last tile.
+
+**Severity:** confuses her. **Spec:** follows a spec rule the screen breaks.
+
+## 20. Picking a saved shape leaves size "One size" and price empty, so a near-duplicate is easy
+
+**Found:** New Button (from +), step 3: Shape → Heart, color Red. Every saved Heart is
+Medium at $4.00, but Size stays **One size** and Price is empty. With $4 typed, Next is
+allowed and step 4 offers to save **Heart, Red** (26HR) beside the existing **Heart, Red,
+Medium** (26HRM), "New color or size of Heart". Shots 33–35.
+
+**Cause:** the draft takes the shape's price only when it starts from that shape (the ⋯
+menu's Add Color or Size…, EditButtonView.swift:169–170), and never its size; picking the
+shape in step 3 fills in neither. The duplicate check compares whole names
+(NewButtonFlow.swift:105), so "Heart, Red" passes.
+
+**Guideline (not HIG):** Entering data: "prefill fields with reasonable default values";
+Machine learning, Mistakes: "Anticipate mistakes."
+
+**To try:** when she picks a shape whose saved buttons all share a size, set that size (and
+the most common price) if she hasn't chosen one; and warn "Heart, Red, Medium is already
+saved. Is this a different size?" when the only difference is a missing size.
+
+**Severity:** confuses her (a second red heart on later invoices, under a new SKU).
+
+## 21. "Change" buttons are 24 points tall
+
+**Found:** Review step: the two **Change** buttons measure 64.7 × 24.3 and 64.7 × 23.3
+points (x 333–398). Shot 18-review-dark. `.controlSize(.small)` (ReviewView.swift:122).
+
+**Guideline:** Buttons: "a hit region of at least 44x44 pt"; Accessibility: 28 × 28 minimum.
+
+**To try:** `.controlSize(.regular)` (about 34 points) with the hit area padded to 44, or make
+the whole card's header row the button.
+
+**Severity:** confuses her (missed taps). **Spec:** "large text and buttons".
+
+## 22. "Already Saved" reads like a label, and the two card buttons differ in size
+
+**Found:** New Button from the Buttons tab, step 2 (from a Crab's ⋯ → Add Color or Size…,
+strawberry photo): each saved Crab's card has **Already Saved** (one line) and **Same Shape,
+New Color or Size** (wrapped onto two lines, a taller pill). Tapping Already Saved ends the
+flow without saving. Shot 43-step2-same-shape-light (the Simulator can't compare photos, so
+these cards are the same-shape list; on her iPhone the photo matches use the same card).
+
+**Guideline:** Writing: labels are verbs; Buttons: "Use style — not size — to visually
+distinguish the preferred choice."
+
+**To try:** **Use This One** (catalog) as in the invoice's "It's This One", and **New Color
+or Size** as the second; both the same height, stacked full width if they don't fit side by
+side.
+
+**Severity:** confuses her.
+
+## 23. Side margins are 16 points on some screens and 20 on others
+
+**Found** (left / right edges, points):
+
+| Screen | Edges | Set by |
+|---|---|---|
+| Lists, tab titles, New Invoice, toolbar circles | 20 / 410 | system margins (nit 10) |
+| Draft bottom bar (total, Next) | 16.7 / 414.0 | InvoiceFlowView.swift:171 `.padding(.horizontal)` |
+| Review cards | 16.0 / 414 | ReviewView.swift:104 `.padding()` |
+| Add a Button heading and grid | 16.3 | AddLineSheet.swift:150 |
+| New Button steps 2 and 4, photo cutout | 16 | NewButtonFlow.swift:338, :512; PhotoCutoutView.swift:105, :137, :160 |
+| "What would you like to do today?" | 26.0 (title at 22.0) | InvoicesTab.swift:33, leading inset 4 |
+
+Shots 01, 06, 07, 18, 29, 30.
+
+**Guideline:** Layout: "Align elements to make them easier to scan."
+
+**To try:** the system margin BarRow uses (Platform.swift:382–392) for all of these; the
+question's leading inset 0.
+
+**Severity:** polish.
+
+## 24. Remove Shipping hangs under the bare Save button, with square corners and no icon
+
+**Found:** open a saved shipping charge: **Remove Shipping** is a card row right under the
+bare **Save** button, its top corners square, red text with no icon. Change Line's Remove from
+Invoice has its own card and a trash icon. Shot 17-shipping-edit-dark.
+
+**Cause:** both buttons are in one `Section` (ShippingEditorView.swift:76–94).
+
+**Guideline:** SPEC.md, "Design guidelines": "a bare prominent button never has a card row
+under it … Destructive rows carry an icon"; Layout: group related items.
+
+**To try:** as LineEditorView.swift:123–135: its own section, `DestructiveLabel("Remove
+Shipping", systemImage: "trash")`.
+
+**Severity:** polish. **Spec:** breaks the spec's own rule.
+
+## 25. Unreached steps in the step bar are 1.6:1, too faint to read
+
+**Found:** a draft with no shipping yet: "3 Review" is #C2C2C6 on #F2F2F7 (**1.59:1**) in
+light, and "2 Shipping" on an empty draft #333333 on black (**1.66:1**) in dark. Shots
+06-draft-step1-empty-dark, 37-duplicate-draft-light. `.opacity(0.4)` (InvoiceFlowView.swift:238).
+
+**Guideline:** WCAG leaves unavailable controls out of the contrast rule, but the step bar is
+also the map of what comes next; Color: don't rely on color alone. **Not HIG** in part.
+
+**To try:** keep the names in the secondary color (about 4.5:1) and show "can't go yet"
+another way: the number's circle outlined instead of filled, and the reason line under the
+bar that Next already uses.
+
+**Severity:** polish.
+
+## 26. Invoice rows wrap "of buttons" onto a third line
+
+**Found:** every invoice row at the default text size reads "Sep 3, 2026 · 2 kinds" then "of
+buttons" on its own line (detail block 33.7 points, two lines). Shots 01, 02, 24.
+
+**Cause:** the date and count share one subheadline (InvoicesTab.swift:247–249) beside a
+right-aligned total.
+
+**Guideline:** Lists and tables: "Keep item text succinct so row content is comfortable to
+read."
+
+**To try:** "Sep 3 · 2 kinds" (the year only when it isn't this year), or the count on its
+own line.
+
+**Severity:** polish.
+
+## 27. A 1-pixel seam crosses the Paid card
+
+**Found:** a full-width line, 1 pixel tall, in the background color, across the Paid card
+(icon column included, where separators don't reach): y 1869 px (623 points) between the 2nd
+and 3rd rows at the top of the list, y 1571 px after scrolling, in light (#F2F2F7) and dark
+(#000000). Seen in shots 01, 02 (light and dark), and again after relaunching.
+
+**Cause:** not found yet. Likely rows at fractional heights (the rows are 70.3 points), so
+one row boundary falls between pixels.
+
+**To try:** round the row's height (padding in InvoiceRow) to whole points and recheck; check
+in a release build.
+
+**Severity:** polish.
+
+## 28. The draft's ⋯ menu holds one item
+
+**Found:** ⋯ on a draft opens a menu with only **Delete Draft…**. Shot 38-draft-more-menu-light.
+
+**Guideline:** Pull-down buttons: "listing a minimum of three items can help the
+interaction feel worthwhile."
+
+**To try:** keep the ⋯ (it matches the finished invoice's) and add Duplicate, which a draft
+can use too; or a trash button in its place.
+
+**Severity:** polish.
+
+## 29. Same thing, different words
+
+**Found:**
+- Settings: Business has **Town** ("Warren, RI 02805"); Bill to has **City** ("Brooklyn, NY")
+  and **ZIP** (SettingsView.swift:28, :39–40). Shot 25-settings-light.
+- A button with no price: "No price" in orange (Buttons list, CatalogView.swift:154), "No price
+  yet" (tiles, AddLineSheet.swift:210), "$0.00" (New Button step 2 cards,
+  NewButtonFlow.swift:354).
+- Alert titles: "Rename shape" (CatalogView.swift:60) beside "New Color" (NewButtonFlow.swift:687).
+- "Touch Up the Edges" (step 1) opens a screen whose button is "Touch Up".
+
+**Guideline:** Writing: consistent terms; "Choose a style for each UI element type and use it
+consistently."
+
+**To try:** "Town" → "City, State and ZIP" (one line, as printed); "No price yet" everywhere;
+"Rename Shape"; "Touch Up" everywhere.
+
+**Severity:** polish.
+
+## 30. The line total, the number that matters, is in grey
+
+**Found:** quantity screen: "Line total" in the primary color, its amount ($48.00, title3
+bold) in the secondary grey. Shots 09, 12.
+
+**Cause:** `LabeledContent` colors its value secondary (LineEditorView.swift:104–106).
+
+**Guideline:** Typography: "Adjust font weight, size, and color as needed to emphasize
+important information."
+
+**To try:** `.foregroundStyle(.primary)` on the amount.
+
+**Severity:** polish.
+
+## 31. Red, burgundy and brown dots vanish on picked (orange) color chips
+
+**Found:** step 3, Red picked: its dot #DE4A22 on the chip's #C0472A measured **1.22:1** in
+light mode (on a capture since replaced); in dark, Change Button with Red picked, **1.31:1**
+(shot 05-buttons-bottom-dark). The white ring carries the shape; the red fill barely shows.
+Burgundy and brown not measured.
+
+**Guideline:** Not HIG: the chip's text names the color, so nothing is lost; but the dot is
+there to show the glaze (SPEC.md, "Adding a new button"), and on a picked chip it can't.
+
+**To try:** a wider white ring (2.5 points) or a white backing disc under the dot on picked
+chips.
+
+**Severity:** polish.
+
+## 32. Two prominent confirm buttons on one sheet
+
+**Found:** Add to Invoice (✓ and **Add to Invoice**), Change Line (✓ and **Save**), Change
+Button (✓ and **Save Changes**), Shipping (✓ and **Add Shipping** / **Save**), photo (✓ Use
+Photo and **Use This Photo**): each has the tinted ✓ at the top right and a filled button at
+the bottom, doing the same thing. The ✓ is also lit before anything has changed. Shots 09,
+15, 17, 29.
+
+**Guideline:** Buttons: "Keep the number of prominent buttons to one or two per view"
+(allowed); SPEC.md: "One prominent button per screen". **Spec:** the screens break the spec's
+own rule.
+
+**Proposal for Caleb:** SPEC.md, "Sheets", makes the ✓ "the one prominent button", so either
+make the bottom button plain (bordered), which keeps the spec, or, as a spec change, keep the
+big bottom button (one obvious action at the bottom) and make the ✓ plain.
+
+**Severity:** polish.
+
+## 33. The receipt viewer closes with ✓, though nothing is confirmed
+
+**Found:** ReceiptViewer.swift:46–49: the only way out is a tinted ✓ ("Done"); tapping an
+amount also closes it. Viewing confirms nothing.
+
+**Guideline:** Toolbars: "the standard Close button closes a modal view"; Sheets: a Done
+button is paired with a Cancel.
+
+**To try:** the ✕ (CancelButton, "Close") at the top left, as Quick Look's PDF viewer has.
+
+**Severity:** polish.
+
+## 34. The PDF page is a picture with a tap, not a button: no press feedback
+
+**Found:** `Image(...).onTapGesture` (ReviewView.swift:213), on Review and the finished
+invoice. It opens Quick Look, but doesn't dim when pressed, unlike the receipt photo, which is
+a button (ShippingEditorView.swift:32).
+
+**Guideline:** Image views: use a button for an interactive image; Buttons: "Always include a
+press state for a custom button."
+
+**To try:** a `Button` with a plain style that dims slightly on press.
+
+**Severity:** polish.
+
+## 35. Saved-color captions under the shape are cut off
+
+**Found:** step 3 with Heart picked: "Burgundy,…", "Navy, Medi…", "Red, Medium" under the
+three saved hearts, at caption2 (11 points), one line, 70 points wide
+(NewButtonFlow.swift:572–575). Shot 33-step3-heart-light.
+
+**Guideline:** Typography: "Avoid truncating text in scrollable regions unless people can
+open a separate view to read the rest" (the captions are in a horizontal scroll view).
+
+**To try:** two lines, or only the color (the size shows when it differs).
+
+**Severity:** polish.
