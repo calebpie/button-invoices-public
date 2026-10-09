@@ -14,6 +14,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 5 | One letter in search finds nothing and says "No Results" | Buttons search; Add a Button in an invoice | Fixed |
 | 6 | Closing search with text in it: the shape cards jump up, then back down | Add a Button in an invoice | Open |
 | 7 | Search circle: opens slowly; on close it collapses mid-bar, then slides over | Buttons tab, search | Open |
+| 8 | The PDF page's top corners are rounded off | Finished invoice, "The PDF" | Open |
 
 ## 1. Grey strip under the tab bar as the keyboard goes away
 
@@ -361,3 +362,35 @@ Third-party guides (not Apple) suggest 0.3–0.5 s for transitions like this.
   contents their own transition so they fade out as the glass shrinks; clear `text` and
   drop focus inside the same animation.
 - Recheck the press-to-movement delay with a probe log at `open()`.
+
+## 8. The PDF page's top corners are rounded off
+
+**Reported** (Caleb, Oct 8, 2026, iPhone, dark mode, screenshot): on a finished invoice
+(0260903), the picture of the PDF under "The PDF" has its top corners cut round, as if by
+a container's corner radius.
+
+**Reproduced** (iOS 27.0 Simulator, iPhone 17, Invoice 0260903; 3x screenshots, points):
+
+- Dark mode: the page's top edge at y 540. Its left edge, going down from the top: x 23.3
+  at the top row, 21.7 at 2 points down, 19.0 at 6, 17.7 at 10, 16.7 at 16, 16.3 from 18
+  on. So a rounded corner of roughly 20 points; the right corner matches by eye.
+- Light mode: the same rounding, but white page on the near-white background, so it
+  barely shows. Same with the page's faint shadow.
+- Not checked yet: the bottom corners (the page runs under the tab bar at this scroll),
+  and the Review screen (step 3), which shows the same pages in a plain scroll view.
+
+**Cause:** FinishedInvoiceView shows the pages as a row of its `List` (`Section("The PDF")`
+with `PDFPages`, `.listRowBackground(Color.clear)`). On iOS 26 an inset-grouped list
+clips each section's rows to the section's rounded card, about 20 points here; the clear
+row background hides the card but not the clip. The page is a sharp-cornered rectangle
+(PDFPages in ReviewView.swift), so its corners are cut.
+
+**To try in the bug bash:**
+
+- Take the pages out of the list's sections: show them below the list (for example the
+  screen as a `ScrollView` like ReviewView, or the pages in a `safeAreaInset`/footer),
+  so nothing clips them.
+- Or keep them in the list and give the page itself a small corner radius and inset
+  (for example 8 points in from the card's edges), so the card's corners fall outside it.
+  Simpler, but the page would no longer look like a sheet of paper.
+- Check the Review screen and the bottom corners in both modes.
