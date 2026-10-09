@@ -9,7 +9,7 @@ to try. App code isn't changed for a nit until the bug bash.
 |---|---|---|---|
 | 1 | Grey strip under the tab bar as the keyboard goes away | Buttons, search | Open |
 | 2 | "Hello, Daphné." fades in place instead of sliding with the page | Invoices, opening an invoice | Open |
-| 3 | The receipt photo can't be opened full size to check the amount | Invoice step 2, Shipping | Open |
+| 3 | The receipt photo can't be opened full size to check the amount | Invoice step 2, Shipping | Fixed; Caleb to check |
 | 4 | Swipe-delete: the row vanishes before she confirms; after she confirms, it vanishes with no animation | Invoices list | Fixed; Caleb to check |
 | 5 | One letter in search finds nothing and says "No Results" | Buttons search; Add a Button in an invoice | Fixed |
 
@@ -114,6 +114,33 @@ own resolution; zooming further would show them larger but softer.
   Look's round trip (look, Done, tap the amount) proves awkward.
 - If the zoomed digits look too soft on her iPhone, keep receipts at a higher resolution
   (for example 3000 pixels, as dropping a photo in on iPad already reads them).
+
+**Fixed** (bug bash, Oct 8, 2026): tapping the receipt opens it full screen in the app's
+own viewer (ReceiptViewer.swift), not Quick Look. Under the photo: "Tap the receipt to see
+it full size." (VoiceOver: "Receipt photo. Double-tap to see it full size.").
+
+- Tried Quick Look first, as the note proposed. It opened from inside the Shipping sheet,
+  but with the photo filling the screen and no Done button or title showing; they appeared
+  only after tapping the picture. Its bottom bar also offered Markup. For her, a screen with
+  no visible way out is worse than the nit, so not used.
+- The viewer: title "Receipt", the app's ✓ button at the top right (always showing), the
+  photo fitted to the screen, and pinch, double-tap and drag to zoom. Along the bottom, the
+  same "Tap the amount for this order:" buttons as the sheet; tapping one fills the amount
+  and closes the viewer, so she can check and pick in one place (the note's alternative).
+- Opening a saved shipping line shows the photo with no amounts (they're read only when the
+  photo is chosen), so the viewer shows just the photo and ✓.
+
+**Rechecked** (iOS 27.0 Simulator, iPhone 17; a test draft from Duplicate on 0260903,
+deleted afterwards): Add Shipping → Choose from Photos → the receipt (IMG_9049): $36.48
+filled in, hint under the photo. Tap the photo: the viewer, receipt fitted to the width,
+amounts at the bottom. Double-tap on the circled total: zoomed to about 3 times, the
+digits about 30 points tall and sharp. Tap $19.58: the viewer closes, the sheet shows
+19.58 with $19.58 highlighted. Open it again, tap ✓: closes, amount unchanged. Pinch not
+tried in the Simulator.
+
+**Check** (Caleb, iPhone): a draft → step 2 → Add Shipping → Choose from Photos → a receipt.
+Tap the photo: it fills the screen. Pinch and double-tap to zoom, drag around. Tap an
+amount at the bottom: back to the sheet with that amount filled in. Open it again, tap ✓.
 
 ## 4. Swipe-delete: the row vanishes before she confirms; after she confirms, it vanishes with no animation
 

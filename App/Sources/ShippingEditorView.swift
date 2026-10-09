@@ -18,6 +18,7 @@ struct ShippingEditorView: View {
     @State private var loaded = false
     @State private var original = ""
     @State private var askDiscard = false
+    @State private var showingReceipt = false
 
     var body: some View {
         Form {
@@ -26,9 +27,22 @@ struct ShippingEditorView: View {
             }
             Section {
                 if let receipt, let image = UIImage(data: receipt) {
-                    Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 220)
+                    // Too small to read the amounts at this size: tapping opens it full size
+                    // to zoom into (Docs/ui-nits.md, nit 3).
+                    Button { showingReceipt = true } label: {
+                        VStack(spacing: 8) {
+                            Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 220)
+                            Text("Tap the receipt to see it full size.").font(.footnote).foregroundStyle(.secondary)
+                        }
                         .frame(maxWidth: .infinity)
-                        .accessibilityLabel("Receipt photo")
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Receipt photo. Double-tap to see it full size.")
+                    .fullScreenCover(isPresented: $showingReceipt) {
+                        ReceiptViewer(image: image, amounts: scan?.amounts ?? [], selected: Money(parsing: amountText)) {
+                            amountText = $0.editingText
+                        }
+                    }
                 }
                 if reading {
                     ProgressView("Reading the receipt…")
