@@ -401,7 +401,7 @@ Applied (HIG page in parentheses):
 - Two tips, typing an order line and repeating an order with Duplicate, each shown until
   she closes it or uses the feature, at most one new tip a day (Offering help).
 - Home Screen quick actions (touch and hold the icon) and App Shortcuts for Siri and
-  the Shortcuts app: New Invoice, Add a Button. ⌘N on an iPad keyboard (Home Screen quick
+  the Shortcuts app: New Invoice, New Button. ⌘N on an iPad keyboard (Home Screen quick
   actions, App Shortcuts, Keyboards).
 - Photos can be dragged in from another app on iPad (Drag and drop).
 - A layered app icon made with Icon Composer, so iOS 26 can render it in Liquid Glass,

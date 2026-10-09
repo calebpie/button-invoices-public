@@ -147,8 +147,8 @@ its PDF again or mark it paid. Touch and hold an invoice for **Duplicate** (a ne
 with the same buttons), **Share PDF…** and **Delete…**. Shake the phone to undo a removal
 or deletion.
 
-Shortcuts: touch and hold the app icon on the Home Screen for **New Invoice** and **Add a
-Button**. Siri knows them too: "Start an invoice in Invoices", "Add a button in Invoices".
+Shortcuts: touch and hold the app icon on the Home Screen for **New Invoice** and **New
+Button**. Siri knows them too: "Start an invoice in Invoices", "New button in Invoices".
 
 **Buttons tab**: every button by shape. The magnifying glass at the top right searches
 (tap ✕ to close it) and **+** adds a new button; both stay put as you scroll. Tap a button to change

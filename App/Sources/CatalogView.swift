@@ -3,7 +3,7 @@ import SwiftData
 import SwiftUI
 
 /// The Buttons tab (SPEC.md, "Buttons"): every saved button, a section per shape with a row
-/// per color and size, Search and Add a Button in the navigation bar, and Archive. Archiving or changing a button
+/// per color and size, Search and New Button in the navigation bar, and Archive. Archiving or changing a button
 /// never changes an invoice that already has it.
 struct CatalogView: View {
     @Environment(\.modelContext) private var context
@@ -38,7 +38,7 @@ struct CatalogView: View {
         // symbols, add the prominent one (Toolbars, "Prefer simple, recognizable symbols";
         // "Use the .prominent style for key actions").
         .searchTitleBar("Buttons", text: $search, prompt: "Search buttons", searchLabel: "Search Buttons",
-                        action: TitleBarAction(title: "Add a Button", systemImage: "plus") {
+                        action: TitleBarAction(title: "New Button", systemImage: "plus") {
                             adding = NewButton(design: nil)
                         })
         .overlay {
@@ -126,7 +126,7 @@ struct CatalogView: View {
         }
     }
 
-    /// The Add a Button quick action and App Shortcut open the new-button steps here.
+    /// The New Button quick action and App Shortcut open the new-button steps here.
     private func handleRequest() {
         guard router.request == .newButton else { return }
         router.request = nil

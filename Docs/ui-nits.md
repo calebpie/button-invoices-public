@@ -19,7 +19,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 10 | The Buttons title sits further left than the other tabs' titles | Buttons tab | Fixed; Caleb to check |
 | 11 | "Archived (1)" can't be opened, so archived buttons can't be seen or unarchived from the list | Buttons tab | Fixed; Caleb to check |
 | 12 | A discount bigger than the price shows a negative line total, and Add is greyed out with no reason | Quantity screen | Fixed; Caleb to check |
-| 13 | "Add a Button" means two different things | Invoice step 1; Home Screen, Siri, Buttons + | Open (UX review; confuses her) |
+| 13 | "Add a Button" means two different things | Invoice step 1; Home Screen, Siri, Buttons + | Fixed (spec changed); Caleb to check |
 | 14 | The missing-bank-details warning sends her to "Home → Business details", which doesn't exist | Invoice step 3, Review | Open (UX review; confuses her) |
 | 15 | Two ‹ back buttons on a draft, each going somewhere different | Draft invoice | Open (UX review; confuses her) |
 | 16 | Questions show only the red button; "Keep Editing" and Cancel never appear | Discard and Delete questions | Open (UX review; confuses her) |
@@ -772,6 +772,24 @@ Invoices"), the + label, and the sheet's "Add a New Button".
 
 **Severity:** confuses her (from the Home Screen, "Add a Button" lands her in a camera step,
 not on an invoice).
+
+**Fix** (Caleb approved, spec included): "Add" now always means putting a button on an
+invoice, and making one is "New Button". Renamed: the Home Screen quick action (project.yml),
+the App Shortcut's title and short title, its phrases ("New button in Invoices", "Save a new
+button in Invoices"; "Add a button in Invoices" dropped), its description ("Saves a new button
+design, starting with its photo."), and the Buttons tab's + label (CatalogView.swift).
+Unchanged: Add a Button in a draft and its sheet, and "Add a New Button" / "Add as a New
+Button" inside it, which make a button and put it on the invoice. SPEC.md (Platform
+conventions) and README.md say New Button.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max): touch and hold the icon: New Invoice,
+New Button (shot 50-nit13-quick-actions-after; before, 48-nit13-quick-actions); New Button
+opens New Button, step 1. The built App Intents metadata lists NewButtonIntent "New Button",
+the new description, and both phrases.
+
+**Check** (Caleb, iPhone): touch and hold the app icon → **New Button**. Expected: New Button,
+step 1. Say "New button in Invoices" to Siri. Expected: the same screen. (Siri may need a
+minute after installing to learn the new phrase.)
 
 ## 14. The missing-bank-details warning sends her to "Home → Business details", which doesn't exist
 

@@ -83,5 +83,5 @@ targets:
             UIApplicationShortcutItemTitle: New Invoice
             UIApplicationShortcutItemIconSymbolName: doc.badge.plus
           - UIApplicationShortcutItemType: NewButton
-            UIApplicationShortcutItemTitle: Add a Button
+            UIApplicationShortcutItemTitle: New Button
             UIApplicationShortcutItemIconSymbolName: plus.circle
