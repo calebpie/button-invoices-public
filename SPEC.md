@@ -17,6 +17,8 @@ details are editable, but there is one customer at a time).
 ## Who uses it
 
 Daphné only. She is not comfortable with Excel and works from an iPhone and an iPad.
+Her iPhone is an iPhone 15 Pro Max; a replacement isn't likely soon, and would likely be
+a Max model too (Caleb, Oct 8, 2026). Her iPad's model isn't recorded.
 Design rules that follow:
 
 - One obvious action per screen, large text and buttons, plain words ("Add Buttons",
