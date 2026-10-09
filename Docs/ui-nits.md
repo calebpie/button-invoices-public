@@ -42,6 +42,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 33 | The receipt viewer closes with ✓, though nothing is confirmed | Receipt viewer | Open (UX review; polish) |
 | 34 | The PDF page is a picture with a tap, not a button: no press feedback | Review, finished invoice | Open (UX review; polish) |
 | 35 | Saved-color captions under the shape are cut off ("Burgundy,…") | New Button step 3, Change Button | Open (UX review; polish) |
+| 36 | Row separators start 64–84 points in from the card's left edge but end 20 from its right | Invoices list, Buttons tab | Fixed; Caleb to check |
 
 ## 1. Grey strip under the tab bar as the keyboard goes away
 
@@ -1393,3 +1394,26 @@ open a separate view to read the rest" (the captions are in a horizontal scroll 
 **To try:** two lines, or only the color (the size shows when it differs).
 
 **Severity:** polish.
+
+## 36. Row separators start 64–84 points in from the card's left edge but end 20 from its right
+
+**Reported:** Caleb, Oct 9, during the bug bash: on the Invoices list the space left of the
+separator lines is much larger than on the right.
+
+**Found** (iOS 27.0 Simulator, iPhone 15 Pro Max, 3x screenshots; cards 20.0–410.0 points):
+Invoices separators 84.0–390.0 (64 points in on the left, 20 on the right); Buttons tab
+104.0–390.0 (84 and 20). Shot 89-separators-light.
+
+**Cause:** iOS's default: a separator starts where the row's text starts, past the icon or
+photo, and ends at the row's trailing margin.
+
+**Fix** (Caleb chose 20 on both sides, both lists): `.alignmentGuide(.listRowSeparatorLeading)
+{ $0[.leading] }` on InvoiceRow (InvoicesTab.swift) and the catalog row (CatalogView.swift),
+so the line starts at the row's margin, under the icon or photo.
+
+**Checked:** Invoices separators all 40.0–390.0, still every 237 pixels (1489, 1726, 1963,
+2200, 2437), no seam (nit 27's detector) (shot 90-nit36-invoices-light); Buttons separators
+40.0–390.0 (91-nit36-buttons-light, crops 92, 93).
+
+**Check** (Caleb, iPhone): both lists; each line between rows has the same gap at both ends.
+

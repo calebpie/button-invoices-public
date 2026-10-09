@@ -159,6 +159,9 @@ struct CatalogView: View {
                 }
             }
             .opacity(variant.isHidden ? 0.5 : 1)
+            // The separator starts under the photo, 20 points from the card's edge on both
+            // sides (nit 36).
+            .alignmentGuide(.listRowSeparatorLeading) { $0[.leading] }
             .accessibilityElement(children: .combine)
             .accessibilityValue(variant.isHidden ? "Archived" : "")
         }

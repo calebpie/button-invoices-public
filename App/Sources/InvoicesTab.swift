@@ -233,6 +233,9 @@ struct InvoiceRow: View {
         }
         .padding(.vertical, 4)
         .modifier(WholePointHeight())
+        // The separator starts at the row's margin, under the icon, not under the text, so
+        // it's 20 points from the card's edge on both sides (nit 36).
+        .alignmentGuide(.listRowSeparatorLeading) { $0[.leading] }
         .onChange(of: invoice.isDeleted ? nil : current, initial: true) { _, now in
             if let now { shown = now }
         }
