@@ -12,6 +12,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 3 | The receipt photo can't be opened full size to check the amount | Invoice step 2, Shipping | Fixed; Caleb to check |
 | 4 | Swipe-delete: the row vanishes before she confirms; after she confirms, it vanishes with no animation | Invoices list | Fixed; Caleb to check |
 | 5 | One letter in search finds nothing and says "No Results" | Buttons search; Add a Button in an invoice | Fixed |
+| 6 | Closing search with text in it: the shape cards jump up, then back down | Add a Button in an invoice | Open |
 
 ## 1. Grey strip under the tab bar as the keyboard goes away
 
@@ -271,3 +272,42 @@ Sailboat, Shell, Star (2), Strawberry. Then in an invoice, Add a Button → type
 three Hearts.
 
 **Checked** (Caleb, Oct 8, 2026, iPhone): Pass.
+
+## 6. Closing search with text in it: the shape cards jump up, then back down
+
+**Reported** (Caleb, Oct 8, 2026, iPhone 17 Simulator, screen recording 19.32.23): in an
+invoice, Add a Button → search → type "he" → ✕. The close isn't clean: the button cards
+jump up, then back down to where they belong.
+
+**From the recording** (11.1 s, frames every 1/30 s; positions in points from the top,
+measured from the frames; "first color" is the top of the first card photo):
+
+- "he" typed by 8.53 s: the three Hearts, heading "Which button? Tap it." at 153, first
+  photo at 203.
+- ✕ at about 8.57 s: the text clears. 8.60–8.83 s: the search field slides back down
+  under the returning "Add a Button" title while the Hearts fade out and the shape grid
+  fades in; the heading text overlaps the title in these frames.
+- 8.87–8.97 s (4 frames): the shape grid is drawn about 140 points too high, its first
+  photos at the top of the content area (120, the top of the measured range, or above),
+  behind the search field.
+- 9.00 s: in one frame, everything drops to its final place: heading at 146, first photo
+  at 261. Steady from then on.
+- With an empty field the content doesn't change on ✕ (the shape grid is already showing),
+  which fits Caleb seeing it only with characters typed. Not yet checked on screen.
+
+**Likely cause:** two changes in the same moment. ✕ clears `search`, which swaps the
+content from the results to the shape grid (ShapePickerView in AddLineSheet.swift, a
+different layout of a different height), while the navigation bar grows back from the
+search-only bar to title plus search field. The new grid is laid out against the
+shorter bar's top inset, then corrected in one step when the bar settles. The Buttons
+tab is different: its search comes and goes through `searchOnRequest` (Platform.swift).
+
+**To try in the bug bash:**
+
+- Keep showing the results until the search has finished closing, then switch to the
+  shape grid (for example, drive the content from the field's `isPresented` state, or
+  switch after the dismissal instead of when the text clears).
+- Or make the swap itself animated in the same transaction as the bar, so the grid moves
+  with the bar instead of jumping.
+- Check the same close on the Buttons tab (nit 1 already covers its keyboard strip), and
+  the Cancel/✕ of the sheet itself while search is active.
