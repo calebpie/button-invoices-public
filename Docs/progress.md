@@ -352,6 +352,32 @@ step 9).
 - To rerun on the iPhone after `make ios`: Docs/m3-test.md, Part 1, step 7, then open the
   Buttons search and type a few letters, to confirm typing is unaffected.
 
+## Undo doesn't survive a restart (Oct 8, 2026; found in the bug bash, nit 4)
+
+**Seen** (iOS 27.0 Simulator, iPhone 17): delete draft 0261008-2, shake, **Undo**: the draft
+is back. Wait 10 s, quit and reopen the app: the draft is gone. Twice out of two.
+
+**Probe** (`-UndoSaveProbe N`, ButtonInvoicesApp.swift; one case per launch, a throwaway
+store written by one container and read by another, as on any later launch; "stored" is
+what a fresh context reads back):
+
+| Case | Stored after the change | After undo and save |
+|---|---|---|
+| 1. SwiftData's undo; the delete saved before undo (as autosave does) | 0 invoices, 0 lines | in memory 1 + 2 (`inserted=3`); **stored 0, 0** |
+| 3. SwiftData's undo of a saved field change (draft → paid) | paid | in memory draft; **stored paid** |
+| 4. The app's own undo step; SwiftData's registration off during the delete | 0, 0; nothing for SwiftData to undo | **stored 1 invoice, 2 lines** |
+| 5. As 4, with the undo manager detached from the context instead | 0, 0 | **stored 1, 2** |
+
+Cases 0 (no save between) and 2 (re-insert after undo) trapped in SwiftData at the delete:
+"A snapshot should exist before creating a new snapshot for undo" (DataUtilities.swift:541);
+case 1, the same steps up to there, didn't. Not seen in the app so far.
+
+**Cause:** with an undo manager on the ModelContext (RootView, for shake to undo), SwiftData
+records undo for every change. Once a change has been saved, undoing it changes only what's
+in memory; later saves don't write it, with no error. Autosave or a save on leaving a screen
+usually runs before she shakes, so every undo in the app (delete invoice, remove button or
+shipping line, archive, delete button) can be lost at the next restart.
+
 ## M2 results (Caleb)
 
 Use the Part N, step M labels from Docs/m2-test.md.
