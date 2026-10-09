@@ -210,8 +210,7 @@ struct InvoiceRow: View {
 
     private struct Summary: Equatable {
         var total: String
-        var date: String
-        var kinds: String
+        var detail: String
     }
 
     var body: some View {
@@ -224,10 +223,9 @@ struct InvoiceRow: View {
                     .frame(minWidth: 32)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Invoice \(invoice.number)").font(.headline)
-                    // Date and count on their own lines: as one line beside the total it
-                    // wrapped "of buttons" onto a line by itself (nit 26).
-                    Text(summary.date).font(.subheadline).foregroundStyle(.secondary)
-                    Text(summary.kinds).font(.subheadline).foregroundStyle(.secondary)
+                    // "2 SKUs", not "2 kinds of buttons", so it fits on one line beside the
+                    // total (nit 26).
+                    Text(summary.detail).font(.subheadline).foregroundStyle(.secondary)
                 }
             }
         } trailing: {
@@ -250,10 +248,10 @@ struct InvoiceRow: View {
     }
 
     private var current: Summary {
-        let kinds = invoice.sortedLines.count
+        let date = invoice.date.formatted(.dateTime.day().month(.abbreviated).year())
+        let skus = invoice.sortedLines.count
         return Summary(total: invoice.total.formatted,
-                       date: invoice.date.formatted(.dateTime.day().month(.abbreviated).year()),
-                       kinds: kinds == 1 ? "1 kind of button" : "\(kinds) kinds of buttons")
+                       detail: "\(date) · \(skus == 1 ? "1 SKU" : "\(skus) SKUs")")
     }
 }
 

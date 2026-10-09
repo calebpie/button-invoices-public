@@ -1236,14 +1236,15 @@ own line.
 
 **Severity:** polish.
 
-**Fix** (Caleb chose two lines): the row's detail is two lines, "Sep 3, 2026" and "2 kinds
-of buttons" ("1 kind of button" for one) (InvoicesTab.swift). Rows are as tall as before.
+**Fix** (Caleb chose "SKUs", on one line, after first trying two lines): the row's detail
+is "Sep 3, 2026 · 2 SKUs" ("1 SKU" for one) (InvoicesTab.swift). Rows are one line shorter.
 
-**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light): every row reads number, date,
-count, with nothing wrapped, including "10 kinds of buttons" beside $976.90 (shot
-85-nit26-rows-light). Both lines #7F7F7F on white, 4.00:1, as before.
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light; 3x pixels): every row is number,
+then date and count on one line (shot 85-nit26-rows-light). Widest, "Aug 12, 2026 · 10 SKUs",
+ends at 243.0 points, $976.90 starts at 299.7; "Aug 19, 2026 · 2 SKUs" ends 47.7 points
+before $2,656.21. #7F7F7F on white, 4.00:1, as before.
 
-**Check** (Caleb, iPhone): the Invoices list; no row has a line with only "of buttons".
+**Check** (Caleb, iPhone): the Invoices list; each row's date and SKU count on one line.
 
 ## 27. A 1-pixel seam crosses the Paid card
 
