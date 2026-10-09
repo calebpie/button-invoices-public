@@ -15,6 +15,8 @@ to try. App code isn't changed for a nit until the bug bash.
 | 6 | Closing search with text in it: the shape cards jump up, then back down | Add a Button in an invoice | Open |
 | 7 | Search circle: opens slowly; on close it collapses mid-bar, then slides over | Buttons tab, search | Open |
 | 8 | The PDF page's top corners are rounded off | Finished invoice, "The PDF" | Open |
+| 9 | More space below New Invoice than above it | Invoices | Open |
+| 10 | The Buttons title sits further left than the other tabs' titles | Buttons tab | Open |
 
 ## 1. Grey strip under the tab bar as the keyboard goes away
 
@@ -394,3 +396,60 @@ row background hides the card but not the clip. The page is a sharp-cornered rec
   (for example 8 points in from the card's edges), so the card's corners fall outside it.
   Simpler, but the page would no longer look like a sheet of paper.
 - Check the Review screen and the bottom corners in both modes.
+
+## 9. More space below New Invoice than above it
+
+**Reported** (Caleb, Oct 8, 2026): the New Invoice button on the Invoices tab could use more
+room above it; there is more white space below it than above.
+
+**Reproduced** (iOS 27.0 Simulator, iPhone 15 Pro Max, light mode; 3x screenshot, points
+from the top of the screen):
+
+- "What would you like to do today?": letters from y 107.7 to the baseline at 117.3 (the
+  "y" descender to 119.7).
+- New Invoice button: y 139.3 to 201.3 (62 points tall).
+- The "Paid" section header's letters start at y 233.3.
+- So 22 points from the line of text to the button (19.6 from the descender), and 32 points
+  from the button to the next header: about 10 points more below.
+
+**Cause:** the space above is set by hand (the subtitle row's bottom inset, 16 points, in
+InvoicesTab's first `Section`); the space below is the list's own gap between sections plus
+the header's top padding.
+
+**To try in the bug bash:**
+
+- Raise the subtitle row's bottom inset so the two gaps match (about 26 points), or match
+  them by eye if the header's letters make an exact match look off.
+- Check with no finished invoices (the empty state instead of "Paid") and with the tip
+  showing, which also sit under the button, and at a large text size.
+
+## 10. The Buttons title sits further left than the other tabs' titles
+
+**Reported** (Caleb, Oct 8, 2026): the left padding of the page headers changes between
+tabs; the Buttons header is a bit further to the left.
+
+**Reproduced** (iOS 27.0 Simulator, iPhone 15 Pro Max; 3x screenshots, leftmost pixel of the
+large title):
+
+| Tab | Title | Left edge |
+|---|---|---|
+| Invoices | Hello, Daphné. | x 22.0 |
+| Buttons | Buttons | x 18.0 |
+| Settings | Settings | x 21.3 |
+
+The list cards below start at about x 20.5 on all three. H and B have about the same space
+before them in the font, so the Buttons title is about 4 points further left; Settings' S
+starts a little further left than H by its shape.
+
+**Cause:** Invoices and Settings put the title in the navigation bar (`shrinkingTitle`, a
+`topBarLeading` toolbar item), which iOS places about 20 points in. Buttons draws its own bar
+(`SearchTitleBar` in Platform.swift, so the search circle can open into the field), with
+`.padding(.horizontal, 16)`.
+
+**To try in the bug bash:**
+
+- Pad the Buttons bar's title by 20 points instead of 16 (or measure iOS's toolbar inset and
+  use that), keeping the circles on the right where they are, and recheck the left edges.
+- If nit 2 moves Invoices and Settings onto the Buttons tab's own bar, set the inset once
+  there instead.
+- Check on iPad too, where the bar's insets differ.
