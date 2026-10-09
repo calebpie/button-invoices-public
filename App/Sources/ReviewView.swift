@@ -126,8 +126,14 @@ struct ReviewStep: View {
             HStack {
                 Text(title).font(.headline).heading()
                 Spacer()
-                Button("Change") { goTo(step) }.buttonStyle(.bordered).controlSize(.small)
-                    .accessibilityLabel("Change \(title)")
+                // Standard size, 44 points to tap: the small one was 24 tall (nit 21).
+                Button { goTo(step) } label: {
+                    Label("Change", systemImage: "pencil")
+                }
+                .buttonStyle(.bordered)
+                .frame(minHeight: 44)
+                .contentShape(Rectangle())
+                .accessibilityLabel("Change \(title)")
             }
             content()
         }

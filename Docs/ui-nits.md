@@ -27,7 +27,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 18 | The big camera picture on the photo step looks tappable but does nothing | New Button step 1 | Fixed; Caleb to check |
 | 19 | Step 3 picks the shape from a list of 20 names, no photos | New Button step 3, Change Button | Fixed; Caleb to check |
 | 20 | Picking a saved shape leaves size "One size" and price empty, so a near-duplicate is easy | New Button step 3 | Fixed; Caleb to check |
-| 21 | "Change" buttons are 24 points tall | Invoice step 3, Review | Open (UX review; confuses her) |
+| 21 | "Change" buttons are 24 points tall | Invoice step 3, Review | Fixed; Caleb to check |
 | 22 | "Already Saved" reads like a label, and the two card buttons differ in size | New Button step 2 | Open (UX review; confuses her) |
 | 23 | Side margins are 16 points on some screens and 20 on others | Draft bars, Review, Add a Button, new-button steps, photo | Open (UX review; polish) |
 | 24 | Remove Shipping hangs under the bare Save button, with square corners and no icon | Shipping sheet (changing a charge) | Open (UX review; polish) |
@@ -1055,6 +1055,18 @@ points (x 333–398). Shot 18-review-dark. `.controlSize(.small)` (ReviewView.sw
 the whole card's header row the button.
 
 **Severity:** confuses her (missed taps). **Spec:** "large text and buttons".
+
+**Fix** (Caleb chose standard-size buttons): "✎ Change", bordered, regular size, with a
+44-point-tall touch area (`.frame(minHeight: 44)` and a content shape) (ReviewView.swift).
+SPEC.md unchanged: the screen now follows it.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light; 3x screenshot, column scans
+through the capsule's middle): both capsules 34.3 points tall (before 24.3 and 23.3); shot
+70-nit21-change-after-light. A tap at y 412, 3 points below the Buttons card's capsule (y
+374.3–408.7), opened step 1.
+
+**Check** (Caleb, iPhone): a draft's Review → tap **Change** beside Buttons, then beside
+Shipping. Each goes to its step.
 
 ## 22. "Already Saved" reads like a label, and the two card buttons differ in size
 
