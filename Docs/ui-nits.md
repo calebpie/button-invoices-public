@@ -1141,13 +1141,19 @@ a card or control meets the background, points):
 | Add a Button grid (74-nit23-add-button-light), still 3 tiles a row | 16.3 / 413.7 | 20.0 / 410.0 |
 | Photo cutout, photo and buttons (75-nit23-cutout-light) | 16 | 20.0 / 410.0 |
 | New Button step 2 cards (76-nit23-step2-light) | 16.0 / 414.0 | 20.0 / 410.0 |
-| "What would you like to do today?" ink (72-nit23-invoices-light), title at 22.0 | 26.0, W's left stroke slightly cut | 25.0, W whole |
+| "What would you like to do today?" ink (72-nit23-invoices-light), title at 22.0 | 26.0, top of the W cut | 21.0, W whole |
 
-The question can't sit level with the title: its row clips anything nearer the edge than about
-23 points, and the W's left stroke reaches past the text's frame. A first try (inset 0)
-measured 23.0 but was the clip, not the letter; enlarged, the W's left stroke was cut flat.
-Now padding before the secondary style gives the W room inside its own layer
-(InvoicesTab.swift); enlarged, its left stroke ends at a slant, like the w in "would".
+The W: a list section's first row is clipped to the section card's rounded corner even
+when the card is clear, and that corner cut the top of the W's left stroke (seen by tinting
+the text's frame: its top-left corner was rounded). Moving the text or padding it moved the
+clip with it; a first try measured the clip edge, not the letter, and Caleb caught it. The
+question is now the section's header, which isn't clipped (InvoicesTab.swift). Pixel map at
+3x: the W's left stroke now starts on row 322 with the other strokes, 5 pixels wide; before,
+it started on row 331. In a header `.secondary` came out a step lighter (#BBBBC1, 1.71:1) and
+`Color.secondary` was 3.29:1, so the question is 60% of the text color: #616163 on #F2F2F7,
+5.54:1 (light); #999999 on black, 7.37:1 (dark, 80-nit23-question-dark). Before, 3.89:1.
+Spacing unchanged (3x pixels): question ink 320–367, New Invoice 448–633, "Drafts" from 728,
+as before; it still scrolls under the shrinking title.
 
 **Check** (Caleb, iPhone): go from the Invoices list into a draft and to Review; the cards
 shouldn't change width.

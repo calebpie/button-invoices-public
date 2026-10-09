@@ -24,18 +24,6 @@ struct InvoicesTab: View {
         NavigationStack(path: $router.invoicePath) {
             List {
                 Section {
-                    // The greeting itself is the screen's title, in the bar (`shrinkingTitle`).
-                    Text("What would you like to do today?")
-                        // The W's left stroke reaches left of the text's frame and was cut
-                        // off there; padding before the style gives it room. The row clips
-                        // anything nearer the edge, so the W starts 3 points right of the
-                        // title's H (nit 23).
-                        .padding(.leading, 3)
-                        .foregroundStyle(.secondary)
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                        // As much room above New Invoice as the list leaves below it (nit 9).
-                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 26, trailing: 0))
                     Button(action: newInvoice) {
                         Label("New Invoice", systemImage: "plus.circle.fill")
                             .font(.title3.weight(.semibold))
@@ -45,6 +33,20 @@ struct InvoicesTab: View {
                     .keyboardShortcut("n", modifiers: .command)
                     .listRowInsets(EdgeInsets())
                     .listRowBackground(Color.clear)
+                } header: {
+                    // The greeting itself is the screen's title, in the bar (`shrinkingTitle`).
+                    // The question is the section's header, not a row: a section's first row
+                    // is clipped to the card's rounded corner even when the card is clear,
+                    // which cut the top of the W (nit 23).
+                    Text("What would you like to do today?")
+                        .font(.body)
+                        // Not .secondary: in a header it's a step lighter than the header's own
+                        // grey (1.71:1), and Color.secondary is 3.29:1. 60% of the text color is
+                        // about 5.5:1 in light mode and 7.4:1 in dark.
+                        .foregroundStyle(Color.primary.opacity(0.6))
+                        .textCase(nil)
+                        // As much room above New Invoice as the list leaves below it (nit 9).
+                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 26, trailing: 0))
                 }
 
                 if invoices.contains(where: { $0.status != .draft }) {
