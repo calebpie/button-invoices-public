@@ -112,7 +112,7 @@ struct EditButtonView: View {
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
             } footer: {
-                if let problem { Text(problem).foregroundStyle(.orange) }
+                if let problem { Notice(problem) }
             }
         }
         .navigationTitle("Change Button")

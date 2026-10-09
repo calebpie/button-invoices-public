@@ -313,8 +313,7 @@ struct NewButtonMatchStep: View {
                 } else {
                     let close = draft.lookAlikes.filter { $0.distance < LookAlike.similar }.prefix(4)
                     if let best = close.first, best.distance < LookAlike.sameButton {
-                        Label("This looks like a button you already saved.", systemImage: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.orange).font(.headline)
+                        Notice("This looks like a button you already saved.").font(.headline)
                     } else if !close.isEmpty {
                         Text("These saved buttons look similar:").font(.headline)
                     } else {
@@ -443,7 +442,7 @@ struct NewButtonDetailsStep: View {
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
             } footer: {
-                if let problem { Text(problem).foregroundStyle(.orange) }
+                if let problem { Notice(problem) }
             }
         }
         .readableWidth()
@@ -487,9 +486,7 @@ struct NewButtonReviewStep: View {
                 }
                 .card()
                 if let best = draft.lookAlikes.first, best.distance < LookAlike.sameButton {
-                    Label("The photo looks a lot like \(best.variant.title). That's fine if this one is a different color or size.",
-                          systemImage: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
+                    Notice("The photo looks a lot like \(best.variant.title). That's fine if this one is a different color or size.")
                 }
                 if draft.photo == nil {
                     Label("No photo yet. You can add one later from the Buttons tab.", systemImage: "camera")
@@ -619,8 +616,7 @@ struct ButtonDetailsSections: View {
                 Button("Use \(ruleSKU), made from the new name") { draft.skuText = ruleSKU; draft.skuEdited = true }
             }
             if let twin = draft.duplicate(designs, variants, editing: editing) {
-                Label("“\(twin.title)” is already saved (SKU \(twin.sku)).", systemImage: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.orange)
+                Notice("“\(twin.title)” is already saved (SKU \(twin.sku)).")
             }
         } header: {
             Text("Name and SKU")

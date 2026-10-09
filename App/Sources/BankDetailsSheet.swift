@@ -31,7 +31,7 @@ struct BankDetailsSheet: View {
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
             } footer: {
-                if let problem { Text(problem).foregroundStyle(.orange) }
+                if let problem { Notice(problem) }
             }
         }
         .scrollDismissesKeyboard(.interactively)

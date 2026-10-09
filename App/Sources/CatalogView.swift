@@ -152,9 +152,11 @@ struct CatalogView: View {
                     }
                 }
             } trailing: {
-                Text(variant.price > .zero ? variant.price.formatted : "No price")
-                    .monospacedDigit()
-                    .foregroundStyle(variant.price > .zero ? .primary : Color.orange)
+                if variant.price > .zero {
+                    Text(variant.price.formatted).monospacedDigit()
+                } else {
+                    Notice("No price")
+                }
             }
             .opacity(variant.isHidden ? 0.5 : 1)
             .accessibilityElement(children: .combine)

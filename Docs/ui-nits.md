@@ -23,7 +23,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 14 | The missing-bank-details warning sends her to "Home → Business details", which doesn't exist | Invoice step 3, Review | Fixed; Caleb to check |
 | 15 | Two ‹ back buttons on a draft, each going somewhere different | Draft invoice | Fixed (spec changed); Caleb to check |
 | 16 | Questions show only the red button; "Keep Editing" and Cancel never appear | Discard and Delete questions | Fixed; Caleb to check |
-| 17 | The orange "why can't I go on" text is 2.1:1 in light mode | New Button step 3, Change Button | Open (UX review; confuses her) |
+| 17 | The orange "why can't I go on" text is 2.1:1 in light mode | New Button step 3, Change Button | Fixed; Caleb to check |
 | 18 | The big camera picture on the photo step looks tappable but does nothing | New Button step 1 | Open (UX review; confuses her) |
 | 19 | Step 3 picks the shape from a list of 20 names, no photos | New Button step 3, Change Button | Open (UX review; confuses her; spec) |
 | 20 | Picking a saved shape leaves size "One size" and price empty, so a near-duplicate is easy | New Button step 3 | Open (UX review; confuses her) |
@@ -915,6 +915,30 @@ Dark mode is fine (orange on black).
 check those too once a warning can be shown (nit 14's warning, a line with no photo).
 
 **Severity:** confuses her (it's the only explanation of the grey button).
+
+**Fix** (Caleb chose dark text and an amber symbol): a shared `Notice` view (Platform.swift)
+draws every warning as a ⚠︎ in a new **Warning** color with the words in the normal text
+color. Warning (Assets.xcassets): #B45309 in light mode, yellower than the rust tint #C0472A
+so it doesn't read as tappable; iOS's orange #FF9230 in dark mode. Used for the "why it's
+grey" sentences (New Button step 3, Change Button, the quantity screen, Bank Details), Review's
+checks (problems keep a red ✕ octagon; "Matches." a green ✓, also dark text now), the
+look-alike and duplicate warnings, and "No price" in the Buttons list; the ! beside a bad
+discount or price is amber. No orange text is left (`grep .orange App/Sources` is empty).
+Gotcha: in a section footer `.primary` resolves to the footer's grey, so the text uses
+`Color.primary`.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max; 3x screenshots):
+
+| Where | Text | Symbol |
+|---|---|---|
+| New Button step 3, under Next, light (shot 58-nit17-step3-notice-light) | #000000 on #F2F2F7, 18.8:1 | #B45309, 4.50:1 |
+| Same, dark (59-nit17-step3-notice-dark) | #FFFFFF on #1C1C1E, 17.0:1 | #FF9230, 7.62:1 |
+| Review, "Your total is $126.00 less…", light, white card (60-nit17-review-notice-light) | #000000 on #FFFFFF, 21:1 | #B45309, 5.02:1 |
+
+Before: the orange text was 2.07:1.
+
+**Check** (Caleb, iPhone, light mode): Buttons tab → **+** → **Skip Photo**, scroll to the
+end: a brown-orange ⚠︎ and black "Pick the shape or type its name." under the grey Next.
 
 ## 18. The big camera picture on the photo step looks tappable but does nothing
 

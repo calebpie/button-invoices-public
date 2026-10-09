@@ -80,7 +80,7 @@ struct LineEditorView: View {
                             .font(.title3.monospacedDigit())
                         if discountIsPercent { Text("%").foregroundStyle(.secondary) }
                         if discountIsWrong {
-                            Image(systemName: "exclamationmark.circle.fill").foregroundStyle(.orange)
+                            Image(systemName: "exclamationmark.circle.fill").foregroundStyle(Color.warning)
                                 .accessibilityLabel("Not a valid discount")
                         }
                     }
@@ -121,7 +121,7 @@ struct LineEditorView: View {
                 .listRowBackground(Color.clear)
             } footer: {
                 // Why the button is grey, as the new-button steps say under Next.
-                if let problem { Text(problem).foregroundStyle(.orange) }
+                if let problem { Notice(problem) }
             }
             if case .edit(let line) = mode {
                 // Its own card: under the bare Save button it had square top corners.
@@ -305,7 +305,7 @@ struct MoneyField: View {
                 .numericInput($text, .decimal)
                 .font(.title3.monospacedDigit())
             if !text.isEmpty && Money(parsing: text) == nil {
-                Image(systemName: "exclamationmark.circle.fill").foregroundStyle(.orange)
+                Image(systemName: "exclamationmark.circle.fill").foregroundStyle(Color.warning)
                     .accessibilityLabel("Not a dollar amount")
             }
         }

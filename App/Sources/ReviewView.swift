@@ -25,8 +25,7 @@ struct ReviewStep: View {
                 if !checks.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         ForEach(checks) { check in
-                            Label(check.text, systemImage: check.level == .problem ? "xmark.octagon.fill" : "exclamationmark.triangle.fill")
-                                .foregroundStyle(check.level == .problem ? .red : .orange)
+                            Notice(check.text, tone: check.level == .problem ? .problem : .warning)
                             if check.fix == .bankDetails {
                                 Button("Add Bank Details", systemImage: "building.columns") { addingBank = true }
                                     .buttonStyle(.bordered)
@@ -94,11 +93,10 @@ struct ReviewStep: View {
                     MoneyField(title: "Total from your notes", text: $expectedText)
                     if let expected = Money(parsing: expectedText) {
                         if expected == invoice.total {
-                            Label("Matches.", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+                            Notice("Matches.", tone: .good)
                         } else {
                             let gap = expected - invoice.total
-                            Label("Your total is \(Money(cents: abs(gap.cents)).formatted) \(gap.cents > 0 ? "more" : "less") than the invoice. Check the quantities and shipping.",
-                                  systemImage: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                            Notice("Your total is \(Money(cents: abs(gap.cents)).formatted) \(gap.cents > 0 ? "more" : "less") than the invoice. Check the quantities and shipping.")
                         }
                     }
                 }

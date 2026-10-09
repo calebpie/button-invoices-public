@@ -458,6 +458,54 @@ extension ToolbarContent {
     }
 }
 
+// MARK: - Warnings
+
+extension Color {
+    /// Amber for warning symbols (nit 17): #B45309 in light mode, 4.5:1 on the grouped
+    /// background and yellower than the rust tint, so it doesn't read as something to tap;
+    /// iOS's orange in dark mode. Only the symbol is colored; the words stay in the text color.
+    static let warning = Color("Warning")
+}
+
+/// A warning or problem sentence: the symbol carries the color, the words are in the normal
+/// text color so they're readable in light mode (orange text was 2.07:1, nit 17).
+struct Notice: View {
+    enum Tone { case warning, problem, good }
+
+    let text: String
+    var tone: Tone = .warning
+
+    init(_ text: String, tone: Tone = .warning) {
+        self.text = text
+        self.tone = tone
+    }
+
+    var body: some View {
+        Label {
+            // Color.primary, not .primary: in a section footer .primary is the footer's grey.
+            Text(text).foregroundStyle(Color.primary)
+        } icon: {
+            Image(systemName: symbol).foregroundStyle(color)
+        }
+    }
+
+    private var symbol: String {
+        switch tone {
+        case .warning: "exclamationmark.triangle.fill"
+        case .problem: "xmark.octagon.fill"
+        case .good: "checkmark.circle.fill"
+        }
+    }
+
+    private var color: Color {
+        switch tone {
+        case .warning: .warning
+        case .problem: .red
+        case .good: .green
+        }
+    }
+}
+
 // MARK: - Toolbar buttons
 
 /// The standard Cancel for sheets: an xmark on iOS 26, the word Cancel before that
