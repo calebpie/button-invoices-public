@@ -12,8 +12,8 @@ to try. App code isn't changed for a nit until the bug bash.
 | 3 | The receipt photo can't be opened full size to check the amount | Invoice step 2, Shipping | Fixed; Caleb to check |
 | 4 | Swipe-delete: the row vanishes before she confirms; after she confirms, it vanishes with no animation | Invoices list | Fixed; Caleb to check |
 | 5 | One letter in search finds nothing and says "No Results" | Buttons search; Add a Button in an invoice | Fixed |
-| 6 | Closing search with text in it: the shape cards jump up, then back down | Add a Button in an invoice | Open |
-| 7 | Search circle: opens slowly; on close it collapses mid-bar, then slides over | Buttons tab, search | Open |
+| 6 | Closing search with text in it: the shape cards jump up, then back down | Add a Button in an invoice | Fixed; Caleb to check |
+| 7 | Search circle: opens slowly; on close it collapses mid-bar, then slides over | Buttons tab, search | Fixed; Caleb to check |
 | 8 | The PDF page's top corners are rounded off | Finished invoice, "The PDF" | Open |
 | 9 | More space below New Invoice than above it | Invoices | Fixed; Caleb to check |
 | 10 | The Buttons title sits further left than the other tabs' titles | Buttons tab | Fixed; Caleb to check |
@@ -336,6 +336,39 @@ tab is different: its search comes and goes through `searchOnRequest` (Platform.
 - Check the same close on the Buttons tab (nit 1 already covers its keyboard strip), and
   the Cancel/✕ of the sheet itself while search is active.
 
+**Fixed** (Oct 8, 2026; AddLineSheet.swift, `ShapePickerView`): once she types, the content
+ignores the keyboard (`ignoresSafeArea(.keyboard)`) and keeps its own room under it (bottom
+padding the keyboard's height, so the last results still scroll clear of it), until the
+keyboard has gone. With nothing typed, nothing changes.
+
+- The Simulator needs the on-screen keyboard to show this. With the Mac keyboard attached
+  iOS hides it, and ✕ closes smoothly. Turned on for the iPhone 15 Pro Max with
+  `xcrun simctl spawn <device> defaults write com.apple.keyboard.preferences
+  AutomaticMinimizationEnabled -bool NO` and a restart of the simulated iPhone.
+- The cause isn't the switch from results to shapes, as first thought: keeping the results
+  showing until the search had closed, they jumped the same way (4.30–4.50 s, then down at
+  4.53). Closing with nothing typed doesn't jump. Closing with text clears it, so the sheet
+  redraws in the middle of the bar's and keyboard's animations, and the content, following
+  the keyboard's shrinking space in that redraw, is drawn too high. Ignoring the keyboard
+  everywhere fixed it (probe), but then closing while scrolled to the end of the shapes
+  jumped instead, by about two rows, where the original slides smoothly; hence only once
+  she types.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, on-screen keyboard, recordings at
+30 fps; points from the top, the heading's letters at x 60):
+
+- "n" typed (9 Nautilus results), ✕: the heading moves 164 → 171 → 185 → 196 → 204 → 209 →
+  212 (2.06–2.30 s) and stays; the shapes fade in in place. Before: drawn about 130 points
+  too high for 5 frames ("ge", 4.27–4.43 s), then down in one frame.
+- Nothing typed, the shapes scrolled to the end with the keyboard up, ✕: slides from 2.00 to
+  2.33 s and ends where the original code does (same rows at y 250, 319, 387).
+- "n" typed, keyboard up: the results scroll up until Add a New Button sits above the
+  keyboard.
+
+**Check** (Caleb, iPhone): a draft → Add a Button → tap the search, type "he" → ✕ at the
+top right. The shapes come back without jumping up first. Then type "n" and scroll down:
+Add a New Button can be scrolled above the keyboard.
+
 ## 7. Search circle: opens slowly; on close it collapses mid-bar, then slides over
 
 **Reported** (Caleb, Oct 8, 2026, iPhone 17 Simulator, screen recording 19.37.22): on the
@@ -384,6 +417,31 @@ Third-party guides (not Apple) suggest 0.3–0.5 s for transitions like this.
   contents their own transition so they fade out as the glass shrinks; clear `text` and
   drop focus inside the same animation.
 - Recheck the press-to-movement delay with a probe log at `open()`.
+
+**Fixed** (Oct 8, 2026; Platform.swift, `SearchTitleBar`):
+
+- The 🔍 circle and the search field are now one view that only changes width: opening grows
+  it to the left into the field, closing shrinks it to the right back into place, the 🔍
+  moving inside it. The field's text fades in and out with it.
+- Both use `.smooth(duration: 0.3)` instead of `.smooth`'s 0.5 s.
+- ✕ clears the text once the field has closed, not at once: clearing it brings back the
+  whole list, and drawing that held the field still for about 0.1 s before it moved.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, recordings at 30 fps):
+
+| | Before | After |
+|---|---|---|
+| Open, first movement to rest | about 0.45 s | 0.27 s (2.17 → 2.43 s) |
+| Close | a circle mid-bar with "…ns" in it (6.13 s), sliding right to 6.53 s | shrinks straight into place, 6.13 → 6.37 s |
+| ✕ to first movement | about 0.1 s still | one frame (✕ greyed 6.10 s, moving 6.13 s) |
+
+The full list comes back at 6.63 s, after the field has settled. Same with the on-screen
+keyboard: ✕ greyed at 5.05 s, shrinking from 5.15 s, at rest 5.42 s. Press-to-movement on
+opening wasn't timed (the Simulator's taps are instant).
+
+**Check** (Caleb, iPhone): Buttons → 🔍: the circle stretches left into the field. Type
+"he", then ✕: the field shrinks back to the right into the 🔍 circle, with no circle
+left in the middle of the bar.
 
 ## 8. The PDF page's top corners are rounded off
 

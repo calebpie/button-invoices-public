@@ -141,15 +141,15 @@ private struct SearchTitleBar: ViewModifier {
     private var bar: some View {
         GlassEffectContainer(spacing: 10) {
             BarRow {
-                if searching {
-                    field
-                    circle("Close Search", systemImage: "xmark", id: "trailing", action: close)
-                } else {
+                if !searching {
                     TitleText(title: title, progress: progress)
                         .transition(.opacity.animation(.easeOut(duration: 0.15)))
                     Spacer(minLength: 8)
-                    circle(searchLabel, systemImage: "magnifyingglass", id: "search", action: open)
-                        .keyboardShortcut("f", modifiers: .command)
+                }
+                searchField
+                if searching {
+                    circle("Close Search", systemImage: "xmark", id: "trailing", action: close)
+                } else {
                     circle(action.title, systemImage: action.systemImage, id: "trailing", prominent: true,
                            action: action.perform)
                 }
@@ -158,27 +158,47 @@ private struct SearchTitleBar: ViewModifier {
         .leavesTapsToItsControls()
     }
 
-    private var field: some View {
+    /// The 🔍 circle and the search field are one view that only changes width, so opening
+    /// grows the circle to the left into the field and closing shrinks it back into place,
+    /// its 🔍 moving with it. As two views sharing a glass ID, the glass morphed between them
+    /// but their contents didn't: closing left an empty circle mid-bar that then slid over
+    /// (Docs/ui-nits.md, nit 7).
+    private var searchField: some View {
         HStack(spacing: 6) {
-            Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+            Image(systemName: "magnifyingglass")
+                .font(searching ? .body : .title3.weight(.medium))
+                .foregroundStyle(searching ? .secondary : .primary)
                 .accessibilityHidden(true)
-            TextField(prompt, text: $text)
-                .focused($focused)
-                .submitLabel(.search)
-                .autocorrectionDisabled()
-                .accessibilityAddTraits(.isSearchField)
-                .onKeyPress(.escape) {
-                    close()
-                    return .handled
+            if searching {
+                TextField(prompt, text: $text)
+                    .focused($focused)
+                    .submitLabel(.search)
+                    .autocorrectionDisabled()
+                    .accessibilityAddTraits(.isSearchField)
+                    .onKeyPress(.escape) {
+                        close()
+                        return .handled
+                    }
+                    .transition(.opacity)
+                if !text.isEmpty {
+                    Button("Clear Text", systemImage: "xmark.circle.fill") { text = "" }
+                        .labelStyle(.iconOnly)
+                        .foregroundStyle(.secondary)
                 }
-            if !text.isEmpty {
-                Button("Clear Text", systemImage: "xmark.circle.fill") { text = "" }
-                    .labelStyle(.iconOnly)
-                    .foregroundStyle(.secondary)
             }
         }
-        .padding(.horizontal, 14)
-        .frame(maxWidth: .infinity, minHeight: 44)
+        .padding(.horizontal, searching ? 14 : 0)
+        .frame(maxWidth: searching ? .infinity : 44, alignment: searching ? .leading : .center)
+        .frame(height: 44)
+        .overlay {
+            if !searching {
+                Button(action: open) { Color.clear.contentShape(.circle) }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(searchLabel)
+                    .keyboardShortcut("f", modifiers: .command)
+            }
+        }
+        .clipShape(.capsule)
         .glassEffect(.regular.interactive(), in: .capsule)
         .glassEffectID("search", in: glass)
     }
@@ -198,15 +218,20 @@ private struct SearchTitleBar: ViewModifier {
         .glassEffectID(id, in: glass)
     }
 
+    /// Shorter than `.smooth`'s default 0.5 s, which felt slow (nit 7).
+    private let motion = Animation.smooth(duration: 0.3)
+
     private func open() {
-        withAnimation(.smooth) { searching = true }
+        withAnimation(motion) { searching = true }
         focused = true
     }
 
     private func close() {
         focused = false
-        withAnimation(.smooth) { searching = false }
-        text = ""
+        // The text clears once the field has closed: clearing it brings back the whole
+        // list, and drawing that at the start held the field still for 0.1 s (nit 7).
+        // Not if she has opened it again meanwhile.
+        withAnimation(motion) { searching = false } completion: { if !searching { text = "" } }
     }
 }
 

@@ -93,6 +93,10 @@ struct ShapePickerView: View {
 
     @Query(sort: [SortDescriptor(\ButtonDesign.name, comparator: .localizedStandard)]) private var designs: [ButtonDesign]
     @Query private var variants: [ButtonVariant]
+    /// From her first letter until the keyboard has gone, the content ignores the keyboard
+    /// and keeps its own room for it (nit 6).
+    @State private var ownKeyboardRoom = false
+    @State private var keyboardHeight: CGFloat = 0
 
     @ScaledMetric private var tileWidth: CGFloat = 104
     private var grid: [GridItem] { [GridItem(.adaptive(minimum: tileWidth), spacing: 12)] }
@@ -144,10 +148,27 @@ struct ShapePickerView: View {
                 .padding(.top, 8)
             }
             .padding()
+            .padding(.bottom, ownKeyboardRoom ? keyboardHeight : 0)
             .frame(maxWidth: 760)
             .frame(maxWidth: .infinity)
         }
         .scrollDismissesKeyboard(.interactively)
+        // Closing the search with text in it (✕) clears the text, so the sheet redraws while
+        // the bar grows back and the keyboard goes. Following the keyboard's shrinking space in
+        // that redraw drew the content about 130 points too high for 5 frames, then dropped it
+        // into place (Docs/ui-nits.md, nit 6). So once she types, the content ignores the
+        // keyboard and makes its own room under it, until the keyboard has gone. With nothing
+        // typed, the system's own handling stays: it slides smoothly, even scrolled to the end.
+        .ignoresSafeArea(ownKeyboardRoom ? .keyboard : [], edges: .bottom)
+        .onChange(of: search) { _, new in
+            if !new.isEmpty { ownKeyboardRoom = true }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardDidShowNotification)) { note in
+            keyboardHeight = (note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect)?.height ?? 0
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardDidHideNotification)) { _ in
+            ownKeyboardRoom = false
+        }
         // The system search field, in its usual place (Search fields).
         .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always),
                     prompt: "Type an order, like 12 red hearts")
