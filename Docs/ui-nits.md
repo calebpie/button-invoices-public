@@ -18,7 +18,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 9 | More space below New Invoice than above it | Invoices | Fixed; Caleb to check |
 | 10 | The Buttons title sits further left than the other tabs' titles | Buttons tab | Fixed; Caleb to check |
 | 11 | "Archived (1)" can't be opened, so archived buttons can't be seen or unarchived from the list | Buttons tab | Fixed; Caleb to check |
-| 12 | A discount bigger than the price shows a negative line total, and Add is greyed out with no reason | Quantity screen | Open (UX review; confuses her) |
+| 12 | A discount bigger than the price shows a negative line total, and Add is greyed out with no reason | Quantity screen | Fixed; Caleb to check |
 | 13 | "Add a Button" means two different things | Invoice step 1; Home Screen, Siri, Buttons + | Open (UX review; confuses her) |
 | 14 | The missing-bank-details warning sends her to "Home → Business details", which doesn't exist | Invoice step 3, Review | Open (UX review; confuses her) |
 | 15 | Two ‹ back buttons on a draft, each going somewhere different | Draft invoice | Open (UX review; confuses her) |
@@ -734,6 +734,24 @@ button; the gap is the missing reason.) The invoice steps already show theirs be
 or price.
 
 **Severity:** confuses her.
+
+**Fix:** one `problem` sentence decides both the grey button and what's said, shown in orange
+under Add to Invoice (or Save), as New Button step 3 does under Next. In order: "Enter how
+many.", "Enter the price for one button.", "The percent off can't be more than 100.", "The
+discount isn't a number.", "The discount can't be more than the price ($4.00)." While there's
+a problem the line total shows "—" and the "12 × …" line is hidden; the orange ! beside the
+discount also shows for a discount over the price. The orange is nit 17's, fixed there.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light): New Invoice → Add a Button →
+Heart → Red → Use This Button: "Enter how many." under the grey button, total "—" (shot
+46-nit12-no-quantity-light). 12, then a $55 discount: the !, "—", and "The discount can't be
+more than the price ($4.00)." (47-nit12-discount-over-price-light). Percent, 550: "The percent
+off can't be more than 100." Remove Discount: $48.00, "12 × $4.00", no sentence; Add to
+Invoice added the line at $48.00.
+
+**Check** (Caleb, iPhone): the same steps. With the number pad up, the sentence under the
+button may be hidden by it; the ! and "—" should still show above it. Note whether that's
+enough, or whether the discount's own reason should also sit under the discount field.
 
 ## 13. "Add a Button" means two different things
 

@@ -79,7 +79,7 @@ struct LineEditorView: View {
                             .numericInput($discountText, .decimal)
                             .font(.title3.monospacedDigit())
                         if discountIsPercent { Text("%").foregroundStyle(.secondary) }
-                        if discount == nil {
+                        if discountIsWrong {
                             Image(systemName: "exclamationmark.circle.fill").foregroundStyle(.orange)
                                 .accessibilityLabel("Not a valid discount")
                         }
@@ -104,7 +104,7 @@ struct LineEditorView: View {
                 LabeledContent("Line total") {
                     Text(lineTotal?.formatted ?? "—").font(.title3.bold()).monospacedDigit()
                 }
-                if let quantity, let price {
+                if problem == nil, let quantity, let price {
                     Text("\(quantity) × \((price - (discount ?? .zero)).formatted)")
                         .foregroundStyle(.secondary).monospacedDigit()
                 }
@@ -119,6 +119,9 @@ struct LineEditorView: View {
                 .disabled(!isValid)
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
+            } footer: {
+                // Why the button is grey, as the new-button steps say under Next.
+                if let problem { Text(problem).foregroundStyle(.orange) }
             }
             if case .edit(let line) = mode {
                 // Its own card: under the bare Save button it had square top corners.
@@ -206,14 +209,27 @@ struct LineEditorView: View {
         Double(discountText.replacingOccurrences(of: "%", with: "").trimmingCharacters(in: .whitespaces)) ?? 0
     }
 
+    /// Nil while anything is wrong, so a discount over the price never shows a negative total.
     private var lineTotal: Money? {
-        guard let quantity, let price, let discount else { return nil }
+        guard problem == nil, let quantity, let price, let discount else { return nil }
         return (price - discount) * quantity
     }
 
-    private var isValid: Bool {
-        guard let price, let discount, quantity != nil else { return false }
-        return price > .zero && discount >= .zero && discount <= price
+    /// What's stopping the line from being added, in her words; nil when it can be.
+    private var problem: String? {
+        guard quantity != nil else { return "Enter how many." }
+        guard let price, price > .zero else { return "Enter the price for one button." }
+        if discountIsPercent, discountPercent > 100 { return "The percent off can't be more than 100." }
+        guard let discount, discount >= .zero else { return "The discount isn't a number." }
+        if discount > price { return "The discount can't be more than the price (\(price.formatted))." }
+        return nil
+    }
+
+    private var isValid: Bool { problem == nil }
+
+    private var discountIsWrong: Bool {
+        guard let discount else { return true }
+        if let price { return discount > price } else { return false }
     }
 
     private func load() {
