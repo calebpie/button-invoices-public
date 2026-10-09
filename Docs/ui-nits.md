@@ -15,7 +15,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 6 | Closing search with text in it: the shape cards jump up, then back down | Add a Button in an invoice | Open |
 | 7 | Search circle: opens slowly; on close it collapses mid-bar, then slides over | Buttons tab, search | Open |
 | 8 | The PDF page's top corners are rounded off | Finished invoice, "The PDF" | Open |
-| 9 | More space below New Invoice than above it | Invoices | Open |
+| 9 | More space below New Invoice than above it | Invoices | Fixed; Caleb to check |
 | 10 | The Buttons title sits further left than the other tabs' titles | Buttons tab | Fixed; Caleb to check |
 
 ## 1. Grey strip under the tab bar as the keyboard goes away
@@ -442,6 +442,17 @@ the header's top padding.
   them by eye if the header's letters make an exact match look off.
 - Check with no finished invoices (the empty state instead of "Paid") and with the tip
   showing, which also sit under the button, and at a large text size.
+
+**Fixed** (Oct 8, 2026; InvoicesTab.swift): the subtitle row's bottom inset is 26 points
+instead of 16, so New Invoice sits 10 points lower and everything below moves down with it.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light mode; 3x screenshot, points):
+subtitle baseline y 117.3 (descender to 119.3), New Invoice y 149.3–211.3, "Paid" letters
+from y 243.3. So 32.0 points above the button and 32.0 below. Not checked: the empty state,
+the tip and large text sizes (the gap above is fixed, the one below follows the text size).
+
+**Check** (Caleb, iPhone): Invoices tab: the space between "What would you like to do
+today?" and New Invoice now looks the same as between New Invoice and the next heading.
 
 ## 10. The Buttons title sits further left than the other tabs' titles
 
