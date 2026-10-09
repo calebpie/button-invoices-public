@@ -43,6 +43,16 @@
       "photo": "crab-blue.png"
     },
     {
+      "design": "Crab",
+      "colors": [
+        "Red"
+      ],
+      "size": "",
+      "sku": "26CR",
+      "priceCents": 1200,
+      "photo": "crab-red.png"
+    },
+    {
       "design": "Daisy",
       "colors": [
         "Black",

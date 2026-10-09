@@ -414,6 +414,31 @@ installed and launched the app; screenshot 1290 × 2796 pixels (430 × 932 point
 Invoices tab as before. Earlier Simulator results in this file and Docs/ui-nits.md were on
 the 6.3-inch iPhone 17.
 
+## More raw photos; the red crab (Oct 8, 2026)
+
+Caleb added 20 raw photos to Examples/Images/Raw and confirmed their labels, now in
+LookAlikeTests (`rawLabels`: 4 more of one button; `rawGroups`: 16 of several, not yet
+used by a test).
+
+- Duplicate check, new single-button photos, closest saved photo: IMG_4144 Heart, Burgundy
+  0.076 (next 0.272); IMG_4146 Daisy, Black / White, Small 0.063 (next 0.465); IMG_4149
+  Flower Burst 0.103 (next 0.335). IMG_4147, the large daisy: closest is the small daisy,
+  0.226, and the saved large daisy is 14th; kept in the test as a known issue.
+- Color fallback vs Vision (the Simulator's cutout): IMG_4146 0.905, IMG_4147 0.948,
+  IMG_4149 0.854; IMG_4144, the burgundy heart, 0.056: its dusty red is inside the range
+  learned from the table, and only a sliver of its rim is kept. Known issue in the test.
+- Crab, Red (26CR, $12.00, no size, as the blue crab) added to the seed (Caleb). Photo: the
+  app's cutout of the red crab in IMG_4709 (a message screenshot; Vision separated the two
+  crabs, the red one 523 px across), with the soft edge firmed, a 1 px fringe shaved and
+  the table cleared from its two holes; 565 px, saved at 600. The blue crab in the same
+  screenshot matches its saved photo at 0.114; red vs blue crab 0.381. In IMG_4707 Vision
+  didn't separate the crabs.
+- `make seed`: 38 buttons, all with an edited photo; only catalog.json and crab-red.png
+  changed. `make test`: 38 tests passed, with the 3 known issues above.
+- Checked in the Simulator (iPhone 17, fresh install): Buttons → Crab 2: Blue 26CBL $12.00
+  and Red 26CR $12.00, with its photo. The catalog loads once, on first launch, so phones
+  and simulators that already have the app don't get the crab; her iPhone will.
+
 ## M2 results (Caleb)
 
 Use the Part N, step M labels from Docs/m2-test.md.

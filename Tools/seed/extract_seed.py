@@ -1,7 +1,8 @@
 """Builds the app's starting catalog from an invoice workbook's Reference sheet.
 
 Writes, into --out (default App/Resources/Seed):
-  catalog.json   every button: description parts, SKU, price, photo file name
+  catalog.json   every button: description parts, SKU, price, photo file name; the
+                 Reference sheet's buttons, then EXTRA_BUTTONS
   Photos/*.png   one photo per button, at most 600 px; the edited PNG from --photos where
                  there is one, otherwise the small copy embedded in the workbook
   business.json  seller, bill-to, routing and account from the Invoice sheet (gitignored:
@@ -106,6 +107,12 @@ ADDRESS_FIXES = {"Suit 100": "Suite 100"}
 # Longest side of the bundled photos. The app shows them at up to 450 px and the PDF at 300.
 PHOTO_SIZE = 600
 
+# Buttons she makes that aren't on the Reference sheet (Caleb, Oct 8, 2026). Each takes its
+# size and price from the button named in "like", and is listed right after it.
+EXTRA_BUTTONS = [
+    {"design": "Crab", "colors": ["Red"], "sku": "26CR", "like": "26CBL"},
+]
+
 # Edited photo file name (without .png) → the SKUs it shows. Two buttons share a photo in
 # the workbook: Nautilus Brown / Brown Large, and Matte White / Unglazed.
 EDITED_PHOTOS = {
@@ -113,6 +120,7 @@ EDITED_PHOTOS = {
     "Cowrie Shell, Black": ["26CSB"],
     "Cowrie Shell, Pale Pink": ["26CSPP"],
     "Crab, Blue": ["26CBL"],
+    "Crab, Red": ["26CR"],  # cut out with the app's cutout from her photo IMG_4709
     "Daisy, Black : White, Large": ["26DBWL"],
     "Daisy, Black : White, Small": ["26DBWS"],
     "Daisy, Red : White, Large": ["26DRWS"],  # invoiced as Small
@@ -252,6 +260,15 @@ def main():
             "photo": photo,
         })
         row += 1
+
+    for extra in EXTRA_BUTTONS:
+        i = next(i for i, v in enumerate(variants) if v["sku"] == extra["like"])
+        like = variants[i]
+        variants.insert(i + 1, {
+            "design": extra["design"], "colors": extra["colors"], "size": like["size"], "sku": extra["sku"],
+            "priceCents": like["priceCents"], "photo": None,
+        })
+        print(f"  added, not on the Reference sheet: {extra['design']}, {' / '.join(extra['colors'])} {extra['sku']}")
 
     # Caleb's edited photos replace the small copies embedded in the workbook. Their file
     # names don't always match the invoice names, so known files are mapped to SKUs

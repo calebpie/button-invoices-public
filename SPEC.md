@@ -51,7 +51,9 @@ and iPad can be switched on later without a migration (see Open questions).
   numbers are kept in the iOS keychain, the rest in the app's settings.
 
 First launch loads the catalog from App/Resources/Seed, which `make seed` builds from
-the 0260903 workbook's Reference sheet (37 buttons). Business details come from the same
+the 0260903 workbook's Reference sheet (37 buttons), plus Crab, Red (26CR), which she made
+before but isn't on the sheet: price and size as the blue crab's (Caleb, Oct 8, 2026).
+Business details come from the same
 workbook into Seed/business.json. Typos in the workbook are corrected on the way in
 (Tools/seed/extract_seed.py), and were corrected in the two template files too (originals
 in Examples/…/Originals before typo fixes):
@@ -66,7 +68,8 @@ in Examples/…/Originals before typo fixes):
 | Crab, Blue 26CBLW (the clover's SKU) | Crab, Blue 26CBL |
 | Shell, Yellow 26SW | Shell, Yellow 26SY |
 
-Photos: Caleb's edited PNG of every button (Examples/Images/Edited, added Oct 8, 2026),
+Photos: Caleb's edited PNG of every button (Examples/Images/Edited, added Oct 8, 2026;
+the red crab's is the app's own cutout from her photo IMG_4709, its edge and holes cleaned),
 at most 600 px, mapped to SKUs by an explicit table in the seed script because the file
 names differ from the invoice names (each pair checked by eye against the workbook
 thumbnail). The invoice names are kept; the file names say:
@@ -242,11 +245,13 @@ unarchives it.
 
 Photo-match thresholds (probe, October 8, 2026: her 8 raw photos against the 37 saved
 edited photos; LookAlikeTests): the same button 0.041–0.103, the same shape in another
-color (hearts, mushrooms) 0.241–0.313, different shapes 0.338 and up. The app warns "looks like" below
-0.2 and lists "similar" below 0.4. Hypothesis until checked with a new photo of a button
-that is already saved. Vision's feature prints fail in the Simulator ("Failed to create
-espresso context", Oct 8, 2026); the step then says it couldn't compare photos and still
-lists the chosen shape's saved buttons.
+color (hearts, mushrooms) 0.241–0.313, different shapes 0.338 and up. The app warns "looks
+like" below 0.2 and lists "similar" below 0.4. Hypothesis until checked with a new photo
+of a button that is already saved. Four more single-button photos (Oct 8, 2026): heart,
+small daisy and flower burst 0.063–0.103; the large daisy came out closest to the small
+daisy (0.226), its own saved photo (taken at an angle) 14th. Vision's feature prints fail
+in the Simulator ("Failed to create espresso context", Oct 8, 2026); the step then says it
+couldn't compare photos and still lists the chosen shape's saved buttons.
 
 ## Button history
 
@@ -427,9 +432,10 @@ Not adopted, and why:
 ## Open questions (for Caleb)
 
 1. Template data, corrected Oct 8, 2026 (Data). Still open: Nautilus, Unglazed shares
-   Matte White's photo and Nautilus, Brown, Large shares Brown's; Pineapple keeps 26PYB;
-   the photo file names suggest different sizes or colors for six buttons (Data, second
-   table): which names are right?
+   Matte White's photo (it is white porcelain; some are on her plate in IMG_4175) and
+   Nautilus, Brown, Large shares Brown's; Pineapple keeps 26PYB; the photo file names
+   suggest different sizes or colors for six buttons (Data, second table): which names are
+   right?
 2. SKU year: fixed at first save (assumed), or re-yeared every January?
 3. Same-day numbering: the April batch was -1…-5 from the first; the app gives the first
    one no suffix and the second "-2". Fine?
