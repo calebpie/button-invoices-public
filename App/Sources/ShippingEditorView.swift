@@ -82,14 +82,19 @@ struct ShippingEditorView: View {
                 .disabled(amount == nil)
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
-                if let charge {
-                    Button("Remove Shipping", role: .destructive) {
+            }
+            if let charge {
+                // Its own card with an icon, as Change Line's Remove from Invoice: under the
+                // bare Save button it had square top corners (nit 24).
+                Section {
+                    Button(role: .destructive) {
                         if let invoice = charge.invoice {
                             Undo.perform("Remove Shipping", context, .remove([charge], from: invoice))
                         }
                         dismiss()
+                    } label: {
+                        DestructiveLabel("Remove Shipping", systemImage: "trash")
                     }
-                    .frame(maxWidth: .infinity)
                 }
             }
         }

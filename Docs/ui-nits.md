@@ -30,7 +30,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 21 | "Change" buttons are 24 points tall | Invoice step 3, Review | Fixed; Caleb to check |
 | 22 | "Already Saved" reads like a label, and the two card buttons differ in size | New Button step 2 | Fixed; Caleb to check |
 | 23 | Side margins are 16 points on some screens and 20 on others | Draft bars, Review, Add a Button, new-button steps, photo | Fixed; Caleb to check |
-| 24 | Remove Shipping hangs under the bare Save button, with square corners and no icon | Shipping sheet (changing a charge) | Open (UX review; polish) |
+| 24 | Remove Shipping hangs under the bare Save button, with square corners and no icon | Shipping sheet (changing a charge) | Fixed; Caleb to check |
 | 25 | Unreached steps in the step bar are 1.6:1, too faint to read | Draft step bar | Open (UX review; polish) |
 | 26 | Invoice rows wrap "of buttons" onto a third line | Invoices list | Open (UX review; polish) |
 | 27 | A 1-pixel seam crosses the Paid card | Invoices list | Open (UX review; polish) |
@@ -1167,6 +1167,18 @@ under it … Destructive rows carry an icon"; Layout: group related items.
 Shipping", systemImage: "trash")`.
 
 **Severity:** polish. **Spec:** breaks the spec's own rule.
+
+**Fix** (Caleb approved): Remove Shipping is in its own section below Save, as
+`DestructiveLabel("Remove Shipping", systemImage: "trash")` (ShippingEditorView.swift), the
+same as Change Line's Remove from Invoice. SPEC.md unchanged: the screen now follows it.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light): a draft's step 2 → Add Shipping →
+12.50 → Add Shipping → tap the charge: Save, then a separate card with a trash icon and
+"Remove Shipping", rounded at all four corners (shot 78-nit24-remove-shipping-light). Tapping
+it removed the charge; the total went from $4,138.50 back to $4,126.00.
+
+**Check** (Caleb, iPhone): open a shipping charge on a draft; Remove Shipping is its own card
+with a trash icon.
 
 ## 25. Unreached steps in the step bar are 1.6:1, too faint to read
 
