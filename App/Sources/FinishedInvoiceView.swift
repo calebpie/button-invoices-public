@@ -60,10 +60,15 @@ struct FinishedInvoiceView: View {
                     set: { invoice.status = $0 ? .paid : .finalized }))
             }
 
-            Section("The PDF") {
+            // In the footer, not a row: a section clips its rows to its rounded card, which
+            // cut the page's top corners (Docs/ui-nits.md, nit 8). Out to the cards' edges,
+            // past the 20 points a footer is inset by, so the page stays as wide as before.
+            Section {
+            } header: {
+                Text("The PDF")
+            } footer: {
                 PDFPages(pages: pages) { fullScreen = pdfURL }
-                    .listRowBackground(Color.clear)
-                    .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                    .padding(.horizontal, -20)
             }
         }
         .readableWidth()

@@ -14,7 +14,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 5 | One letter in search finds nothing and says "No Results" | Buttons search; Add a Button in an invoice | Fixed |
 | 6 | Closing search with text in it: the shape cards jump up, then back down | Add a Button in an invoice | Fixed; Caleb to check |
 | 7 | Search circle: opens slowly; on close it collapses mid-bar, then slides over | Buttons tab, search | Fixed; Caleb to check |
-| 8 | The PDF page's top corners are rounded off | Finished invoice, "The PDF" | Open |
+| 8 | The PDF page's top corners are rounded off | Finished invoice, "The PDF" | Fixed; Caleb to check |
 | 9 | More space below New Invoice than above it | Invoices | Fixed; Caleb to check |
 | 10 | The Buttons title sits further left than the other tabs' titles | Buttons tab | Fixed; Caleb to check |
 
@@ -527,6 +527,36 @@ row background hides the card but not the clip. The page is a sharp-cornered rec
   (for example 8 points in from the card's edges), so the card's corners fall outside it.
   Simpler, but the page would no longer look like a sheet of paper.
 - Check the Review screen and the bottom corners in both modes.
+
+**Fixed** (Oct 9, 2026; FinishedInvoiceView.swift): the pages are now the footer of the
+"The PDF" section instead of its row. A list doesn't clip a footer to the section's card.
+A footer is inset 20 points further than the cards, which made the page 350 points wide
+(x 40–390) in a first try. It's padded back out by those 20 points, so it's as wide as
+before and lines up with the cards above it.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, Invoice 0260903; 3x screenshots,
+points; the page's left and right edges going down from its top row):
+
+| Points below the page's top | Before (light) | After (light) | After (dark) |
+|---|---|---|---|
+| 0 | 27.3 / 402.7 | 20.0 / 410.0 | 20.0 / 410.0 |
+| 1 | 26.3 / 403.7 | 20.0 / 410.0 | 20.0 / 410.0 |
+| 2 | 25.3 / 404.7 | 20.0 / 410.0 | 20.0 / 410.0 |
+| 4 | 24.0 / 406.0 | 20.0 / 410.0 | 20.0 / 410.0 |
+| 6 | 22.7 / 407.3 | 20.0 / 410.0 | 20.0 / 410.0 |
+| 8 | 22.3 / 407.7 | 20.0 / 410.0 | 20.0 / 410.0 |
+
+Also checked:
+
+- The bottom corners (dark, scrolled to the end; page bottom at y 815): 20.0 / 410.0 on
+  every row up to 8 points above it.
+- The page's shadow now shows along its sides; before, the card cut it off.
+- Tapping the page still opens it full size.
+- Not checked on screen: the Review screen (step 3). It's a `ScrollView` with no list, so
+  nothing clips its pages.
+
+**Check** (Caleb, iPhone, dark mode): open Invoice 0260903 and scroll to "The PDF": the page
+has square corners at the top and bottom, as wide as the cards above it.
 
 ## 9. More space below New Invoice than above it
 
