@@ -25,7 +25,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 16 | Questions show only the red button; "Keep Editing" and Cancel never appear | Discard and Delete questions | Fixed; Caleb to check |
 | 17 | The orange "why can't I go on" text is 2.1:1 in light mode | New Button step 3, Change Button | Fixed; Caleb to check |
 | 18 | The big camera picture on the photo step looks tappable but does nothing | New Button step 1 | Fixed; Caleb to check |
-| 19 | Step 3 picks the shape from a list of 20 names, no photos | New Button step 3, Change Button | Open (UX review; confuses her; spec) |
+| 19 | Step 3 picks the shape from a list of 20 names, no photos | New Button step 3, Change Button | Fixed; Caleb to check |
 | 20 | Picking a saved shape leaves size "One size" and price empty, so a near-duplicate is easy | New Button step 3 | Open (UX review; confuses her) |
 | 21 | "Change" buttons are 24 points tall | Invoice step 3, Review | Open (UX review; confuses her) |
 | 22 | "Already Saved" reads like a label, and the two card buttons differ in size | New Button step 2 | Open (UX review; confuses her) |
@@ -985,6 +985,23 @@ grid of shape photos (AddLineSheet.swift:114).
 its last tile.
 
 **Severity:** confuses her. **Spec:** follows a spec rule the screen breaks.
+
+**Fix** (Caleb chose the grid): the Shape row opens **Which shape?** (`ShapeChoiceView`,
+NewButtonFlow.swift): the Add a Button sheet's photo tiles (`DesignTile`), the chosen one
+outlined in the accent color, and **A New Shape** ("Type its name") last. Picking a shape
+goes back with its photo and name in the row and its saved colors in the strip below; A New
+Shape goes back to "Pick a saved shape" with the name field. Shared by New Button step 3 and
+Change Button. SPEC.md unchanged: the screen now follows it.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light): New Button → Skip Photo → the
+row reads "Pick a saved shape ›" (shot 63-nit19-shape-row-new-light); the grid, 20 shapes and
+A New Shape (64-nit19-which-shape-light); Heart → the row shows the heart and Heart, with
+Burgundy, Navy and Red below (65-nit19-heart-picked-light); Strawberry, then the grid again:
+Strawberry outlined; A New Shape → the name field is back. Change Button for Bunny: the row
+shows Bunny; the grid opens with Bunny outlined.
+
+**Check** (Caleb, iPhone): Buttons tab → **+** → **Skip Photo** → tap **Pick a saved shape**
+→ **Heart**. Expected: the Heart row with its photo, and its saved colors under it.
 
 ## 20. Picking a saved shape leaves size "One size" and price empty, so a near-duplicate is easy
 

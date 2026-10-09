@@ -527,6 +527,64 @@ struct NewButtonReviewStep: View {
 
 // MARK: - Shared form sections
 
+/// "Which shape?": the saved shapes as photo tiles, and A New Shape last. Picking one goes
+/// back to the button's details with it filled in.
+struct ShapeChoiceView: View {
+    let designs: [ButtonDesign]
+    @Binding var chosen: PersistentIdentifier?
+
+    @Environment(\.dismiss) private var dismiss
+    @ScaledMetric private var tileWidth: CGFloat = 104
+    private var grid: [GridItem] { [GridItem(.adaptive(minimum: tileWidth), spacing: 12)] }
+
+    var body: some View {
+        ScrollView {
+            LazyVGrid(columns: grid, spacing: 12) {
+                ForEach(designs) { design in
+                    Button { pick(design.persistentModelID) } label: {
+                        DesignTile(design: design)
+                            .overlay {
+                                if design.persistentModelID == chosen {
+                                    RoundedRectangle(cornerRadius: 12).strokeBorder(Color.accentColor, lineWidth: 3)
+                                }
+                            }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(design.persistentModelID == chosen ? .isSelected : [])
+                }
+                Button { pick(nil) } label: { newShapeTile }
+                    .buttonStyle(.plain)
+            }
+            .padding()
+        }
+        // The plain background, as in Add a Button, so the tiles' cards show.
+        .background(Color(.systemBackground))
+        .navigationTitle("Which shape?")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var newShapeTile: some View {
+        VStack(spacing: 6) {
+            Image(systemName: "plus.circle.fill")
+                .font(.system(size: 44))
+                .foregroundStyle(Color.accentColor)
+                .frame(width: 84, height: 84)
+            Text("A New Shape").font(.subheadline.weight(.semibold)).multilineTextAlignment(.center)
+            Text("Type its name").font(.caption).foregroundStyle(.secondary)
+        }
+        .padding(8)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(RoundedRectangle(cornerRadius: 12).fill(Color(.secondarySystemBackground)))
+        .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
+    }
+
+    private func pick(_ id: PersistentIdentifier?) {
+        chosen = id
+        dismiss()
+    }
+}
+
 /// Shape, colors, size, price, and the name and SKU as they'll be printed. Used for new
 /// buttons and for changing saved ones.
 struct ButtonDetailsSections: View {
@@ -563,10 +621,22 @@ struct ButtonDetailsSections: View {
 
     private var designSection: some View {
         Section {
-            Picker("Shape", selection: $draft.designID) {
-                Text("New shape…").tag(PersistentIdentifier?.none)
-                ForEach(designs) { Text($0.name).tag(Optional($0.persistentModelID)) }
+            // Photos, not names (SPEC.md, "Who uses it"; nit 19): the row opens a grid of
+            // shape photos, the same tiles as Add a Button.
+            NavigationLink {
+                ShapeChoiceView(designs: designs, chosen: $draft.designID)
+            } label: {
+                if let design = draft.chosenDesign(designs) {
+                    HStack(spacing: 12) {
+                        ButtonPhoto(data: design.coverPhoto, side: 44)
+                        Text(design.name).font(.body.weight(.medium))
+                    }
+                } else {
+                    // No saved shape picked: the name field below is for a new one.
+                    Text("Pick a saved shape")
+                }
             }
+            .accessibilityLabel(draft.chosenDesign(designs).map { "Shape: \($0.name)" } ?? "Pick a saved shape")
             if let design = draft.chosenDesign(designs) {
                 let siblings = design.visibleVariants.filter { $0 !== editing }
                 if !siblings.isEmpty {
