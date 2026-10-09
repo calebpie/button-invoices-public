@@ -387,9 +387,10 @@ Button and Remove Shipping (back in their old places, renumbering the lines afte
 Archive, Unarchive and Archive Shape. Probe cases 4 and 5 above are this approach.
 - Delete This Button (only offered for a button never on an invoice, after a question) no
   longer offers an undo. Before, a shake after it showed an unnamed "Undo" with the same
-  problem. SPEC.md, "Undo", lists "deleting"; to confirm with Caleb.
+  problem. Caleb agreed (Oct 8); SPEC.md, "Undo", now says so.
 - Other edits (quantities, prices, names) were undoable by shake only by accident of
   SwiftData recording everything; they aren't now, as SPEC.md lists only the actions above.
+  Caleb agreed (Oct 8).
 
 **Checked** (iOS 27.0 Simulator, iPhone 17, quitting and reopening the app after each Undo):
 - Delete draft 0261008-2, shake: "Undo Delete Draft"; Undo; reopen: the draft is there,

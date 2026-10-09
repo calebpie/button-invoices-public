@@ -387,7 +387,9 @@ Applied (HIG page in parentheses):
 - Quantity stepper; Dollars / Percent as a segmented control (Steppers, Segmented
   controls).
 - Undo: shake to undo (or three-finger swipe) for removing a line or shipping charge,
-  archiving and deleting, each named ("Undo Delete Invoice") (Undo and redo).
+  archiving and deleting an invoice, each named ("Undo Delete Invoice") (Undo and redo).
+  Deleting a button (only offered for one never invoiced, after a question) and other
+  edits aren't undoable (Caleb, Oct 8, 2026).
 - The app reopens where she left off (Launching, Multitasking).
 - Two tips, typing an order line and repeating an order with Duplicate, each shown until
   she closes it or uses the feature, at most one new tip a day (Offering help).
