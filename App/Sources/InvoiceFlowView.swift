@@ -319,18 +319,12 @@ struct ButtonsStep: View {
     }
 
     private func remove(_ line: InvoiceLine) {
-        context.undoManager?.setActionName("Remove Button")
-        context.delete(line)
-        for (i, other) in invoice.sortedLines.filter({ $0 !== line }).enumerated() { other.position = i }
+        Undo.perform("Remove Button", context, .remove([line], from: invoice))
     }
 
     private func delete(at offsets: IndexSet) {
         let lines = invoice.sortedLines
-        context.undoManager?.setActionName("Remove Button")
-        for i in offsets { context.delete(lines[i]) }
-        for (i, line) in lines.enumerated().filter({ !offsets.contains($0.offset) }).map(\.element).enumerated() {
-            line.position = i
-        }
+        Undo.perform("Remove Button", context, .remove(offsets.map { lines[$0] }, from: invoice))
     }
 
     private func move(from: IndexSet, to: Int) {
@@ -387,15 +381,13 @@ struct ShippingStep: View {
                             .contextMenu {
                                 Button("Change…", systemImage: "pencil") { editing = charge }
                                 Button("Remove", systemImage: "trash", role: .destructive) {
-                                    context.undoManager?.setActionName("Remove Shipping")
-                                    context.delete(charge)
+                                    Undo.perform("Remove Shipping", context, .remove([charge], from: invoice))
                                 }
                             }
                     }
                     .onDelete { offsets in
                         let charges = invoice.sortedShipping
-                        context.undoManager?.setActionName("Remove Shipping")
-                        for i in offsets { context.delete(charges[i]) }
+                        Undo.perform("Remove Shipping", context, .remove(offsets.map { charges[$0] }, from: invoice))
                     }
                 }
             }

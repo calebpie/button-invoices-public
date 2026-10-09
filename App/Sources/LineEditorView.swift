@@ -124,8 +124,9 @@ struct LineEditorView: View {
                 // Its own card: under the bare Save button it had square top corners.
                 Section {
                     Button(role: .destructive) {
-                        context.undoManager?.setActionName("Remove Button")
-                        context.delete(line)
+                        if let invoice = line.invoice {
+                            Undo.perform("Remove Button", context, .remove([line], from: invoice))
+                        }
                         dismiss()
                     } label: {
                         DestructiveLabel("Remove from Invoice", systemImage: "trash")

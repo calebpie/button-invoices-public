@@ -378,6 +378,32 @@ in memory; later saves don't write it, with no error. Autosave or a save on leav
 usually runs before she shakes, so every undo in the app (delete invoice, remove button or
 shipping line, archive, delete button) can be lost at the next restart.
 
+**Fix** (App/Sources/Undo.swift): the undo manager is no longer attached to the data, so
+SwiftData records nothing. Each undoable action is an `Undo.Step` that makes its change and
+returns the step that reverses it; `Undo.perform` saves at once and records the reverse
+under the action's name, and running it records the redo. Covered: Delete Invoice / Delete
+Draft (the reverse puts back a new copy with every field, line and shipping charge), Remove
+Button and Remove Shipping (back in their old places, renumbering the lines after them),
+Archive, Unarchive and Archive Shape. Probe cases 4 and 5 above are this approach.
+- Delete This Button (only offered for a button never on an invoice, after a question) no
+  longer offers an undo. Before, a shake after it showed an unnamed "Undo" with the same
+  problem. SPEC.md, "Undo", lists "deleting"; to confirm with Caleb.
+- Other edits (quantities, prices, names) were undoable by shake only by accident of
+  SwiftData recording everything; they aren't now, as SPEC.md lists only the actions above.
+
+**Checked** (iOS 27.0 Simulator, iPhone 17, quitting and reopening the app after each Undo):
+- Delete draft 0261008-2, shake: "Undo Delete Draft"; Undo; reopen: the draft is there,
+  3 kinds, $3,723.00.
+- In it, remove the middle line (Mushroom, 500 × $8.00, 10% off): $123.00. Shake: "Undo
+  Remove Button"; Undo: Mushroom back between Heart and Daisy with its discount, $3,723.00.
+  Shake again: "Redo Remove Button" (Cancel). Reopen: 3 kinds, $3,723.00.
+- Buttons tab, swipe Bunny to archive; shake: "Undo Archive"; Undo; reopen: Bunny listed.
+- Not checked on screen: Remove Shipping, deleting a finished invoice, Archive Shape.
+
+**Check** (Caleb, iPhone, after `make ios`): Docs/m3-test.md, Part 1, step 7 (remove the
+heart line, shake, Undo), then swipe the app away in the app switcher and reopen it: the
+heart line is still there. Then the same with deleting a draft from the Invoices list.
+
 ## M2 results (Caleb)
 
 Use the Part N, step M labels from Docs/m2-test.md.

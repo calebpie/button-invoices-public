@@ -68,9 +68,7 @@ struct EditButtonView: View {
             Section {
                 Button(variant.isHidden ? "Unarchive This Button" : "Archive This Button",
                        systemImage: variant.isHidden ? "tray.and.arrow.up" : "archivebox") {
-                    context.undoManager?.setActionName(variant.isHidden ? "Unarchive" : "Archive")
-                    variant.isHidden.toggle()
-                    try? context.save()
+                    Undo.perform(variant.isHidden ? "Unarchive" : "Archive", context, .setHidden([variant], !variant.isHidden))
                     dismiss()
                 }
                 if neverInvoiced {

@@ -45,8 +45,7 @@ struct CatalogView: View {
                                         renaming = design
                                     }
                                     Button("Archive Shape", systemImage: "archivebox") {
-                                        context.undoManager?.setActionName("Archive \(design.name)")
-                                        for variant in design.variants ?? [] { variant.isHidden = true }
+                                        Undo.perform("Archive \(design.name)", context, .setHidden(design.variants ?? [], true))
                                     }
                                 } label: {
                                     Image(systemName: "ellipsis.circle").font(.title3)
@@ -149,14 +148,12 @@ struct CatalogView: View {
     @ViewBuilder private func archiveButton(_ variant: ButtonVariant) -> some View {
         if variant.isHidden {
             Button("Unarchive", systemImage: "tray.and.arrow.up") {
-                context.undoManager?.setActionName("Unarchive")
-                variant.isHidden = false
+                Undo.perform("Unarchive", context, .setHidden([variant], false))
             }
             .tint(.blue)
         } else {
             Button("Archive", systemImage: "archivebox") {
-                context.undoManager?.setActionName("Archive")
-                variant.isHidden = true
+                Undo.perform("Archive", context, .setHidden([variant], true))
             }
             .tint(.gray)
         }

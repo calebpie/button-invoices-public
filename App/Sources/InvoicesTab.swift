@@ -191,8 +191,7 @@ struct InvoicesTab: View {
 
     /// Deleting can be undone with a shake (Undo and redo, "describe the operation").
     static func delete(_ invoice: Invoice, _ context: ModelContext) {
-        context.undoManager?.setActionName(invoice.status == .draft ? "Delete Draft" : "Delete Invoice")
-        context.delete(invoice)
+        Undo.perform(invoice.status == .draft ? "Delete Draft" : "Delete Invoice", context, .delete(invoice))
     }
 }
 

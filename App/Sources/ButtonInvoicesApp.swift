@@ -278,9 +278,9 @@ struct RootView: View {
             }
         }
         .onAppear {
-            // Shake to undo, and the three-finger swipe, act on the saved data
-            // (Undo and redo).
-            context.undoManager = undoManager
+            // Shake to undo, and the three-finger swipe (Undo and redo). Not attached to the
+            // data: the app records its own undo steps (Undo.swift).
+            Undo.manager = undoManager
             restore()
             #if DEBUG
             // Probe: `-OrientationProbe landscape` turns the headless Simulator sideways.

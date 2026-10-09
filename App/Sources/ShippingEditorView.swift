@@ -70,8 +70,9 @@ struct ShippingEditorView: View {
                 .listRowBackground(Color.clear)
                 if let charge {
                     Button("Remove Shipping", role: .destructive) {
-                        context.undoManager?.setActionName("Remove Shipping")
-                        context.delete(charge)
+                        if let invoice = charge.invoice {
+                            Undo.perform("Remove Shipping", context, .remove([charge], from: invoice))
+                        }
                         dismiss()
                     }
                     .frame(maxWidth: .infinity)
