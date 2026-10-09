@@ -115,8 +115,9 @@ struct FinishedInvoiceView: View {
         } label: {
             Label("More", systemImage: "ellipsis")
         }
-        // On the menu, so on iOS 26 the questions point at ⋯.
-        .confirmationDialog("Make changes to invoice \(invoice.number)?", isPresented: $confirmChanges, titleVisibility: .visible) {
+        // Alerts, so Cancel shows beside the answer (nit 16).
+        .alert("Make changes to invoice \(invoice.number)?", isPresented: $confirmChanges) {
+            Button("Cancel", role: .cancel) {}
             Button("Make Changes") {
                 invoice.status = .draft
                 invoice.finalizedAt = nil
@@ -125,7 +126,8 @@ struct FinishedInvoiceView: View {
         } message: {
             Text("It goes back to being a draft. If you already sent it, send the new PDF when you finish.")
         }
-        .confirmationDialog("Delete invoice \(invoice.number)?", isPresented: $confirmDelete, titleVisibility: .visible) {
+        .alert("Delete invoice \(invoice.number)?", isPresented: $confirmDelete) {
+            Button("Cancel", role: .cancel) {}
             Button("Delete Invoice", role: .destructive) {
                 dismiss()
                 InvoiceActions.delete(invoice, context)

@@ -79,6 +79,8 @@ looks off.
    with each field's whole row above it; tapping the heart photo puts it away. Note anything
    hidden under the keyboard.
 4. Tap **Add to Invoice**, then tap the heart line to change it, change the quantity and swipe
-   the sheet down. Note the question's buttons: is there a **Keep Editing** (nit 16)? Tap
-   outside the question; the sheet should stay. Tap **✕** → **Discard Changes**.
-5. **⋯ → Delete Draft…**: note the question's buttons again, then tap **Delete Draft**.
+   the sheet down. Expected: a box in the middle, "Discard your changes?", with **Discard
+   Changes** and **Keep Editing** (nit 16). Tap **Keep Editing**; the sheet stays with your
+   change. Tap **✕** → **Discard Changes**.
+5. **⋯ → Delete Draft…**. Expected: **Cancel** and **Delete Draft** side by side. Tap
+   **Delete Draft**.

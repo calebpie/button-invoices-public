@@ -496,19 +496,20 @@ struct ConfirmButton: View {
 
 extension View {
     /// Asks before throwing away edits when she swipes a sheet down (Sheets, "If people have
-    /// unsaved changes … use an action sheet"). The ✕ asks with `discardQuestion` on the
-    /// button itself, so on iOS 26 that question points at the ✕.
+    /// unsaved changes … use an action sheet"; an alert here, nit 16). The ✕ asks with
+    /// `discardQuestion` too.
     func confirmsDiscard(_ isDirty: Bool, onDiscard: @escaping () -> Void) -> some View {
         modifier(DiscardOnSwipe(isDirty: isDirty, onDiscard: onDiscard))
     }
 
-    /// "Discard your changes?" with Discard Changes and Keep Editing. Attach it to the button
-    /// that asks.
+    /// "Discard your changes?" with Discard Changes and Keep Editing. An alert, not a
+    /// confirmation dialog: on iOS 26 a dialog anchored to a button is a bubble that leaves
+    /// out the cancel button, so the red one was the only answer she saw (nit 16).
     func discardQuestion(_ title: String = "Discard your changes?", isAsking: Binding<Bool>,
                          onDiscard: @escaping () -> Void) -> some View {
-        confirmationDialog(title, isPresented: isAsking, titleVisibility: .visible) {
-            Button("Discard Changes", role: .destructive, action: onDiscard)
+        alert(title, isPresented: isAsking) {
             Button("Keep Editing", role: .cancel) {}
+            Button("Discard Changes", role: .destructive, action: onDiscard)
         }
     }
 }

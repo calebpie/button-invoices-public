@@ -22,7 +22,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 13 | "Add a Button" means two different things | Invoice step 1; Home Screen, Siri, Buttons + | Fixed (spec changed); Caleb to check |
 | 14 | The missing-bank-details warning sends her to "Home → Business details", which doesn't exist | Invoice step 3, Review | Fixed; Caleb to check |
 | 15 | Two ‹ back buttons on a draft, each going somewhere different | Draft invoice | Fixed (spec changed); Caleb to check |
-| 16 | Questions show only the red button; "Keep Editing" and Cancel never appear | Discard and Delete questions | Open (UX review; confuses her) |
+| 16 | Questions show only the red button; "Keep Editing" and Cancel never appear | Discard and Delete questions | Fixed; Caleb to check |
 | 17 | The orange "why can't I go on" text is 2.1:1 in light mode | New Button step 3, Change Button | Open (UX review; confuses her) |
 | 18 | The big camera picture on the photo step looks tappable but does nothing | New Button step 1 | Open (UX review; confuses her) |
 | 19 | Step 3 picks the shape from a list of 20 names, no photos | New Button step 3, Change Button | Open (UX review; confuses her; spec) |
@@ -883,6 +883,23 @@ still drops it, use an alert for these.
 
 **Severity:** confuses her (on the discard and delete questions the only visible choice is
 the destructive one; Make Changes isn't red but has the same gap).
+
+**Fix** (Caleb chose alerts): every question is an alert instead of a confirmation dialog, so
+iOS draws the cancel button: `discardQuestion` (Platform.swift; every sheet's ✕ and swipe
+down, and "Discard your touch-up?"), Delete Draft (draft ⋯), Delete Draft / Delete Invoice
+(Invoices list), Make Changes and Delete Invoice (finished invoice), Delete Button (Change
+Button). Titles and messages unchanged; each has Cancel or Keep Editing. With short labels
+iOS puts the two side by side; "Discard Changes" / "Keep Editing" are long, so they stack,
+red on top.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light): swipe a draft left → Delete:
+"Delete draft 0261009?" with Cancel and Delete Draft side by side (shot
+56-nit16-delete-alert-light); Cancel kept the draft. Shipping sheet, type 77, ✕: "Discard your
+changes?" with Discard Changes and Keep Editing (57-nit16-discard-alert-light); Keep Editing
+kept the sheet and 77; swiping the sheet down asked again; Discard Changes closed it with no
+charge added.
+
+**Check** (Caleb, iPhone): Docs/m3-test.md, Part 4, steps 4 and 5.
 
 ## 17. The orange "why can't I go on" text is 2.1:1 in light mode
 

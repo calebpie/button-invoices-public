@@ -60,7 +60,9 @@ struct InvoiceFlowView: View {
                 } label: {
                     Label("More", systemImage: "ellipsis")
                 }
-                .confirmationDialog("Delete draft \(invoice.number)?", isPresented: $confirmDelete, titleVisibility: .visible) {
+                // An alert, so Cancel shows beside the red button (nit 16).
+                .alert("Delete draft \(invoice.number)?", isPresented: $confirmDelete) {
+                    Button("Cancel", role: .cancel) {}
                     Button("Delete Draft", role: .destructive) {
                         dismiss()
                         InvoiceActions.delete(invoice, context)

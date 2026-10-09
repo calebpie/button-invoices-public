@@ -130,7 +130,8 @@ struct EditButtonView: View {
         .fullScreenCover(item: $cutoutSource) { source in
             PhotoCutoutView(source: source.image) { png in draft.photo = png }
         }
-        .confirmationDialog("Delete \(variant.title)?", isPresented: $confirmDelete, titleVisibility: .visible) {
+        .alert("Delete \(variant.title)?", isPresented: $confirmDelete) {
+            Button("Cancel", role: .cancel) {}
             Button("Delete Button", role: .destructive, action: delete)
         } message: {
             Text("It has never been on an invoice, so nothing else changes.")

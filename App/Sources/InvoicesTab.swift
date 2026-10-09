@@ -74,10 +74,9 @@ struct InvoicesTab: View {
                                         Divider()
                                         Button("Delete…", systemImage: "trash", role: .destructive) { pendingDelete = invoice }
                                     }
-                                    // On the row, so on iOS 26 the question points at the
-                                    // invoice being deleted (Action sheets).
-                                    .confirmationDialog(deleteTitle(invoice), isPresented: isDeleting(invoice),
-                                                        titleVisibility: .visible) {
+                                    // An alert, so Cancel shows beside the red button (nit 16).
+                                    .alert(deleteTitle(invoice), isPresented: isDeleting(invoice)) {
+                                        Button("Cancel", role: .cancel) {}
                                         Button(invoice.status == .draft ? "Delete Draft" : "Delete Invoice", role: .destructive) {
                                             InvoiceActions.delete(invoice, context)
                                             pendingDelete = nil
