@@ -13,6 +13,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 4 | Swipe-delete: the row vanishes before she confirms; after she confirms, it vanishes with no animation | Invoices list | Fixed; Caleb to check |
 | 5 | One letter in search finds nothing and says "No Results" | Buttons search; Add a Button in an invoice | Fixed |
 | 6 | Closing search with text in it: the shape cards jump up, then back down | Add a Button in an invoice | Open |
+| 7 | Search circle: opens slowly; on close it collapses mid-bar, then slides over | Buttons tab, search | Open |
 
 ## 1. Grey strip under the tab bar as the keyboard goes away
 
@@ -311,3 +312,52 @@ tab is different: its search comes and goes through `searchOnRequest` (Platform.
   with the bar instead of jumping.
 - Check the same close on the Buttons tab (nit 1 already covers its keyboard strip), and
   the Cancel/✕ of the sheet itself while search is active.
+
+## 7. Search circle: opens slowly; on close it collapses mid-bar, then slides over
+
+**Reported** (Caleb, Oct 8, 2026, iPhone 17 Simulator, screen recording 19.37.22): on the
+Buttons tab, the 🔍 circle grows into the search field a bit too slowly. And closing
+it, the field first shrinks into a circle that stays toward the middle of the bar, then
+jumps over to its place, with the 🔍 icon sliding in.
+
+**From the recording** (5.8 s, every frame 1/30 s, the top bar only; x in points from the
+left):
+
+- Opening: 🔍 pressed (highlighted) from 1.50 s. Nothing moves until 1.70 s. The title
+  fades and the circle stretches left into the field from 1.70 s; the field reaches about
+  its full width at 2.10 s and stops moving at 2.23–2.27 s. So about 0.55 s of movement,
+  and about 0.75 s from the press to rest.
+- Closing: ✕ tapped about 3.35 s (it greys from 3.37 s). The full field (x 16–332) is
+  there at 3.43 s and gone at 3.47 s, in one frame: in its place is a 44-point circle at
+  x ≈ 174, the middle of where the field was, showing a clipped piece of the placeholder
+  ("…ns" of "Search buttons"). The circle sits there to 3.53 s, then moves right to the
+  🔍 place beside + over 3.57–3.90 s, its 🔍 icon fading in as it moves; the title
+  "Buttons" fades in from 3.57 s and the + turns back from ✕ over the same time.
+
+**Apple's guidance:** the Human Interface Guidelines (Motion) give no durations; they
+ask for brief, precise feedback that doesn't make people wait for the animation to finish.
+The app uses `withAnimation(.smooth)` for both (Platform.swift, `SearchTitleBar.open` /
+`close`), and `.smooth` is a spring of 0.5 s perceptual duration by default (SwiftUI,
+`smooth(duration: TimeInterval = 0.5, extraBounce:)`), which matches the ~0.55 s measured.
+Third-party guides (not Apple) suggest 0.3–0.5 s for transitions like this.
+
+**Likely causes:**
+
+- Slow: the 0.5 s default spring, plus ~0.2 s before anything moves after the press
+  (possibly the button's own press-and-release before the action runs, not timed yet).
+- The close: the field and the circle share one glass ID ("search"), so the glass morphs
+  between them, but the content inside doesn't: the field's text and icon are removed at
+  once, and the circle's glass starts at the field's centre with the new layout's content
+  (the 🔍) arriving from where the field's contents were. `close()` also sets
+  `focused = false` before the animation and clears `text` after it, outside it.
+
+**To try in the bug bash:**
+
+- A shorter spring for both, e.g. `.smooth(duration: 0.3)` or `.snappy(duration: 0.3)`,
+  and compare frame by frame with iOS's own minimized search (a tab bar search tab) if
+  one can be found in the Simulator's apps.
+- For the close: animate the field's width down to the circle's size first (the field
+  shrinking to the right, into the 🔍 place), then swap to the circle; or give the field's
+  contents their own transition so they fade out as the glass shrinks; clear `text` and
+  drop focus inside the same animation.
+- Recheck the press-to-movement delay with a probe log at `open()`.
