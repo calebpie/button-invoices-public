@@ -31,7 +31,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 22 | "Already Saved" reads like a label, and the two card buttons differ in size | New Button step 2 | Fixed; Caleb to check |
 | 23 | Side margins are 16 points on some screens and 20 on others | Draft bars, Review, Add a Button, new-button steps, photo | Fixed; Caleb to check |
 | 24 | Remove Shipping hangs under the bare Save button, with square corners and no icon | Shipping sheet (changing a charge) | Fixed; Caleb to check |
-| 25 | Unreached steps in the step bar are 1.6:1, too faint to read | Draft step bar | Open (UX review; polish) |
+| 25 | Unreached steps in the step bar are 1.6:1, too faint to read | Draft step bar | Fixed; Caleb to check |
 | 26 | Invoice rows wrap "of buttons" onto a third line | Invoices list | Open (UX review; polish) |
 | 27 | A 1-pixel seam crosses the Paid card | Invoices list | Open (UX review; polish) |
 | 28 | The draft's ⋯ menu holds one item | Draft invoice | Open (UX review; polish) |
@@ -1200,6 +1200,25 @@ another way: the number's circle outlined instead of filled, and the reason line
 bar that Next already uses.
 
 **Severity:** polish.
+
+**Fix** (Caleb approved): a step she can't reach yet keeps its name and number in 60% of the
+text color, with its number in an outlined circle instead of a filled one
+(InvoiceFlowView.swift); the current step stays filled in the accent color, reachable ones in
+grey. The 40% opacity is gone, and the steps use `StepButtonStyle`, the plain style without
+its dimming of a disabled button (with `.plain`, the disabled label still measured 2.10:1).
+Still `.disabled`, so tapping it does nothing and VoiceOver reads it as dimmed.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max; a draft on step 2 with no shipping):
+
+| | Before | After |
+|---|---|---|
+| "3 Review", light (83-nit25-step-bar-light) | #C2C2C6 on #F2F2F7, 1.59:1 | #616163, 5.54:1 (name, number and ring) |
+| "3 Review", dark (84-nit25-step-bar-dark) | 1.66:1 | #999999 on black, 7.37:1 |
+
+Tapping "3 Review" stayed on step 2; tapping "1 Buttons" went to step 1.
+
+**Check** (Caleb, iPhone): a new invoice's step bar: "2 Shipping" and "3 Review" readable,
+with outlined numbers, until each step can be reached.
 
 ## 26. Invoice rows wrap "of buttons" onto a third line
 

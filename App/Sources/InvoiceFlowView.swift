@@ -209,23 +209,35 @@ struct StepIndicator: View {
                 Button {
                     step = s
                 } label: {
+                    // A step she can't go to yet keeps a readable name and shows "not yet"
+                    // with an outlined circle; fading it to 40% made it 1.6:1 (nit 25).
+                    let reachable = isReachable(s)
+                    let notYet = Color.primary.opacity(0.6)
                     HStack(spacing: 6) {
                         Text("\(s.rawValue + 1)")
                             .font(.subheadline.bold())
                             .frame(width: circle, height: circle)
-                            .background(Circle().fill(s == step ? Color.accentColor : Color(.tertiarySystemFill)))
-                            .foregroundStyle(s == step ? .white : .primary)
+                            .background {
+                                if s == step {
+                                    Circle().fill(Color.accentColor)
+                                } else if reachable {
+                                    Circle().fill(Color(.tertiarySystemFill))
+                                } else {
+                                    Circle().strokeBorder(notYet, lineWidth: 1.5)
+                                }
+                            }
+                            .foregroundStyle(s == step ? Color.white : reachable ? Color.primary : notYet)
                         if typeSize < .xxLarge || s == step {
                             Text(s.title).font(.subheadline.weight(s == step ? .semibold : .regular))
+                                .foregroundStyle(reachable ? Color.primary : notYet)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.8)
                         }
                     }
                     .frame(maxWidth: .infinity, minHeight: 44)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(StepButtonStyle())
                 .disabled(!isReachable(s))
-                .opacity(isReachable(s) ? 1 : 0.4)
                 .accessibilityLabel("Step \(s.rawValue + 1), \(s.title)")
                 .accessibilityAddTraits(s == step ? .isSelected : [])
                 .accessibilityShowsLargeContentViewer {
@@ -434,5 +446,15 @@ extension View {
         } else {
             buttonStyle(.bordered).labelStyle(.titleAndIcon)
         }
+    }
+}
+
+/// The plain style without its dimming of a disabled step: the step bar draws "not yet"
+/// itself, readable (nit 25).
+private struct StepButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .contentShape(Rectangle())
+            .opacity(configuration.isPressed ? 0.6 : 1)
     }
 }
