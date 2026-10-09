@@ -67,8 +67,9 @@ looks off.
 
 1. Buttons tab → **Crab** heading's **⋯** → **Add Color or Size…** → **Choose from Photos** →
    the strawberry → **Use This Photo** → **Next**. Expected: a list of look-alike buttons with
-   **Strawberry, Red / Green** first, then "Your saved Crab buttons:". Note: whether each
-   card's two buttons fit side by side or wrap (nit 22), and how the heading reads.
+   **Strawberry, Red / Green** first, then "Your saved Crab buttons:". Expected: each card has
+   **It's This One** and **New Color or Size**, the same size (nit 22). Note how the heading
+   reads.
    Swipe the sheet down → **Discard Changes**.
 2. **+** → **Choose from Photos** → a photo that is only in iCloud (an old one, or one taken on
    another device). Expected: something on screen while it downloads. Note how many seconds

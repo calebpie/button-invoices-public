@@ -28,7 +28,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 19 | Step 3 picks the shape from a list of 20 names, no photos | New Button step 3, Change Button | Fixed; Caleb to check |
 | 20 | Picking a saved shape leaves size "One size" and price empty, so a near-duplicate is easy | New Button step 3 | Fixed; Caleb to check |
 | 21 | "Change" buttons are 24 points tall | Invoice step 3, Review | Fixed; Caleb to check |
-| 22 | "Already Saved" reads like a label, and the two card buttons differ in size | New Button step 2 | Open (UX review; confuses her) |
+| 22 | "Already Saved" reads like a label, and the two card buttons differ in size | New Button step 2 | Fixed; Caleb to check |
 | 23 | Side margins are 16 points on some screens and 20 on others | Draft bars, Review, Add a Button, new-button steps, photo | Open (UX review; polish) |
 | 24 | Remove Shipping hangs under the bare Save button, with square corners and no icon | Shipping sheet (changing a charge) | Open (UX review; polish) |
 | 25 | Unreached steps in the step bar are 1.6:1, too faint to read | Draft step bar | Open (UX review; polish) |
@@ -1084,6 +1084,21 @@ or Size** as the second; both the same height, stacked full width if they don't 
 side.
 
 **Severity:** confuses her.
+
+**Fix** (Caleb approved): the card's buttons are **It's This One** (both purposes; was
+"Already Saved" from the Buttons tab) and **New Color or Size**, equal width and height, side
+by side when both fit on one line, else stacked (`ViewThatFits`) (NewButtonFlow.swift). From
+the Buttons tab, a note above the cards: "If it's one of these, tap It's This One. Nothing new
+is saved." Also: "It doesn't look like any saved button." was green text, 1.99:1 on the
+grouped background; it's now dark text with a green ✓ (nit 17's style).
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light): Crab ⋯ → Add Color or Size… →
+the strawberry → Next: "Couldn't compare photos on this device.", the note, then both Crab
+cards with It's This One and New Color or Size side by side, both 50.0 points tall (before
+23 and 37) (shot 71-nit22-match-cards-light). It's This One on Crab, Blue closed the sheet;
+Crab still has 2 buttons.
+
+**Check** (Caleb, iPhone): Docs/m3-test.md, Part 4, step 1 (now with photo matches).
 
 ## 23. Side margins are 16 points on some screens and 20 on others
 

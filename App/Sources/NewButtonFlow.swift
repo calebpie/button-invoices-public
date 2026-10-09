@@ -351,10 +351,15 @@ struct NewButtonMatchStep: View {
                     } else if !close.isEmpty {
                         Text("These saved buttons look similar:").font(.headline)
                     } else {
-                        Label("It doesn't look like any saved button.", systemImage: "checkmark.circle.fill")
-                            .foregroundStyle(.green).font(.headline)
+                        Notice("It doesn't look like any saved button.", tone: .good).font(.headline)
                     }
-                    ForEach(Array(close), id: \.variant.persistentModelID) { match in
+                }
+                if purpose == .catalog, !checking, hasCards {
+                    Text("If it's one of these, tap It's This One. Nothing new is saved.")
+                        .foregroundStyle(.secondary)
+                }
+                if !checking, !failed {
+                    ForEach(closeMatches, id: \.variant.persistentModelID) { match in
                         matchCard(match.variant)
                     }
                 }
@@ -378,6 +383,12 @@ struct NewButtonMatchStep: View {
         .task { await check() }
     }
 
+    private var closeMatches: [(variant: ButtonVariant, distance: Double)] {
+        Array(draft.lookAlikes.filter { $0.distance < LookAlike.similar }.prefix(4))
+    }
+
+    private var hasCards: Bool { !closeMatches.isEmpty || !sameShape.isEmpty }
+
     private func matchCard(_ v: ButtonVariant) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 14) {
@@ -387,25 +398,35 @@ struct NewButtonMatchStep: View {
                     Text("\(v.price.formatted) · \(v.sku)" + (v.isHidden ? " · archived" : "")).foregroundStyle(.secondary)
                 }
             }
-            HStack {
-                Button(purpose == .invoice ? "It's This One" : "Already Saved") {
-                    v.isHidden = false // using it again brings it back from the archive
-                    chose(v)
-                }
-                    .buttonStyle(.bordered)
-                Button("Same Shape, New Color or Size") {
-                    draft.designID = v.design?.persistentModelID
-                    draft.newDesignName = ""
-                    if draft.colorsText.isEmpty { draft.colorsText = v.colorsText }
-                    if draft.size.isEmpty { draft.size = v.size }
-                    if draft.price == nil { draft.priceText = v.price.editingText }
-                    advance(.details)
-                }
-                .buttonStyle(.bordered)
+            // Verbs, the same height, side by side when both fit on one line, else stacked
+            // (nit 22).
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 10) { matchButtons(v) }
+                VStack(spacing: 10) { matchButtons(v) }
             }
-            .font(.subheadline)
         }
         .card()
+    }
+
+    @ViewBuilder private func matchButtons(_ v: ButtonVariant) -> some View {
+        Button {
+            v.isHidden = false // using it again brings it back from the archive
+            chose(v)
+        } label: {
+            Text("It's This One").lineLimit(1).fixedSize().frame(maxWidth: .infinity, minHeight: 36)
+        }
+        .buttonStyle(.bordered)
+        Button {
+            draft.designID = v.design?.persistentModelID
+            draft.newDesignName = ""
+            if draft.colorsText.isEmpty { draft.colorsText = v.colorsText }
+            if draft.size.isEmpty { draft.size = v.size }
+            if draft.price == nil { draft.priceText = v.price.editingText }
+            advance(.details)
+        } label: {
+            Text("New Color or Size").lineLimit(1).fixedSize().frame(maxWidth: .infinity, minHeight: 36)
+        }
+        .buttonStyle(.bordered)
     }
 
     private func check() async {
