@@ -12,7 +12,6 @@ struct CatalogView: View {
     @Query private var variants: [ButtonVariant]
 
     @State private var search = ""
-    @State private var showArchived = false
     @State private var editing: ButtonVariant?
     @State private var adding: NewButton?
     @State private var renaming: ButtonDesign?
@@ -100,10 +99,12 @@ struct CatalogView: View {
                 }
             }
             if !archived.isEmpty {
-                Section(isExpanded: $showArchived) {
+                Section {
                     ForEach(archived) { row($0) }
                 } header: {
                     Text("Archived (\(archived.count))")
+                } footer: {
+                    Text("Archived buttons aren't offered for new invoices. To use one again, tap it, then Unarchive This Button at the bottom.")
                 }
             }
         }

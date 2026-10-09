@@ -17,7 +17,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 8 | The PDF page's top corners are rounded off | Finished invoice, "The PDF" | Fixed; Caleb to check |
 | 9 | More space below New Invoice than above it | Invoices | Fixed; Caleb to check |
 | 10 | The Buttons title sits further left than the other tabs' titles | Buttons tab | Fixed; Caleb to check |
-| 11 | "Archived (1)" can't be opened, so archived buttons can't be seen or unarchived from the list | Buttons tab | Open (UX review; blocks her) |
+| 11 | "Archived (1)" can't be opened, so archived buttons can't be seen or unarchived from the list | Buttons tab | Fixed; Caleb to check |
 | 12 | A discount bigger than the price shows a negative line total, and Add is greyed out with no reason | Quantity screen | Open (UX review; confuses her) |
 | 13 | "Add a Button" means two different things | Invoice step 1; Home Screen, Siri, Buttons + | Open (UX review; confuses her) |
 | 14 | The missing-bank-details warning sends her to "Home → Business details", which doesn't exist | Invoice step 3, Review | Open (UX review; confuses her) |
@@ -697,6 +697,22 @@ Unarchive, but nothing tells her so.)
 Buttons (1)" with a chevron that opens them on their own screen.
 
 **Severity:** blocks her from browsing archived buttons; search is a hidden way round.
+
+**Fix** (Caleb chose the always-open section): the Archived section is a plain section, so
+its rows always show, dimmed and with the shape in the name ("Bunny, Black / White"). A note
+under it says how to bring one back: "Archived buttons aren't offered for new invoices. To
+use one again, tap it, then Unarchive This Button at the bottom." The wording matches the
+Change Button sheet's note, and "at the bottom" because the button is the last on that sheet.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max): Bunny archived, end of the list: the
+heading, the Bunny row and the note, in light and dark (shots 44-nit11-archived-open-light,
+45-nit11-archived-open-dark). Tapping the row opened Change Button with Unarchive This Button
+at the bottom; tapping it closed the sheet, Bunny went back under its shape and the Archived
+section went away.
+
+**Check** (Caleb, iPhone): Buttons tab, swipe Bunny left → **Archive**, scroll to the end.
+Expected: "Archived (1)" with Bunny under it, dimmed, and the note. Tap Bunny → scroll to
+**Unarchive This Button** → tap it. Expected: Bunny back at the top under "Bunny".
 
 ## 12. A discount bigger than the price shows a negative line total, and Add is greyed out with no reason
 
