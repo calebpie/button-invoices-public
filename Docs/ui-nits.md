@@ -35,7 +35,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 26 | Invoice rows wrap "of buttons" onto a third line | Invoices list | Fixed; Caleb to check |
 | 27 | A 1-pixel seam crosses the Paid card | Invoices list | Fixed; Caleb to check |
 | 28 | The draft's ⋯ menu holds one item | Draft invoice | Fixed; Caleb to check |
-| 29 | Same thing, different words: Town / City, No price / No price yet / $0.00, alert capitals | Settings, Buttons, New Button | Open (UX review; polish) |
+| 29 | Same thing, different words: Town / City, No price / No price yet / $0.00, alert capitals | Settings, Buttons, New Button | Fixed; Caleb to check |
 | 30 | The line total, the number that matters, is in grey | Quantity screen | Open (UX review; polish) |
 | 31 | Red, burgundy and brown dots vanish on picked (orange) color chips | New Button step 3, Change Button | Open (UX review; polish) |
 | 32 | Two prominent confirm buttons on one sheet | Add to Invoice, Change Line, Change Button, Shipping, photo | Open (UX review; polish; spec) |
@@ -1320,6 +1320,24 @@ consistently."
 "Rename Shape"; "Touch Up" everywhere.
 
 **Severity:** polish.
+
+**Fix** (Caleb approved all four):
+- Settings labels: Business "Town" → **City, State, ZIP**; Bill to "City" → **City, State**
+  (SettingsView.swift). Labels only; the lines and the PDF are unchanged.
+- No price: **No price yet** in the Buttons list (CatalogView.swift) and on New Button step
+  2's cards, which showed "$0.00" (NewButtonFlow.swift), as on the Add a Button tiles.
+- "Rename shape" → **Rename Shape** (CatalogView.swift).
+- "Touch Up the Edges" → **Touch Up** on the photo step and Change Button (NewButtonFlow.swift,
+  EditButtonView.swift), as the screen, its button and its messages say.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light): Settings shows "City, State,
+ZIP" beside "Warren, RI 02805" and "City, State" beside "Brooklyn, NY", each on one line
+(shot 95-nit29-settings-light, gitignored: it shows her address). No saved button lacks a
+price, so "No price yet" wasn't seen on screen; the build passes and no "No price", "Rename
+shape" or "Touch Up the Edges" is left in App/Sources.
+
+**Check** (Caleb, iPhone): Settings → the two address labels; Buttons tab → **+** → a photo →
+the row under it says **Touch Up**.
 
 ## 30. The line total, the number that matters, is in grey
 

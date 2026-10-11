@@ -44,7 +44,7 @@ struct EditButtonView: View {
                 }
                 if let source = draft.source, draft.photo != nil {
                     Button { cutoutSource = .init(image: source) } label: {
-                        Label("Touch Up the Edges", systemImage: "paintbrush.pointed")
+                        Label("Touch Up", systemImage: "paintbrush.pointed")
                     }
                 }
             } header: {

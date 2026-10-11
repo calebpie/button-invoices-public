@@ -56,7 +56,7 @@ struct CatalogView: View {
         }
         .onAppear(perform: handleRequest)
         .onChange(of: router.request) { handleRequest() }
-        .alert("Rename shape", isPresented: .init(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
+        .alert("Rename Shape", isPresented: .init(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
             TextField("Name", text: $newName)
             Button("Cancel", role: .cancel) { renaming = nil }
             Button("Rename") { rename() }
@@ -155,7 +155,7 @@ struct CatalogView: View {
                 if variant.price > .zero {
                     Text(variant.price.formatted).monospacedDigit()
                 } else {
-                    Notice("No price")
+                    Notice("No price yet")
                 }
             }
             .opacity(variant.isHidden ? 0.5 : 1)

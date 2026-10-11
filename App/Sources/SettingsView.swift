@@ -25,7 +25,7 @@ struct SettingsView: View {
             Section {
                 field("Name", text: $settings.profile.sellerName, prompt: "Daphné Verley Ceramics")
                 line($settings.profile.sellerLines, 0, "Street", prompt: "123 Example St")
-                line($settings.profile.sellerLines, 1, "Town", prompt: "Warren, RI 02805")
+                line($settings.profile.sellerLines, 1, "City, State, ZIP", prompt: "Warren, RI 02805")
                 line($settings.profile.sellerLines, 2, "Phone", prompt: "(401) 555-0100", keyboard: .phonePad)
             } header: {
                 Text("Business")
@@ -36,7 +36,7 @@ struct SettingsView: View {
             Section {
                 field("Name", text: $settings.profile.billToName, prompt: "Alix of Bohemia")
                 line($settings.profile.billToLines, 0, "Street", prompt: "61 Greenpoint Avenue")
-                line($settings.profile.billToLines, 1, "City", prompt: "Brooklyn, NY")
+                line($settings.profile.billToLines, 1, "City, State", prompt: "Brooklyn, NY")
                 line($settings.profile.billToLines, 2, "ZIP", prompt: "11222", keyboard: .numbersAndPunctuation)
             } header: {
                 Text("Bill to")

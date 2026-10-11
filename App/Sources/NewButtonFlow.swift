@@ -271,7 +271,7 @@ struct NewButtonPhotoStep: View {
                 }
                 if let source = draft.source, draft.photo != nil {
                     Button { cutoutSource = CutoutSource(image: source) } label: {
-                        Label("Touch Up the Edges", systemImage: "paintbrush.pointed")
+                        Label("Touch Up", systemImage: "paintbrush.pointed")
                     }
                 }
             } footer: {
@@ -396,7 +396,7 @@ struct NewButtonMatchStep: View {
                 ButtonPhoto(data: v.photo, side: 64)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(v.title).font(.headline)
-                    Text("\(v.price.formatted) · \(v.sku)" + (v.isHidden ? " · archived" : "")).foregroundStyle(.secondary)
+                    Text("\(v.price > .zero ? v.price.formatted : "No price yet") · \(v.sku)" + (v.isHidden ? " · archived" : "")).foregroundStyle(.secondary)
                 }
             }
             // Verbs, the same height, side by side when both fit on one line, else stacked
