@@ -28,6 +28,7 @@ struct InvoiceFlowView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
     @Environment(BusinessSettings.self) private var settings
+    @Environment(AppRouter.self) private var router
     @State private var step: FlowStep = .buttons
     @State private var started = false
     @State private var confirmDelete = false
@@ -55,7 +56,13 @@ struct InvoiceFlowView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
+                // Duplicate first, as on a finished invoice's ⋯; a menu of one item was a tap
+                // for nothing (nit 28).
                 Menu {
+                    Button("Duplicate", systemImage: "plus.square.on.square") {
+                        router.invoicePath = [InvoiceActions.duplicate(invoice, context, existing: allInvoices.map(\.number))]
+                    }
+                    Divider()
                     Button("Delete Draft…", systemImage: "trash", role: .destructive) { confirmDelete = true }
                 } label: {
                     Label("More", systemImage: "ellipsis")

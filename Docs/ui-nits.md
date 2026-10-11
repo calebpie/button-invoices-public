@@ -34,7 +34,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 25 | Unreached steps in the step bar are 1.6:1, too faint to read | Draft step bar | Fixed; Caleb to check |
 | 26 | Invoice rows wrap "of buttons" onto a third line | Invoices list | Fixed; Caleb to check |
 | 27 | A 1-pixel seam crosses the Paid card | Invoices list | Fixed; Caleb to check |
-| 28 | The draft's ⋯ menu holds one item | Draft invoice | Open (UX review; polish) |
+| 28 | The draft's ⋯ menu holds one item | Draft invoice | Fixed; Caleb to check |
 | 29 | Same thing, different words: Town / City, No price / No price yet / $0.00, alert capitals | Settings, Buttons, New Button | Open (UX review; polish) |
 | 30 | The line total, the number that matters, is in grey | Quantity screen | Open (UX review; polish) |
 | 31 | Red, burgundy and brown dots vanish on picked (orange) color chips | New Button step 3, Change Button | Open (UX review; polish) |
@@ -1290,6 +1290,17 @@ interaction feel worthwhile."
 can use too; or a trash button in its place.
 
 **Severity:** polish.
+
+**Fix** (Caleb approved): the draft's ⋯ has **Duplicate**, a divider, then **Delete Draft…**
+(InvoiceFlowView.swift), as a finished invoice's ⋯ starts with Duplicate. It copies the
+draft with `InvoiceActions.duplicate` and opens the copy, as Duplicate does from the list.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light): Invoice 0261009 → ⋯: Duplicate,
+Delete Draft… (shot 94-nit28-draft-menu-light). Duplicate opened Invoice 0261011 (today's
+date), $4,126.00, on the step it could reach; the copy was then deleted.
+
+**Check** (Caleb, iPhone): a draft's ⋯ → **Duplicate**: a new draft opens with the same
+buttons. Delete it with ⋯ → **Delete Draft…**.
 
 ## 29. Same thing, different words
 
