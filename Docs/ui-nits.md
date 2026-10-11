@@ -37,7 +37,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 28 | The draft's ⋯ menu holds one item | Draft invoice | Fixed; Caleb to check |
 | 29 | Same thing, different words: Town / City, No price / No price yet / $0.00, alert capitals | Settings, Buttons, New Button | Fixed; Caleb to check |
 | 30 | The line total, the number that matters, is in grey | Quantity screen | Fixed; Caleb to check |
-| 31 | Red, burgundy and brown dots vanish on picked (orange) color chips | New Button step 3, Change Button | Open (UX review; polish) |
+| 31 | Red, burgundy and brown dots vanish on picked (orange) color chips | New Button step 3, Change Button | Fixed; Caleb to check |
 | 32 | Two prominent confirm buttons on one sheet | Add to Invoice, Change Line, Change Button, Shipping, photo | Open (UX review; polish; spec) |
 | 33 | The receipt viewer closes with ✓, though nothing is confirmed | Receipt viewer | Open (UX review; polish) |
 | 34 | The PDF page is a picture with a tap, not a button: no press feedback | Review, finished invoice | Open (UX review; polish) |
@@ -1376,6 +1376,23 @@ there to show the glaze (SPEC.md, "Adding a new button"), and on a picked chip i
 chips.
 
 **Severity:** polish.
+
+**Measured** (Oct 11, from the swatch values, against the picked chip #C0472A light /
+#E56E52 dark): Red 1.22 / 1.31, Burgundy 1.19 / 1.90, Brown 1.17 / 1.87, Green 1.35 / 1.18,
+Blue 1.98 / 1.23; best Black and Navy, 2.9–5.3.
+
+**Fix** (Caleb chose the white disc): on a picked chip the dot (14 points, thin dark
+outline) sits on an 18-point white disc (ColorDot, NewButtonFlow.swift), so every dot is
+seen against white, as on unpicked chips: Red 4.11:1, Burgundy 5.97:1, Brown 5.87:1.
+Unpicked chips are unchanged.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max): New Button → Skip Photo → Red and
+Burgundy picked: both dots drawn in their own colors (#DE4A22, #A8423F) inside a white disc,
+clear in light and dark (shots 99-nit31-white-disc-light, 100-nit31-white-disc-dark; before,
+98-nit31-picked-chips-light). Discarded; nothing saved.
+
+**Check** (Caleb, iPhone): Buttons tab → **+** → **Skip Photo** → tap **Red**: its dot shows
+on the rust chip.
 
 ## 32. Two prominent confirm buttons on one sheet
 

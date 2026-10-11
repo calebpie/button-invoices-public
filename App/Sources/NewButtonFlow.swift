@@ -895,16 +895,19 @@ struct ButtonDetailsSections: View {
 /// the app doesn't know gets no dot.
 struct ColorDot: View {
     let name: String
-    /// On an orange chip the ring is white, so a dark or reddish dot still stands out.
+    /// On a picked (rust) chip the dot sits on a white disc, so a red, burgundy or brown dot
+    /// still shows: against the chip they were 1.2:1 (nit 31).
     var onAccent = false
 
     var body: some View {
         if let rgb = Swatch.rgb(for: name) {
             Circle()
                 .fill(Color(red: rgb.red, green: rgb.green, blue: rgb.blue))
-                .overlay(Circle().strokeBorder(onAccent ? Color.white : Color.primary.opacity(0.25),
-                                               lineWidth: onAccent ? 1.5 : 0.5))
+                .overlay(Circle().strokeBorder(onAccent ? Color.black.opacity(0.25) : Color.primary.opacity(0.25),
+                                               lineWidth: 0.5))
                 .frame(width: 14, height: 14)
+                .padding(onAccent ? 2 : 0)
+                .background { if onAccent { Circle().fill(Color.white) } }
                 .accessibilityHidden(true)
         }
     }
