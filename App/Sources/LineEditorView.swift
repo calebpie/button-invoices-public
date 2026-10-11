@@ -102,7 +102,10 @@ struct LineEditorView: View {
 
             Section {
                 LabeledContent("Line total") {
+                    // Color.primary: LabeledContent greys its value, and this is the number she
+                    // checks (nit 30).
                     Text(lineTotal?.formatted ?? "—").font(.title3.bold()).monospacedDigit()
+                        .foregroundStyle(Color.primary)
                 }
                 if problem == nil, let quantity, let price {
                     Text("\(quantity) × \((price - (discount ?? .zero)).formatted)")

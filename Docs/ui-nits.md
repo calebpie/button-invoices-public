@@ -36,7 +36,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 27 | A 1-pixel seam crosses the Paid card | Invoices list | Fixed; Caleb to check |
 | 28 | The draft's ⋯ menu holds one item | Draft invoice | Fixed; Caleb to check |
 | 29 | Same thing, different words: Town / City, No price / No price yet / $0.00, alert capitals | Settings, Buttons, New Button | Fixed; Caleb to check |
-| 30 | The line total, the number that matters, is in grey | Quantity screen | Open (UX review; polish) |
+| 30 | The line total, the number that matters, is in grey | Quantity screen | Fixed; Caleb to check |
 | 31 | Red, burgundy and brown dots vanish on picked (orange) color chips | New Button step 3, Change Button | Open (UX review; polish) |
 | 32 | Two prominent confirm buttons on one sheet | Add to Invoice, Change Line, Change Button, Shipping, photo | Open (UX review; polish; spec) |
 | 33 | The receipt viewer closes with ✓, though nothing is confirmed | Receipt viewer | Open (UX review; polish) |
@@ -1352,6 +1352,15 @@ important information."
 **To try:** `.foregroundStyle(.primary)` on the amount.
 
 **Severity:** polish.
+
+**Fix** (Caleb approved): the amount is `Color.primary` (LineEditorView.swift); "12 × $4.00"
+under it stays secondary.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max; Change Line for Nautilus, Black,
+$126.00): light #000000 on white, 21:1 (shot 96-nit30-line-total-light); dark #FFFFFF on
+#2C2C2E, 13.94:1 (97-nit30-line-total-dark); before, dark #9F9FA5, 5.29:1 (shot 09).
+
+**Check** (Caleb, iPhone): a draft → tap a line: the line total is as dark as "Line total".
 
 ## 31. Red, burgundy and brown dots vanish on picked (orange) color chips
 
