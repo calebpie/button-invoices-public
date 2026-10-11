@@ -46,7 +46,7 @@ struct ReceiptViewer: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
-                        ConfirmButton(title: "Done") { dismiss() }
+                        ConfirmButton(title: "Done", prominent: true) { dismiss() }
                     }
                 }
         }

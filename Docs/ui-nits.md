@@ -38,7 +38,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 29 | Same thing, different words: Town / City, No price / No price yet / $0.00, alert capitals | Settings, Buttons, New Button | Fixed; Caleb to check |
 | 30 | The line total, the number that matters, is in grey | Quantity screen | Fixed; Caleb to check |
 | 31 | Red, burgundy and brown dots vanish on picked (orange) color chips | New Button step 3, Change Button | Fixed; Caleb to check |
-| 32 | Two prominent confirm buttons on one sheet | Add to Invoice, Change Line, Change Button, Shipping, photo | Open (UX review; polish; spec) |
+| 32 | Two prominent confirm buttons on one sheet | Add to Invoice, Change Line, Change Button, Shipping, photo | Fixed (spec changed); Caleb to check |
 | 33 | The receipt viewer closes with ✓, though nothing is confirmed | Receipt viewer | Open (UX review; polish) |
 | 34 | The PDF page is a picture with a tap, not a button: no press feedback | Review, finished invoice | Open (UX review; polish) |
 | 35 | Saved-color captions under the shape are cut off ("Burgundy,…") | New Button step 3, Change Button | Open (UX review; polish) |
@@ -1411,6 +1411,22 @@ make the bottom button plain (bordered), which keeps the spec, or, as a spec cha
 big bottom button (one obvious action at the bottom) and make the ✓ plain.
 
 **Severity:** polish.
+
+**Fix** (Caleb chose the bottom button, a spec change): `ConfirmButton` (Platform.swift)
+is plain unless `prominent: true`. Add to Invoice / Change Line, Change Button, Shipping,
+Bank Details and the photo screen place it with `.topBarTrailing`, because the
+`.confirmationAction` placement tints it on iOS 26 even without the confirm role (tried
+first: still rust; `.buttonStyle(.glass)` drew a second capsule inside the bar's circle).
+Still prominent: the photo screen while touching up (no Use This Photo button then) and the
+receipt viewer (nit 33). SPEC.md, "Sheets": the big filled button at the bottom is the one
+prominent button where a sheet has one, and the ✓ is plain; otherwise the ✓ is.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light): Change Line: ✕ and ✓ the same
+plain glass circles, Save the only rust button (shots 101-nit32-change-line-light,
+102-nit32-plain-check-light). The plain ✓ saved a change (Nautilus 14 → 15, $135.00), then
+set back to 14.
+
+**Check** (Caleb, iPhone): a draft → tap a line: one rust button (Save), a plain ✓.
 
 ## 33. The receipt viewer closes with ✓, though nothing is confirmed
 

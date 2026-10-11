@@ -106,7 +106,7 @@ struct ShippingEditorView: View {
                 CancelButton { if isDirty { askDiscard = true } else { dismiss() } }
                     .discardQuestion(isAsking: $askDiscard) { dismiss() }
             }
-            ToolbarItem(placement: .confirmationAction) {
+            ToolbarItem(placement: .topBarTrailing) {
                 ConfirmButton(title: charge == nil ? "Add" : "Save", action: save).disabled(amount == nil)
             }
         }

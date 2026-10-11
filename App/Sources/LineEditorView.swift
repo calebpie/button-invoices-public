@@ -150,7 +150,7 @@ struct LineEditorView: View {
                         .discardQuestion(isAsking: $askDiscard) { dismiss() }
                 }
             }
-            ToolbarItem(placement: .confirmationAction) {
+            ToolbarItem(placement: .topBarTrailing) {
                 ConfirmButton(title: isNew ? "Add" : "Save", action: save).disabled(!isValid)
             }
         }

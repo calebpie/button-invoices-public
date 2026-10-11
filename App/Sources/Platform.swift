@@ -549,18 +549,27 @@ struct CancelButton: View {
     }
 }
 
-/// The one prominent action of a sheet, on the trailing side: a tinted checkmark on iOS 26
+/// A sheet's confirm action, on the trailing side: a checkmark on iOS 26. Plain where the
+/// sheet has a big filled button at the bottom doing the same, which is then the one
+/// prominent button (SPEC.md, "Sheets"; nit 32); tinted where it's the only way to finish
 /// (Toolbars, "Use the .prominent style for key actions").
 struct ConfirmButton: View {
     let title: String
+    var prominent = false
     let action: () -> Void
 
     var body: some View {
         if #available(iOS 26.0, *) {
-            Button(title, systemImage: "checkmark", role: .confirm, action: action)
-                .labelStyle(.iconOnly)
+            if prominent {
+                Button(title, systemImage: "checkmark", role: .confirm, action: action)
+                    .labelStyle(.iconOnly)
+            } else {
+                // Placed with .topBarTrailing (the confirmation placement tints it).
+                Button(title, systemImage: "checkmark", action: action)
+                    .labelStyle(.iconOnly)
+            }
         } else {
-            Button(title, action: action).fontWeight(.semibold)
+            Button(title, action: action).fontWeight(prominent ? .semibold : .regular)
         }
     }
 }

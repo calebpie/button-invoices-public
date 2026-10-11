@@ -341,8 +341,9 @@ Applied (HIG page in parentheses):
 - Navigation: the standard back button and edge swipe everywhere, the tab bar always
   visible, filled tab symbols (Tab bars, Toolbars). Controls over scrolling content use
   the system scroll edge effect (Layout).
-- Sheets: Cancel (✕) at the top left and the confirm action (✓) at the top right, the
-  one prominent button. Edits in a sheet are never lost silently: Cancel or swiping the
+- Sheets: Cancel (✕) at the top left and the confirm action (✓) at the top right. Where
+  the sheet ends in a big filled button that does the same ("Add to Invoice", "Save"),
+  that button is the one prominent button and the ✓ is plain; otherwise the ✓ is. Edits in a sheet are never lost silently: Cancel or swiping the
   sheet down asks "Discard your changes?", from the ✕ when she tapped it (Sheets,
   Toolbars).
 - One prominent button per screen; title-case labels; "…" on menu items that ask a

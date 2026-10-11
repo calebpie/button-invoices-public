@@ -42,8 +42,9 @@ struct PhotoCutoutView: View {
                     CancelButton { if canvas?.canUndo == true { askDiscard = true } else { dismiss() } }
                         .discardQuestion("Discard your touch-up?", isAsking: $askDiscard) { dismiss() }
                 }
-                ToolbarItem(placement: .confirmationAction) {
-                    ConfirmButton(title: touchingUp ? "Done" : "Use Photo") {
+                ToolbarItem(placement: touchingUp ? .confirmationAction : .topBarTrailing) {
+                    // Prominent while touching up: there's no Use This Photo button then (nit 32).
+                    ConfirmButton(title: touchingUp ? "Done" : "Use Photo", prominent: touchingUp) {
                         if touchingUp { touchingUp = false } else { finish() }
                     }
                     .disabled(cutout == nil || saving)

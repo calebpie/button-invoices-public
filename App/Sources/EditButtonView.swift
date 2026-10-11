@@ -122,7 +122,7 @@ struct EditButtonView: View {
                 CancelButton { if isDirty { askDiscard = true } else { dismiss() } }
                     .discardQuestion(isAsking: $askDiscard) { dismiss() }
             }
-            ToolbarItem(placement: .confirmationAction) {
+            ToolbarItem(placement: .topBarTrailing) {
                 ConfirmButton(title: "Save", action: save).disabled(problem != nil)
             }
         }
