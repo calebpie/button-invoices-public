@@ -41,7 +41,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 32 | Two prominent confirm buttons on one sheet | Add to Invoice, Change Line, Change Button, Shipping, photo | Fixed (spec changed); Caleb to check |
 | 33 | The receipt viewer closes with ✓, though nothing is confirmed | Receipt viewer | Fixed; Caleb to check |
 | 34 | The PDF page is a picture with a tap, not a button: no press feedback | Review, finished invoice | Fixed; Caleb to check |
-| 35 | Saved-color captions under the shape are cut off ("Burgundy,…") | New Button step 3, Change Button | Open (UX review; polish) |
+| 35 | Saved-color captions under the shape are cut off ("Burgundy,…") | New Button step 3, Change Button | Fixed; Caleb to check |
 | 36 | Row separators start 64–84 points in from the card's left edge but end 20 from its right | Invoices list, Buttons tab | Fixed; Caleb to check |
 
 ## 1. Grey strip under the tab bar as the keyboard goes away
@@ -1490,6 +1490,18 @@ open a separate view to read the rest" (the captions are in a horizontal scroll 
 **To try:** two lines, or only the color (the size shows when it differs).
 
 **Severity:** polish.
+
+**Fix** (Caleb approved): the caption is the color only, with the size added only when the
+shape's saved buttons don't all share one; caption size (12 points) instead of caption2,
+centered, up to two lines (NewButtonFlow.swift).
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light): Heart (all Medium): "Burgundy",
+"Navy", "Red", none cut (shot 107-nit35-heart-captions-light; before, 106). Daisy (Small and
+Large): "Black / White, Large", "Black / White, Small", "Red / White, Small", each on two
+lines, none cut (108-nit35-daisy-captions-light). Nothing saved.
+
+**Check** (Caleb, iPhone): Buttons tab → **+** → **Skip Photo** → **Pick a saved shape** →
+**Heart**: the colors under the shape are whole.
 
 ## 36. Row separators start 64–84 points in from the card's left edge but end 20 from its right
 

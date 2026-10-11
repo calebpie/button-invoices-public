@@ -699,13 +699,20 @@ struct ButtonDetailsSections: View {
             if let design = draft.chosenDesign(designs) {
                 let siblings = design.visibleVariants.filter { $0 !== editing }
                 if !siblings.isEmpty {
+                    // The color only, and the size only when they differ: "Burgundy, Medium"
+                    // in 70 points was cut to "Burgundy,…" (nit 35).
+                    let mixedSizes = Set(siblings.map(\.size)).count > 1
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
+                        HStack(alignment: .top, spacing: 10) {
                             ForEach(siblings) { v in
                                 VStack(spacing: 2) {
                                     ButtonPhoto(data: v.photo, side: 44)
-                                    Text(v.colors.joined(separator: "/") + (v.size.isEmpty ? "" : ", \(v.size)"))
-                                        .font(.caption2).lineLimit(1)
+                                    Text(v.colors.joined(separator: " / ")
+                                         + (mixedSizes && !v.size.isEmpty ? ", \(v.size)" : ""))
+                                        .font(.caption)
+                                        .multilineTextAlignment(.center)
+                                        .lineLimit(2)
+                                        .minimumScaleFactor(0.85)
                                 }
                                 .frame(width: 70)
                             }
