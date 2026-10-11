@@ -40,7 +40,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 31 | Red, burgundy and brown dots vanish on picked (orange) color chips | New Button step 3, Change Button | Fixed; Caleb to check |
 | 32 | Two prominent confirm buttons on one sheet | Add to Invoice, Change Line, Change Button, Shipping, photo | Fixed (spec changed); Caleb to check |
 | 33 | The receipt viewer closes with ✓, though nothing is confirmed | Receipt viewer | Fixed; Caleb to check |
-| 34 | The PDF page is a picture with a tap, not a button: no press feedback | Review, finished invoice | Open (UX review; polish) |
+| 34 | The PDF page is a picture with a tap, not a button: no press feedback | Review, finished invoice | Fixed; Caleb to check |
 | 35 | Saved-color captions under the shape are cut off ("Burgundy,…") | New Button step 3, Change Button | Open (UX review; polish) |
 | 36 | Row separators start 64–84 points in from the card's left edge but end 20 from its right | Invoices list, Buttons tab | Fixed; Caleb to check |
 
@@ -1464,6 +1464,19 @@ press state for a custom button."
 **To try:** a `Button` with a plain style that dims slightly on press.
 
 **Severity:** polish.
+
+**Fix** (Caleb approved): each page is a `Button` (PDFPages, ReviewView.swift; used on Review
+and the finished invoice) with `PagePressStyle`: a 12% black wash while pressed. The plain
+style was tried first: it fades the label, and a white page over the light background only
+went from #FFFFFF to #FCFCFD.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light; Invoice 0260903; screenshots every
+0.6 s during a 4-second press): blank page #FFFFFF normally, #E0E0E0 while pressed (shots
+104-nit34-page-normal-light, 105-nit34-page-pressed-light, gitignored: her address); on
+release Quick Look opened; ✕ closed it.
+
+**Check** (Caleb, iPhone): a finished invoice → press the page: it greys while your finger is
+on it, and opens full size when you lift.
 
 ## 35. Saved-color captions under the shape are cut off
 

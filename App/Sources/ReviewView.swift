@@ -225,15 +225,28 @@ struct PDFPages: View {
         VStack(spacing: 12) {
             if pages.isEmpty { ProgressView().frame(maxWidth: .infinity, minHeight: 200) }
             ForEach(Array(pages.enumerated()), id: \.offset) { _, page in
-                Image(uiImage: page).resizable().scaledToFit()
-                    .background(.white)
-                    .shadow(color: .black.opacity(0.15), radius: 4, y: 2)
-                    .onTapGesture(perform: onTap)
-                    .accessibilityLabel("Invoice page. Double-tap to see it full size.")
+                // A button, so it dims while pressed and VoiceOver calls it one (nit 34).
+                Button(action: onTap) {
+                    Image(uiImage: page).resizable().scaledToFit()
+                        .background(.white)
+                        .shadow(color: .black.opacity(0.15), radius: 4, y: 2)
+                }
+                .buttonStyle(PagePressStyle())
+                .accessibilityLabel("Invoice page. Double-tap to see it full size.")
             }
             if !pages.isEmpty {
                 Text("Tap the page to see it full size.").font(.footnote).foregroundStyle(.secondary)
             }
+        }
+    }
+
+    /// The plain style fades a pressed button, which on a white page over a light background
+    /// barely shows (#FFFFFF → #FCFCFD); a grey wash does (nit 34).
+    private struct PagePressStyle: ButtonStyle {
+        func makeBody(configuration: Configuration) -> some View {
+            configuration.label
+                .overlay(Color.black.opacity(configuration.isPressed ? 0.12 : 0))
+                .contentShape(Rectangle())
         }
     }
 
