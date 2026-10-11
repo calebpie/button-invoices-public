@@ -3,6 +3,7 @@
 An iPhone and iPad app that lets Daphné Verley, a ceramicist, invoice Alix of Bohemia on her own.
 
 <!-- Demo: a 20–30 second screen recording from a real iPhone (Vision only works on device): type an order line, tap the photo, add shipping from a receipt photo, Finish, share sheet. Convert to GIF or upload as an MP4 in the GitHub editor. -->
+![Making an invoice](Docs/demo.gif)
 
 ## Why it exists
 
