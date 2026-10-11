@@ -1,11 +1,48 @@
 # Button Invoices
 
-An iPhone and iPad app for Daphné Verley to invoice Alix of Bohemia for buttons: pick
-buttons by typing the way she texts ("12 red hearts @ $4"), add new ones with a photo
-(background removed for you), add shipping, check the total, and send a PDF that looks
-like the Excel invoices. Design and decisions: [SPEC.md](SPEC.md). Status: [Docs/progress.md](Docs/progress.md).
+An iPhone and iPad app that lets Daphné Verley, a ceramicist, invoice Alix of Bohemia on her own.
 
-## Layout
+<!-- Demo: a 20–30 second screen recording from a real iPhone (Vision only works on device): type an order line, tap the photo, add shipping from a receipt photo, Finish, share sheet. Convert to GIF or upload as an MP4 in the GitHub editor. -->
+
+## Why it exists
+
+Daphné makes ceramic buttons and sells them to Alix of Bohemia. Every invoice used to run through me: she texted quantities, photos and shipping receipts, and I rebuilt each order in an Excel template and sent back a PDF. She isn't comfortable with Excel, and she shouldn't have to be. I was the bottleneck, so I built the thing that replaces me.
+
+## What she does
+
+She types an order line the way she already texts it ("125 burgundy mushrooms @ $8") and taps the matching photo. A new button starts with a photo: the app removes the background, checks whether she's saved that button before, and suggests a name and SKU. Shipping can come from a photo of the receipt. The app does every bit of arithmetic, then sends a PDF laid out like the invoices Alix of Bohemia already gets.
+
+## Decisions
+
+- **Her words, not mine.** Search reads her own phrasing, one-letter typos and her color words included ("blush" means pale pink). When she picks a button after typing words it didn't know, it learns them, and she can see and correct what it learned.
+- **Sent means sent.** Nothing she does later, from repricing a button to changing her address, can silently change an invoice she has already finished.
+- **Show, then confirm.** A shipping receipt lists several shipments, and reading it isn't perfect, so the app offers the amounts it found as buttons to tap and puts the likeliest one in the amount field for her to check. It never fills one in without her seeing it.
+- **No "Are you sure?" on Finish.** Nothing leaves the phone until she picks where to send it, and Make Changes reverses it.
+- **Left out on purpose.** Widgets, notifications, Live Activities: nothing in her week needs them, and each is one more thing to learn or dismiss.
+- **Private by default.** The app makes no network requests. The bank numbers in Settings live in the keychain; each finished invoice keeps its own copy, since they're printed on it.
+
+## How I know it works
+
+- It reproduces all nine invoices she has already sent, to the cent.
+- All 17 order lines from her real messages find the button that was invoiced.
+- Background removal, duplicate-photo matching and receipt reading are tested against her own photos.
+- 38 automated tests, plus on-device test runs recorded in [Docs/progress.md](Docs/progress.md).
+
+The bank details, street address and phone number in this public copy are stand-ins.
+
+## Status
+
+Running on my iPhone. It goes to hers through TestFlight once the bug bash is done and Apple approves my developer account, and her first real invoice is the final acceptance test.
+
+## How it was built
+
+I set the requirements, made the product calls and tested each milestone, in the Simulator and then on my iPhone. Claude Code wrote the code and kept the spec current. The first commit landed on October 8, and the app was running on my iPhone about 14 hours later. The commit history shows every step after that. The full design, including what was left out and why, is in [SPEC.md](SPEC.md).
+
+---
+
+## Developer guide
+
+### Layout
 
 | Path | What |
 |---|---|
@@ -16,7 +53,7 @@ like the Excel invoices. Design and decisions: [SPEC.md](SPEC.md). Status: [Docs
 | `Examples/` | Real invoices, photos and messages (gitignored) |
 | `project.yml` | Xcode project definition; `make generate` writes `ButtonInvoices.xcodeproj` (never edit that) |
 
-## Commands
+### Commands
 
 ```bash
 make test
@@ -67,7 +104,7 @@ there are no sent invoices. To start the Simulator over with a fresh seed:
 xcrun simctl uninstall booted com.calebpietrafesa.ButtonInvoices
 ```
 
-## First-time setup (Mac)
+### First-time setup (Mac)
 
 Steps 1–5 are done on Caleb's M4 Max as of October 8, 2026 (Xcode 27.0 installed, signed in).
 
@@ -82,9 +119,9 @@ Steps 1–5 are done on Caleb's M4 Max as of October 8, 2026 (Xcode 27.0 install
 5. If Xcode says the bundle ID is taken, change `BUNDLE_ID_PREFIX` in
    `Configs/Signing.xcconfig` and run `make ios` again.
 
-## Installing on her iPhone or iPad
+### Installing on her iPhone or iPad
 
-### Now: over a cable (free or paid team)
+#### Now: over a cable (free or paid team)
 
 1. Connect the iPhone to the Mac with a cable, unlock it, tap **Trust** and enter the passcode.
 2. `make ios` finds the connected iPhone (or iPad), builds for it, installs the app and
@@ -105,13 +142,13 @@ Finder).
 With the free Personal Team the app stops opening after 7 days; run `make ios` again
 with the phone connected. Her data is kept.
 
-### Once the paid account is approved: TestFlight (recommended)
+#### Once the paid account is approved: TestFlight (recommended)
 
 TestFlight lets her install and update the app herself, with no cable, and each build
 lasts 90 days. Steps will be added to this README when the paid team exists (SPEC.md,
 "Platform").
 
-## Before the first install for her
+### Before the first install for her
 
 - Settings tab: check the address, bill-to, and the routing and account numbers (copied
   from the template, with "Suit 100" corrected to "Suite 100").
@@ -120,7 +157,7 @@ lasts 90 days. Steps will be added to this README when the paid team exists (SPE
 - Data lives on the device and is included in its iCloud Backup. Deleting the app deletes
   the invoices and buttons.
 
-## How she uses it
+### How she uses it
 
 Three tabs at the bottom: **Invoices**, **Buttons**, **Settings**.
 
