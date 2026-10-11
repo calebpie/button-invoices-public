@@ -9,6 +9,8 @@
 | Bug bash | Pending: the nits in Docs/ui-nits.md (nits 11–35 from the Oct 9 UX review open), fixed together before the build goes to her iPhone; Docs/m3-test.md, Part 4 for Caleb |
 | M3 App on her iPhone | Started: Docs/m3-test.md, Part 1, all pass on Caleb's iPhone (Personal Team, `make ios`; step 7 after the shake-to-undo fix); Part 2 waits for the bug bash and the paid team |
 
+Current: `make test`, 38 tests in 10 suites passed (Oct 11, 2026); the 5 tests that need the private Examples/ folder skip in this public copy.
+
 ## Automated results (Claude, Oct 8, 2026, M4 Max, Xcode 27.0, iOS 27.0 Simulator)
 
 `make test`: 34 tests in 8 suites passed.
