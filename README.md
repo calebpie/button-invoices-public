@@ -21,9 +21,10 @@ like the Excel invoices. Design and decisions: [SPEC.md](SPEC.md). Status: [Docs
 ```bash
 make test
 ```
-Runs the InvoiceKit tests (34, about 10 s): name cleanup, SKUs against the template, her
+Runs the InvoiceKit tests (38, about 10 s): name cleanup, SKUs against the template, her
 17 message lines against the catalog, the nine example totals, PDF pagination, photo
-cutouts, and the photo duplicate check.
+cutouts, and the photo duplicate check. Without Examples/, the five that need her photos,
+receipt or sent invoices are skipped and say what they need.
 
 ```bash
 make sample-pdfs
@@ -59,7 +60,9 @@ workbooks in Examples/; the catalog comes from 0260903 (another workbook:
 `python3 Tools/seed/extract_seed.py --xlsx <file>`) and the edited PNGs in
 `Examples/Images/Edited`. Only affects a fresh install: the app loads the
 seed once, on first launch. business.json and invoices.json are gitignored (bank details,
-real sales), so a fresh clone needs Examples/ and `make seed` before building. To start the Simulator over with a fresh seed:
+real sales). Without Examples/, `make seed` keeps the committed catalog and photos and
+copies the stand-in details in `App/Resources/Seed/business.example.json` to business.json;
+there are no sent invoices. To start the Simulator over with a fresh seed:
 ```bash
 xcrun simctl uninstall booted com.calebpietrafesa.ButtonInvoices
 ```

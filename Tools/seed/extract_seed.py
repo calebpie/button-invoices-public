@@ -11,6 +11,10 @@ Writes, into --out (default App/Resources/Seed):
                  <number>.xlsx"), as sent: number, date, lines, shipping, printed total.
                  Loaded as paid invoices on first launch (gitignored: real sales)
 
+Without Examples/ (a clone of the public repository), the committed catalog.json and
+Photos stay as they are, business.json is copied from the stand-in business.example.json
+if it doesn't exist yet, and there are no sent invoices.
+
 Standard library only. Usage (from the repo root; `make seed` runs this):
   python3 Tools/seed/extract_seed.py [--xlsx <workbook>] [--photos <dir>] [--out <dir>]
 """
@@ -222,12 +226,28 @@ def extract_invoices(folder):
     return invoices
 
 
+def seed_without_examples(out):
+    """A clone without the gitignored Examples/: keeps the committed catalog and photos and
+    gives the app the stand-in seller and bank details."""
+    business = out / "business.json"
+    if business.exists():
+        print(f"{EXAMPLES}/ not found: kept the committed catalog.json and Photos, and the existing {business}")
+    else:
+        shutil.copyfile(out / "business.example.json", business)
+        print(f"{EXAMPLES}/ not found: kept the committed catalog.json and Photos; "
+              f"{business} has the stand-in details from business.example.json")
+    print("No sent invoices: invoices.json is made from the invoice workbooks in Examples/")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--xlsx", type=Path, default=DEFAULT_XLSX)
     ap.add_argument("--photos", type=Path, default=DEFAULT_PHOTOS)
     ap.add_argument("--out", type=Path, default=Path("App/Resources/Seed"))
     args = ap.parse_args()
+    if not args.xlsx.exists() and args.xlsx == DEFAULT_XLSX and not EXAMPLES.exists():
+        seed_without_examples(args.out)
+        return
     if not args.xlsx.exists():
         sys.exit(f"Workbook not found: {args.xlsx}")
 

@@ -117,7 +117,8 @@ import Testing
         #expect(scan.date == "8/31/2026")
     }
 
-    @Test(.enabled(if: FileManager.default.fileExists(atPath: Repo.examples.appendingPathComponent("Images/Shipping Receipts/IMG_9063.heic").path)))
+    @Test(.enabled(if: FileManager.default.fileExists(atPath: Repo.examples.appendingPathComponent("Images/Shipping Receipts/IMG_9063.heic").path),
+                   "needs Examples/Images/Shipping Receipts/IMG_9063.heic"))
     func readsAReceipt() async throws {
         let url = Repo.examples.appendingPathComponent("Images/Shipping Receipts/IMG_9063.heic")
         let image = try #require(ImageTools.uprightImage(from: Data(contentsOf: url), maxSide: 3000))

@@ -1,0 +1,16 @@
+{
+  "sellerName": "Daphné Verley Ceramics",
+  "sellerLines": [
+    "123 Example St, Suite 100",
+    "Warren, RI 02805",
+    "(401) 555-0100"
+  ],
+  "billToName": "Alix of Bohemia",
+  "billToLines": [
+    "61 Greenpoint Avenue",
+    "Brooklyn, NY",
+    "11222"
+  ],
+  "routing": "000000000",
+  "account": "000000000000"
+}

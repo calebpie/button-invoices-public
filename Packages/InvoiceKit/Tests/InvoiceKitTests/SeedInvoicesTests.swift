@@ -7,7 +7,8 @@ import Testing
 @Suite struct SeedInvoicesTests {
     static let url = Repo.seed.appendingPathComponent("invoices.json")
 
-    @Test(.enabled(if: FileManager.default.fileExists(atPath: url.path), "needs make seed"))
+    @Test(.enabled(if: FileManager.default.fileExists(atPath: url.path),
+                   "needs Seed/invoices.json, which make seed builds from the invoice workbooks in Examples/"))
     func matchTheSentInvoices() throws {
         let seed = try JSONDecoder().decode(SeedInvoices.self, from: Data(contentsOf: Self.url))
         #expect(seed.invoices.map(\.number) == ExampleInvoice.all.map(\.number))
