@@ -39,7 +39,7 @@ to try. App code isn't changed for a nit until the bug bash.
 | 30 | The line total, the number that matters, is in grey | Quantity screen | Fixed; Caleb to check |
 | 31 | Red, burgundy and brown dots vanish on picked (orange) color chips | New Button step 3, Change Button | Fixed; Caleb to check |
 | 32 | Two prominent confirm buttons on one sheet | Add to Invoice, Change Line, Change Button, Shipping, photo | Fixed (spec changed); Caleb to check |
-| 33 | The receipt viewer closes with ✓, though nothing is confirmed | Receipt viewer | Open (UX review; polish) |
+| 33 | The receipt viewer closes with ✓, though nothing is confirmed | Receipt viewer | Fixed; Caleb to check |
 | 34 | The PDF page is a picture with a tap, not a button: no press feedback | Review, finished invoice | Open (UX review; polish) |
 | 35 | Saved-color captions under the shape are cut off ("Burgundy,…") | New Button step 3, Change Button | Open (UX review; polish) |
 | 36 | Row separators start 64–84 points in from the card's left edge but end 20 from its right | Invoices list, Buttons tab | Fixed; Caleb to check |
@@ -1418,7 +1418,7 @@ Bank Details and the photo screen place it with `.topBarTrailing`, because the
 `.confirmationAction` placement tints it on iOS 26 even without the confirm role (tried
 first: still rust; `.buttonStyle(.glass)` drew a second capsule inside the bar's circle).
 Still prominent: the photo screen while touching up (no Use This Photo button then) and the
-receipt viewer (nit 33). SPEC.md, "Sheets": the big filled button at the bottom is the one
+receipt viewer (nit 33, since a ✕). SPEC.md, "Sheets": the big filled button at the bottom is the one
 prominent button where a sheet has one, and the ✓ is plain; otherwise the ✓ is.
 
 **Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light): Change Line: ✕ and ✓ the same
@@ -1439,6 +1439,18 @@ button is paired with a Cancel.
 **To try:** the ✕ (CancelButton, "Close") at the top left, as Quick Look's PDF viewer has.
 
 **Severity:** polish.
+
+**Fix** (Caleb approved): the ✓ "Done" is gone; the standard ✕ ("Close") is at the top left
+(ReceiptViewer.swift). Tapping an amount still picks it and closes the viewer.
+
+**Checked** (iOS 27.0 Simulator, iPhone 15 Pro Max, light; receipt IMG_9049.heic added to
+the Simulator's Photos): Shipping → Choose from Photos → the receipt: $36.48 read, amounts
+$36.48 / $19.58 / $16.90; tap the receipt: the viewer with ✕ at the top left and no ✓ (shot
+103-nit33-receipt-close-light, gitignored); ✕ closed it with $36.48 unchanged. The test
+charge was discarded.
+
+**Check** (Caleb, iPhone): Docs/m3-test.md, Part 1, step 8, then tap the receipt: close it
+with the ✕ at the top left.
 
 ## 34. The PDF page is a picture with a tap, not a button: no press feedback
 

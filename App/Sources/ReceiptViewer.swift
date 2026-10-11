@@ -45,8 +45,10 @@ struct ReceiptViewer: View {
                 .navigationTitle("Receipt")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                    ToolbarItem(placement: .confirmationAction) {
-                        ConfirmButton(title: "Done", prominent: true) { dismiss() }
+                    // Close, not ✓: looking confirms nothing; tapping an amount is the choice
+                    // (Toolbars, "the standard Close button"; nit 33).
+                    ToolbarItem(placement: .cancellationAction) {
+                        CancelButton(title: "Close") { dismiss() }
                     }
                 }
         }
