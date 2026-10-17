@@ -147,11 +147,57 @@ Finder).
 With the free Personal Team the app stops opening after 7 days; run `make ios` again
 with the phone connected. Her data is kept.
 
-#### Once the paid account is approved: TestFlight (recommended)
+#### TestFlight (paid team, recommended)
 
-TestFlight lets her install and update the app herself, with no cable, and each build
-lasts 90 days. Steps will be added to this README when the paid team exists (SPEC.md,
-"Platform").
+She installs the free TestFlight app once; after that she installs and updates
+**Invoices** herself, with no cable. Her data is kept from one build to the next. Each
+build stops opening 90 days after its upload, so upload a new one before then (the
+TestFlight app shows the days left).
+
+The upload includes everything in App/Resources/Seed, her bank details too: Apple
+receives it, and anyone invited as a tester can install it.
+
+**Once, in App Store Connect** (appstoreconnect.apple.com, your Apple ID):
+
+1. **Apps** → **+** (top left) → **New App**. Platforms: **iOS**. Name: any name not yet
+   on the App Store, such as "Button Invoices DV" (her Home Screen shows "Invoices"
+   whatever this says). Primary Language: **English (U.S.)**. Bundle ID:
+   **com.calebpietrafesa.ButtonInvoices**. SKU: `button-invoices`. User Access:
+   **Full Access**. **Create**.
+
+**Each build:**
+
+2. Commit, then:
+   ```bash
+   make testflight
+   ```
+   It builds the release version, gives it a new build number (the UTC date and time,
+   such as 20261017.1653), signs it with the paid team and uploads it. It stops if
+   anything is uncommitted, or if the seed is missing (`make seed`). Record the build
+   number and commit it prints in Docs/progress.md. `UPLOAD=0 make testflight` signs
+   the same package into build/testflight without uploading.
+3. App Store Connect → **Apps** → the app → **TestFlight**. The build shows as
+   processing, then is ready for testing, usually within 15 minutes. It asks no
+   encryption question (`ITSAppUsesNonExemptEncryption` is NO in project.yml).
+
+**Testers, internal (no review by Apple; builds reach testers as soon as they're
+processed):**
+
+4. **TestFlight** → **Internal Testing** → **+** → a group named **Family** → add yourself.
+   On your iPhone: App Store → **TestFlight** → Get, open it, then **Invoices** →
+   **Install**. It replaces the `make ios` copy and keeps its data.
+5. Her account, once: **Users and Access** → **+** → her name and her Apple ID's email,
+   role **Marketing** (little access), Apps: only this one → **Invite**. She opens the
+   email and accepts, signing in with her Apple ID. Then add her to the **Family** group.
+6. On her iPhone: App Store → **TestFlight** → Get. Open TestFlight's email on the iPhone
+   → **View in TestFlight** → **Accept** → **Install**. In TestFlight, on the Invoices
+   page, turn on **Automatic Updates**.
+
+**Or external (no App Store Connect account for her; the first build of each version
+waits for Apple's beta review, usually about a day):** TestFlight → **External
+Testing** → **+** → a group → add the build, fill in the test information Apple asks
+for, **Submit for Review**. Once approved, **Enable Public Link** and text her the link;
+she taps it on her iPhone, then **Accept** → **Install**.
 
 ### Before the first install for her
 

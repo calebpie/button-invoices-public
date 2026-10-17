@@ -7,7 +7,7 @@
 | M1 Core logic and PDF | Done: Caleb ran Docs/m2-test.md, Part 1, steps 1–5, all pass (Oct 8, 2026) |
 | M2 App in the Simulator | Done: Caleb ran Docs/m2-test.md, Parts 2–4, all pass (Oct 8, 2026; results below) |
 | Bug bash | Done: nits 1–36 in Docs/ui-nits.md fixed (Oct 8–11) and checked by Caleb on his iPhone (Oct 17); Docs/m3-test.md, Part 4 still for Caleb |
-| M3 App on her iPhone | Started: Docs/m3-test.md, Part 1, all pass on Caleb's iPhone (Personal Team, `make ios`; step 7 after the shake-to-undo fix); Part 2 (TestFlight to her iPhone) is next |
+| M3 App on her iPhone | Started: Docs/m3-test.md, Part 1, all pass on Caleb's iPhone (Personal Team, `make ios`; step 7 after the shake-to-undo fix). Paid team approved Oct 17; `make testflight` signs for the App Store (dry run). Part 2 (TestFlight, bug-bash recheck, her iPhone) is next |
 
 Current: `make test`, 38 tests in 10 suites passed (Oct 11, 2026); the 5 tests that need the private Examples/ folder skip in this public copy.
 
@@ -455,6 +455,30 @@ used by a test).
 - setup-signing.sh now says the record can be out of date, gives the `TEAM=` command,
   and fixes two stale references (README step numbers; CLAUDE.md has no Signing
   section). README, "First-time setup", step 4 says the same.
+
+## `make testflight` (Oct 17, 2026)
+
+- Tools/scripts/testflight.sh: archives the Release build with build number
+  `date -u +%Y%m%d.%H%M`, exports it for App Store Connect with automatic signing and
+  `-allowProvisioningUpdates`, and uploads it. Stops on uncommitted changes
+  (ALLOW_DIRTY=1 overrides) or a missing seed file. UPLOAD=0 exports without uploading.
+- project.yml: Info.plist's CFBundleVersion and CFBundleShortVersionString were the
+  literals "1" and "1.0" written by XcodeGen, so a build-number override had no effect.
+  They are now `$(CURRENT_PROJECT_VERSION)` and `$(MARKETING_VERSION)`.
+- Dry run, `UPLOAD=0 ALLOW_DIRTY=1 make testflight` (Claude, Xcode 27.0 27A266a), build
+  20261017.1653 from commit 705bc6f: ** EXPORT SUCCEEDED **. The .ipa, 21,519,581
+  bytes (app 21 MB):
+  - CFBundleVersion 20261017.1653, CFBundleShortVersionString 1.0, bundle ID
+    com.calebpietrafesa.ButtonInvoices
+  - Signed by "Apple Distribution: CALEB PIETRAFESA (A1B2C3D4E5)", made by Xcode
+    during the export: the team is the paid one, though Xcode's preferences still call
+    it the Personal Team (entry above)
+  - Profile "iOS Team Store Provisioning Profile: com.calebpietrafesa.ButtonInvoices", no
+    device list, expires 2027-10-17; entitlements beta-reports-active true,
+    get-task-allow false
+  - Seed in the app: Photos, business.json, catalog.json, invoices.json
+- Not yet run: the upload. It needs the app record in App Store Connect (README,
+  "TestFlight", step 1) and is Docs/m3-test.md, Part 2, step 2.
 
 ## M2 results (Caleb)
 

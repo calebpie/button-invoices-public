@@ -44,13 +44,28 @@ app is on your iPhone from `make ios`; with the free team it stops opening after
 10. Back on the Invoices tab, swipe the new invoice left → **Delete** → **Delete
     Invoice**.
 
-## Part 2: Her iPhone (once the paid team is approved)
+## Part 2: TestFlight, your iPhone then hers
 
-First, the bug bash: every open item in Docs/ui-nits.md fixed and rechecked.
+Steps 1–3 and 6–7 follow README, "TestFlight (paid team, recommended)". Step 5 is the
+bug-bash recheck: every open item in Docs/ui-nits.md checked before she gets the app.
 
-TestFlight steps will be added here and in the README when the paid team exists: upload a
-build, invite her, she installs TestFlight and the app, no cable. Expected: the app opens
-on her iPhone with her saved data seeded, as in Part 1, step 1.
+1. Create the app in App Store Connect (README step 1). Expected: the app is listed
+   under **Apps**, with bundle ID com.calebpietrafesa.ButtonInvoices.
+2. `make testflight` with everything committed. Expected: "Uploaded build …" with a
+   build number and commit. Record both under "M3 results".
+3. App Store Connect → the app → **TestFlight**. Expected: the build is ready for
+   testing within about 15 minutes, with no encryption question. Note how many minutes
+   it took.
+4. Add yourself as an internal tester and install from TestFlight on your iPhone (README
+   step 4). Expected: **Invoices** opens with the data you had from `make ios`.
+5. On that build: each nit marked "Caleb to check" in Docs/ui-nits.md, then Part 4 below.
+   Record each as Pass or what you saw.
+6. Invite her (README steps 5–6, or the external link). Expected: on her iPhone the app
+   opens with "Hello, Daphné." and the nine sent invoices under Paid, as in Part 1,
+   step 1. Then check the Settings tab with her (README, "Before the first install for
+   her").
+7. On her iPhone: Settings → her name → **iCloud** → **iCloud Backup** → on. Expected: on.
+   The backup is the only copy of her invoices off the phone.
 
 ## Part 3: Her next real invoice (SPEC.md, Milestones)
 

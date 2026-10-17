@@ -7,7 +7,7 @@ SIM_APP   := $(BUILD_DIR)/Build/Products/Debug-iphonesimulator/Button Invoices.a
 IOS_APP   := $(BUILD_DIR)/Build/Products/Debug-iphoneos/Button Invoices.app
 SIMULATOR ?= iPhone 15 Pro Max
 
-.PHONY: help setup generate open sim ios test sample-pdfs seed clean
+.PHONY: help setup generate open sim ios testflight test sample-pdfs seed clean
 
 help:
 	@echo "make setup        One time, after signing into Xcode: find your team ID, write Configs/Signing.xcconfig"
@@ -15,6 +15,7 @@ help:
 	@echo "make open         Regenerate, then open the project in Xcode"
 	@echo "make sim          Build and launch the app in the Simulator, on her iPhone 15 Pro Max (SIMULATOR=\"iPad Air 11-inch (M4)\" for another)"
 	@echo "make ios          Build, install and launch the app on the iPhone connected by cable"
+	@echo "make testflight   Build, sign and upload a new build for TestFlight (UPLOAD=0: sign only, in build/testflight)"
 	@echo "make test         Run the InvoiceKit tests (naming, SKUs, matching, totals, PDF, photo cutout)"
 	@echo "make sample-pdfs  Re-create the example invoices as PDFs in build/sample-pdfs, to compare with Examples/"
 	@echo "make seed         Rebuild the starting catalog in App/Resources/Seed from the newest invoice workbook"
@@ -39,6 +40,9 @@ sim: generate
 
 ios: generate
 	Tools/scripts/run-ios.sh "$(PROJECT)" "$(BUILD_DIR)" "$(IOS_APP)"
+
+testflight: generate
+	Tools/scripts/testflight.sh "$(PROJECT)" "$(BUILD_DIR)"
 
 test:
 	swift test --package-path Packages/InvoiceKit

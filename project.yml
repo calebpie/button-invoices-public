@@ -78,6 +78,10 @@ targets:
     info:
       path: App/Info.plist
       properties:
+        # From the build settings, so `make testflight` can give each upload a new build
+        # number (XcodeGen otherwise writes the literal values here).
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UIApplicationShortcutItems:
           - UIApplicationShortcutItemType: NewInvoice
             UIApplicationShortcutItemTitle: New Invoice
