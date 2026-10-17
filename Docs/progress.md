@@ -6,8 +6,8 @@
 |---|---|
 | M1 Core logic and PDF | Done: Caleb ran Docs/m2-test.md, Part 1, steps 1–5, all pass (Oct 8, 2026) |
 | M2 App in the Simulator | Done: Caleb ran Docs/m2-test.md, Parts 2–4, all pass (Oct 8, 2026; results below) |
-| Bug bash | Fixed in the Simulator (Oct 9–11): nits 11–36 in Docs/ui-nits.md, each with a check for Caleb on his iPhone; Docs/m3-test.md, Part 4 for Caleb |
-| M3 App on her iPhone | Started: Docs/m3-test.md, Part 1, all pass on Caleb's iPhone (Personal Team, `make ios`; step 7 after the shake-to-undo fix); Part 2 waits for the bug bash and the paid team |
+| Bug bash | Done: nits 1–36 in Docs/ui-nits.md fixed (Oct 8–11) and checked by Caleb on his iPhone (Oct 17); Docs/m3-test.md, Part 4 still for Caleb |
+| M3 App on her iPhone | Started: Docs/m3-test.md, Part 1, all pass on Caleb's iPhone (Personal Team, `make ios`; step 7 after the shake-to-undo fix); Part 2 (TestFlight to her iPhone) is next |
 
 Current: `make test`, 38 tests in 10 suites passed (Oct 11, 2026); the 5 tests that need the private Examples/ folder skip in this public copy.
 
@@ -493,3 +493,4 @@ Use the Part N, step M labels from Docs/m3-test.md. Part 1 is on Caleb's iPhone 
 | Part 1, step 9 | Pass.|
 | Part 1, step 10 | Pass.|
 | Part 2, bug bash, nit 5 | Pass. |
+| Part 2, step 5 | Nits: Pass. Every open nit in Docs/ui-nits.md (1–4, 6–36) checked on Caleb's iPhone, all good; closed (Oct 17, 2026). Part 4 not yet run. |

@@ -7,42 +7,42 @@ to try. App code isn't changed for a nit until the bug bash.
 
 | # | Nit | Where | Status |
 |---|---|---|---|
-| 1 | Grey strip under the tab bar as the keyboard goes away | Buttons, search | Fixed (the list); strip left as iOS's; Caleb to check |
-| 2 | "Hello, Daphné." fades in place instead of sliding with the page | Invoices, opening an invoice | Fixed; Caleb to check |
-| 3 | The receipt photo can't be opened full size to check the amount | Invoice step 2, Shipping | Fixed; Caleb to check |
-| 4 | Swipe-delete: the row vanishes before she confirms; after she confirms, it vanishes with no animation | Invoices list | Fixed; Caleb to check |
+| 1 | Grey strip under the tab bar as the keyboard goes away | Buttons, search | Fixed (the list); strip left as iOS's; closed, Caleb checked on his iPhone (Oct 17) |
+| 2 | "Hello, Daphné." fades in place instead of sliding with the page | Invoices, opening an invoice | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 3 | The receipt photo can't be opened full size to check the amount | Invoice step 2, Shipping | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 4 | Swipe-delete: the row vanishes before she confirms; after she confirms, it vanishes with no animation | Invoices list | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
 | 5 | One letter in search finds nothing and says "No Results" | Buttons search; Add a Button in an invoice | Fixed |
-| 6 | Closing search with text in it: the shape cards jump up, then back down | Add a Button in an invoice | Fixed; Caleb to check |
-| 7 | Search circle: opens slowly; on close it collapses mid-bar, then slides over | Buttons tab, search | Fixed; Caleb to check |
-| 8 | The PDF page's top corners are rounded off | Finished invoice, "The PDF" | Fixed; Caleb to check |
-| 9 | More space below New Invoice than above it | Invoices | Fixed; Caleb to check |
-| 10 | The Buttons title sits further left than the other tabs' titles | Buttons tab | Fixed; Caleb to check |
-| 11 | "Archived (1)" can't be opened, so archived buttons can't be seen or unarchived from the list | Buttons tab | Fixed; Caleb to check |
-| 12 | A discount bigger than the price shows a negative line total, and Add is greyed out with no reason | Quantity screen | Fixed; Caleb to check |
-| 13 | "Add a Button" means two different things | Invoice step 1; Home Screen, Siri, Buttons + | Fixed (spec changed); Caleb to check |
-| 14 | The missing-bank-details warning sends her to "Home → Business details", which doesn't exist | Invoice step 3, Review | Fixed; Caleb to check |
-| 15 | Two ‹ back buttons on a draft, each going somewhere different | Draft invoice | Fixed (spec changed); Caleb to check |
-| 16 | Questions show only the red button; "Keep Editing" and Cancel never appear | Discard and Delete questions | Fixed; Caleb to check |
-| 17 | The orange "why can't I go on" text is 2.1:1 in light mode | New Button step 3, Change Button | Fixed; Caleb to check |
-| 18 | The big camera picture on the photo step looks tappable but does nothing | New Button step 1 | Fixed; Caleb to check |
-| 19 | Step 3 picks the shape from a list of 20 names, no photos | New Button step 3, Change Button | Fixed; Caleb to check |
-| 20 | Picking a saved shape leaves size "One size" and price empty, so a near-duplicate is easy | New Button step 3 | Fixed; Caleb to check |
-| 21 | "Change" buttons are 24 points tall | Invoice step 3, Review | Fixed; Caleb to check |
-| 22 | "Already Saved" reads like a label, and the two card buttons differ in size | New Button step 2 | Fixed; Caleb to check |
-| 23 | Side margins are 16 points on some screens and 20 on others | Draft bars, Review, Add a Button, new-button steps, photo | Fixed; Caleb to check |
-| 24 | Remove Shipping hangs under the bare Save button, with square corners and no icon | Shipping sheet (changing a charge) | Fixed; Caleb to check |
-| 25 | Unreached steps in the step bar are 1.6:1, too faint to read | Draft step bar | Fixed; Caleb to check |
-| 26 | Invoice rows wrap "of buttons" onto a third line | Invoices list | Fixed; Caleb to check |
-| 27 | A 1-pixel seam crosses the Paid card | Invoices list | Fixed; Caleb to check |
-| 28 | The draft's ⋯ menu holds one item | Draft invoice | Fixed; Caleb to check |
-| 29 | Same thing, different words: Town / City, No price / No price yet / $0.00, alert capitals | Settings, Buttons, New Button | Fixed; Caleb to check |
-| 30 | The line total, the number that matters, is in grey | Quantity screen | Fixed; Caleb to check |
-| 31 | Red, burgundy and brown dots vanish on picked (orange) color chips | New Button step 3, Change Button | Fixed; Caleb to check |
-| 32 | Two prominent confirm buttons on one sheet | Add to Invoice, Change Line, Change Button, Shipping, photo | Fixed (spec changed); Caleb to check |
-| 33 | The receipt viewer closes with ✓, though nothing is confirmed | Receipt viewer | Fixed; Caleb to check |
-| 34 | The PDF page is a picture with a tap, not a button: no press feedback | Review, finished invoice | Fixed; Caleb to check |
-| 35 | Saved-color captions under the shape are cut off ("Burgundy,…") | New Button step 3, Change Button | Fixed; Caleb to check |
-| 36 | Row separators start 64–84 points in from the card's left edge but end 20 from its right | Invoices list, Buttons tab | Fixed; Caleb to check |
+| 6 | Closing search with text in it: the shape cards jump up, then back down | Add a Button in an invoice | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 7 | Search circle: opens slowly; on close it collapses mid-bar, then slides over | Buttons tab, search | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 8 | The PDF page's top corners are rounded off | Finished invoice, "The PDF" | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 9 | More space below New Invoice than above it | Invoices | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 10 | The Buttons title sits further left than the other tabs' titles | Buttons tab | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 11 | "Archived (1)" can't be opened, so archived buttons can't be seen or unarchived from the list | Buttons tab | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 12 | A discount bigger than the price shows a negative line total, and Add is greyed out with no reason | Quantity screen | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 13 | "Add a Button" means two different things | Invoice step 1; Home Screen, Siri, Buttons + | Fixed (spec changed); closed, Caleb checked on his iPhone (Oct 17) |
+| 14 | The missing-bank-details warning sends her to "Home → Business details", which doesn't exist | Invoice step 3, Review | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 15 | Two ‹ back buttons on a draft, each going somewhere different | Draft invoice | Fixed (spec changed); closed, Caleb checked on his iPhone (Oct 17) |
+| 16 | Questions show only the red button; "Keep Editing" and Cancel never appear | Discard and Delete questions | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 17 | The orange "why can't I go on" text is 2.1:1 in light mode | New Button step 3, Change Button | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 18 | The big camera picture on the photo step looks tappable but does nothing | New Button step 1 | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 19 | Step 3 picks the shape from a list of 20 names, no photos | New Button step 3, Change Button | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 20 | Picking a saved shape leaves size "One size" and price empty, so a near-duplicate is easy | New Button step 3 | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 21 | "Change" buttons are 24 points tall | Invoice step 3, Review | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 22 | "Already Saved" reads like a label, and the two card buttons differ in size | New Button step 2 | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 23 | Side margins are 16 points on some screens and 20 on others | Draft bars, Review, Add a Button, new-button steps, photo | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 24 | Remove Shipping hangs under the bare Save button, with square corners and no icon | Shipping sheet (changing a charge) | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 25 | Unreached steps in the step bar are 1.6:1, too faint to read | Draft step bar | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 26 | Invoice rows wrap "of buttons" onto a third line | Invoices list | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 27 | A 1-pixel seam crosses the Paid card | Invoices list | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 28 | The draft's ⋯ menu holds one item | Draft invoice | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 29 | Same thing, different words: Town / City, No price / No price yet / $0.00, alert capitals | Settings, Buttons, New Button | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 30 | The line total, the number that matters, is in grey | Quantity screen | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 31 | Red, burgundy and brown dots vanish on picked (orange) color chips | New Button step 3, Change Button | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 32 | Two prominent confirm buttons on one sheet | Add to Invoice, Change Line, Change Button, Shipping, photo | Fixed (spec changed); closed, Caleb checked on his iPhone (Oct 17) |
+| 33 | The receipt viewer closes with ✓, though nothing is confirmed | Receipt viewer | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 34 | The PDF page is a picture with a tap, not a button: no press feedback | Review, finished invoice | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 35 | Saved-color captions under the shape are cut off ("Burgundy,…") | New Button step 3, Change Button | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
+| 36 | Row separators start 64–84 points in from the card's left edge but end 20 from its right | Invoices list, Buttons tab | Fixed; closed, Caleb checked on his iPhone (Oct 17) |
 
 ## 1. Grey strip under the tab bar as the keyboard goes away
 
