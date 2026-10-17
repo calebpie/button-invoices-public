@@ -492,10 +492,6 @@ Use the Part N, step M labels from Docs/m2-test.md.
 | Part 1, step 5 | Pass: 8 buttons with transparent backgrounds, comparable to Examples/Images/Edited |
 | Part 2, step 1 | Fail (Oct 8): `make sim` built the app, then stopped with "Unable to find application named 'Simulator'" and "make: *** [sim] Error 1". Fixed (above); rerun. Pass (Oct 8). |
 | Part 2, step 2 | Pass. |
-| Part 2, step 3 | Pass: the build reached TestFlight (processing time not noted). |
-| Part 2, step 4 | Pass: installed from TestFlight on Caleb's iPhone; it kept the data from the `make ios` copy (a test button he had made showed in Buttons). The uploaded seed has no test button (catalog.json identical to the repo's). |
-| Part 2, step 5 | Pass. Every open nit in Docs/ui-nits.md (1–4, 6–36) checked on Caleb's iPhone, all good; closed (Oct 17, 2026). Part 4: Pass. |
-| Part 4, steps 1–5 | Pass (Oct 17, 2026, Caleb's iPhone). |
 | Part 2, step 3 | Pass. |
 | Part 2, step 4 | Pass. |
 | Part 2, step 5 | Pass. |
@@ -537,3 +533,7 @@ Use the Part N, step M labels from Docs/m3-test.md. Part 1 is on Caleb's iPhone 
 | Part 2, bug bash, nit 5 | Pass. |
 | Part 2, step 1 | Pass (Oct 17, 2026). A first `make testflight` before it stopped with "App record with bundle identifier \"com.calebpietrafesa.ButtonInvoices\" not found on App Store Connect"; the build and signing had worked. |
 | Part 2, step 2 | Pass: "Upload succeeded", build 20261017.1700 from commit 4d3b072, uploaded 12:01 CDT Oct 17, 2026, about one minute from start to "Uploaded package is processing". Expires 90 days after upload, about Jan 15, 2027 (TestFlight shows the exact date). |
+| Part 2, step 3 | Pass: the build reached TestFlight (processing time not noted). |
+| Part 2, step 4 | Pass: installed from TestFlight on Caleb's iPhone; it kept the data from the `make ios` copy (a test button he had made showed in Buttons). The uploaded seed has no test button (catalog.json identical to the repo's). |
+| Part 2, step 5 | Pass. Every open nit in Docs/ui-nits.md (1–4, 6–36) checked on Caleb's iPhone, all good; closed (Oct 17, 2026). Part 4: Pass. |
+| Part 4, steps 1–5 | Pass (Oct 17, 2026, Caleb's iPhone). |
