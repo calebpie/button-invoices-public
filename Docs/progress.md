@@ -466,7 +466,7 @@ used by a test).
   literals "1" and "1.0" written by XcodeGen, so a build-number override had no effect.
   They are now `$(CURRENT_PROJECT_VERSION)` and `$(MARKETING_VERSION)`.
 - Dry run, `UPLOAD=0 ALLOW_DIRTY=1 make testflight` (Claude, Xcode 27.0 27A266a), build
-  20261017.1653 from commit 705bc6f: ** EXPORT SUCCEEDED **. The .ipa, 21,519,581
+  20261017.1653 from commit aceb4d3: ** EXPORT SUCCEEDED **. The .ipa, 21,519,581
   bytes (app 21 MB):
   - CFBundleVersion 20261017.1653, CFBundleShortVersionString 1.0, bundle ID
     com.calebpietrafesa.ButtonInvoices
@@ -477,8 +477,7 @@ used by a test).
     device list, expires 2027-10-17; entitlements beta-reports-active true,
     get-task-allow false
   - Seed in the app: Photos, business.json, catalog.json, invoices.json
-- Not yet run: the upload. It needs the app record in App Store Connect (README,
-  "TestFlight", step 1) and is Docs/m3-test.md, Part 2, step 2.
+- The upload ran later that day: build 20261017.1700 (M3 results, Part 2, step 2).
 
 ## M2 results (Caleb)
 
@@ -532,4 +531,6 @@ Use the Part N, step M labels from Docs/m3-test.md. Part 1 is on Caleb's iPhone 
 | Part 1, step 9 | Pass.|
 | Part 1, step 10 | Pass.|
 | Part 2, bug bash, nit 5 | Pass. |
+| Part 2, step 1 | Pass (Oct 17, 2026). A first `make testflight` before it stopped with "App record with bundle identifier \"com.calebpietrafesa.ButtonInvoices\" not found on App Store Connect"; the build and signing had worked. |
+| Part 2, step 2 | Pass: "Upload succeeded", build 20261017.1700 from commit 4d3b072, uploaded 12:01 CDT Oct 17, 2026, about one minute from start to "Uploaded package is processing". Expires 90 days after upload, about Jan 15, 2027 (TestFlight shows the exact date). |
 | Part 2, step 5 | Nits: Pass. Every open nit in Docs/ui-nits.md (1–4, 6–36) checked on Caleb's iPhone, all good; closed (Oct 17, 2026). Part 4 not yet run. |
