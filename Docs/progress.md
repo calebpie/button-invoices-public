@@ -441,6 +441,21 @@ used by a test).
   and Red 26CR $12.00, with its photo. The catalog loads once, on first launch, so phones
   and simulators that already have the app don't get the crab; her iPhone will.
 
+## Paid team approved; `make setup` still saw a Personal Team (Oct 17, 2026)
+
+- Xcode → Settings → Apple Accounts: one team, "CALEB PIETRAFESA", role Admin, no
+  "(Personal Team)". developer.apple.com/account → Membership details: Team ID
+  A1B2C3D4E5, the same ID as the free team (Caleb).
+- Xcode's preferences, rewritten 11:47 that day, still held under
+  IDEProvisioningTeamByIdentifier: teamID A1B2C3D4E5, teamName "CALEB PIETRAFESA
+  (Personal Team)", isFreeProvisioningTeam true, teamType "Personal Team". So
+  `make setup` said "Only the free Personal Team is available" and stopped.
+- Configs/Signing.xcconfig already had DEVELOPMENT_TEAM = A1B2C3D4E5, which is right for
+  the paid team. `TEAM=A1B2C3D4E5 make setup` rewrote it unchanged.
+- setup-signing.sh now says the record can be out of date, gives the `TEAM=` command,
+  and fixes two stale references (README step numbers; CLAUDE.md has no Signing
+  section). README, "First-time setup", step 4 says the same.
+
 ## M2 results (Caleb)
 
 Use the Part N, step M labels from Docs/m2-test.md.

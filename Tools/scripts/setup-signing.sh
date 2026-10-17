@@ -1,7 +1,7 @@
 #!/bin/bash
 # Finds the Apple development team(s) this Mac can sign with and writes the team ID into
 # Configs/Signing.xcconfig. Run after signing into Xcode and creating a development
-# certificate (README, "First-time setup", step 6).
+# certificate (README, "First-time setup", step 3).
 # To pick a specific team: TEAM=XXXXXXXXXX make setup
 set -euo pipefail
 cd "$(dirname "$0")/../.."
@@ -38,7 +38,7 @@ if [ -z "$TEAM" ]; then
         echo "Xcode's settings list no team yet, and this Mac has no Apple Development certificate"
         echo "(which also names the team). In Xcode: Settings… (⌘,) → Accounts → select your"
         echo "Apple ID → select the team → Manage Certificates… → + → Apple Development → Done."
-        echo "Then run this again. Details: README.md, \"First-time setup\", step 6."
+        echo "Then run this again. Details: README.md, \"First-time setup\", step 3."
         exit 1
     elif [ "$COUNT" -gt 1 ]; then
         echo "This Mac can sign with several teams:"
@@ -50,14 +50,19 @@ if [ -z "$TEAM" ]; then
     KIND=$(printf "%s" "$TEAMS" | cut -f2)
     if [ "$KIND" != paid ] && [ -z "${ALLOW_PERSONAL_TEAM:-}" ]; then
         if [ "$KIND" = personal ]; then
-            echo "Only the free Personal Team is available, so nothing was changed."
+            echo "Only the free Personal Team is available, so nothing was changed:"
+            printf "%s\n" "$TEAMS" | describe
+            echo "Xcode's record of that can be out of date: when an account becomes paid, the"
+            echo "team keeps its ID and the record isn't updated (Oct 2026). If"
+            echo "developer.apple.com/account → Membership details shows this Team ID, it's the paid"
+            echo "team: TEAM=$(printf "%s" "$TEAMS" | cut -f1) make setup"
         else
             echo "Found one team, but its certificate doesn't say whether it's the free Personal Team"
             echo "or the paid team, so nothing was changed:"
             printf "%s\n" "$TEAMS" | describe
         fi
         echo "To use the Personal Team until the paid team is approved: ALLOW_PERSONAL_TEAM=1 make setup"
-        echo "(then check that the team name it prints is yours). See CLAUDE.md, Signing."
+        echo "(then check that the team name it prints is yours). See README.md, \"First-time setup\", step 4."
         exit 1
     fi
     TEAM=$(printf "%s" "$TEAMS" | cut -f1)
@@ -69,6 +74,9 @@ FOUND=$(printf "%s\n" "$TEAMS" | awk -F'\t' -v id="$TEAM" '$1 == id')
 if [ -n "$FOUND" ]; then
     echo "Team:"
     printf "%s\n" "$FOUND" | describe
+    if [ "$(printf "%s" "$FOUND" | cut -f2)" = personal ] && [ -z "${ALLOW_PERSONAL_TEAM:-}" ]; then
+        echo "(Xcode's record still says Personal Team; it isn't updated when the account becomes paid.)"
+    fi
     echo "Check that the name is yours before the first signed build."
 else
     echo "This Mac has no certificate or Xcode record for that team, so its name can't be shown."

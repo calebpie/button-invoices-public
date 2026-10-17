@@ -117,6 +117,10 @@ Steps 1–5 are done on Caleb's M4 Max as of October 8, 2026 (Xcode 27.0 install
    Manage Certificates… → + → Apple Development → Done.
 4. Run `make setup` (paid team) or `ALLOW_PERSONAL_TEAM=1 make setup` (free Personal Team),
    and check that the team name it prints is yours. It writes `Configs/Signing.xcconfig`.
+   If it says only the Personal Team is available after the paid membership was approved,
+   compare the Team ID under developer.apple.com/account → Membership details: an upgraded
+   account keeps its team ID, and Xcode's record of the team stays marked free. Then
+   `TEAM=<that ID> make setup`.
 5. If Xcode says the bundle ID is taken, change `BUNDLE_ID_PREFIX` in
    `Configs/Signing.xcconfig` and run `make ios` again.
 

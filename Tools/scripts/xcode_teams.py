@@ -8,11 +8,14 @@ Two sources, merged:
    different keys across versions, so this searches the whole plist for dictionaries
    with a teamID. Xcode 27.0 writes them late: on the M4 Max (Oct 2026), right after
    sign-in the preferences held only the Apple ID, and IDEProvisioningTeamByIdentifier
-   appeared once an Apple Development certificate had been created.
+   appeared once an Apple Development certificate had been created. The flag goes stale:
+   on Oct 17, 2026, after Caleb's paid membership was approved, Xcode's Accounts screen
+   showed the team without "(Personal Team)", but the preferences still flagged
+   A1B2C3D4E5 as free. The team ID didn't change.
 2. Apple Development signing certificates in the keychain. Each names its team ID
    (subject OU) and team name (subject O) but not whether the team is free, so these
    teams are reported as unknown. Xcode creates one in Settings → Accounts → Manage
-   Certificates (README, "First-time setup", step 6)."""
+   Certificates (README, "First-time setup", step 3)."""
 
 import plistlib
 import re
