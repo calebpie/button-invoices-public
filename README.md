@@ -33,7 +33,7 @@ The bank details, street address and phone number in this public copy are stand-
 
 ## Status
 
-Running on my iPhone. It goes to hers through TestFlight once the bug bash is done and Apple approves my developer account, and her first real invoice is the final acceptance test.
+Running on my iPhone, installed from TestFlight, after a bug bash of 36 small UI fixes, each checked on the phone. It goes to hers next, through TestFlight, and her first real invoice is the final acceptance test.
 
 ## How it was built
 
